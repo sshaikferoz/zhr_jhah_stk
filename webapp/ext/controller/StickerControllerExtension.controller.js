@@ -4,6 +4,26 @@ sap.ui.define([
 ], function (ControllerExtension, JSONModel) {
     "use strict";
 
+    // "HH:MM:SS" (Edm.TimeOfDay) -> "H:MM AM/PM" for slot dropdown labels only.
+    // The raw value is kept for saving.
+    function formatTime12h(sTime) {
+        if (!sTime) {
+            return "";
+        }
+        var aParts = String(sTime).split(":");
+        var iHour = parseInt(aParts[0], 10);
+        var sMin = aParts[1] || "00";
+        if (isNaN(iHour)) {
+            return String(sTime);
+        }
+        var sMeridiem = iHour >= 12 ? "PM" : "AM";
+        var iHour12 = iHour % 12;
+        if (iHour12 === 0) {
+            iHour12 = 12;
+        }
+        return iHour12 + ":" + sMin + " " + sMeridiem;
+    }
+
     return ControllerExtension.extend("com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension", {
 
         override: {
@@ -112,7 +132,7 @@ sap.ui.define([
                         SlotId: oSlot.SlotId,
                         FromTime: oSlot.FromTime,
                         ToTime: oSlot.ToTime,
-                        label: String(oSlot.FromTime || "").substring(0, 5) + " - " + String(oSlot.ToTime || "").substring(0, 5)
+                        label: formatTime12h(oSlot.FromTime) + " - " + formatTime12h(oSlot.ToTime)
                     });
                 });
                 aDates.sort();

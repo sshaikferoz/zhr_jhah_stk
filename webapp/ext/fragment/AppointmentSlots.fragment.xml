@@ -2,20 +2,23 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:form="sap.ui.layout.form"
+    xmlns:macros="sap.fe.macros"
     core:require="{ handler: 'com/jhah/zhrjhahsecstk/ext/controller/AppointmentSlots' }">
 
     <!--
-        Custom "Appointment Slot" section.
-        - Appointment Date: a DatePicker restricted to the dates that exist in the
-          AppointmentSlot list (minDate/maxDate from the slot data, plus validation).
-        - Time Slot: a dropdown of every slot (From - To) for the chosen date.
-        Both write back to the Sticker Master entity (AppointmentDate,
-        AppointmentFromTime, AppointmentToTime, SlotId). The slot data lives in the
-        "apptslots" JSON model, populated by StickerControllerExtension.
+        Unified "Appointment Information" section. The appointment date + time-slot
+        picker sit together with the resulting times, location and request date.
+        - Appointment Date: DatePicker restricted to the dates in AppointmentSlot.
+        - Time Slot: dropdown of every slot (12h AM/PM labels) for the chosen date.
+        Picking writes back AppointmentDate, AppointmentFromTime, AppointmentToTime,
+        SlotId (raw HH:MM:SS values); changing the date clears the slot.
+        Location and Request Date use FE building blocks so the value help/formatting
+        stay intact. Slot data comes from the "apptslots" JSON model.
     -->
     <form:SimpleForm
         layout="ResponsiveGridLayout"
         editable="true"
+        title="Appointment Information"
         labelSpanXL="4"
         labelSpanL="4"
         labelSpanM="4"
@@ -45,6 +48,18 @@
                 selectionChange="handler.onAppointmentSlotChange">
                 <core:Item key="{apptslots>SlotId}" text="{apptslots>label}" />
             </ComboBox>
+
+            <Label text="Appointment From Time" />
+            <Text text="{FromTime}" visible="{= !${HideApp} }" />
+
+            <Label text="Appointment To Time" />
+            <Text text="{ToTime}" visible="{= !${HideApp} }" />
+
+            <Label text="Appointment Location" />
+            <macros:Field metaPath="AppointmentLocation" />
+
+            <Label text="Request Date" />
+            <macros:Field metaPath="RequestDate" />
         </form:content>
     </form:SimpleForm>
 

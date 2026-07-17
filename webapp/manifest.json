@@ -170,10 +170,10 @@
                   "sections": {
                     "appointmentSlotSection": {
                       "template": "com.jhah.zhrjhahsecstk.ext.fragment.AppointmentSlots",
-                      "title": "Appointment Slot",
+                      "title": "Appointment Details",
                       "position": {
-                        "placement": "Before",
-                        "anchor": "AppointDetails"
+                        "placement": "After",
+                        "anchor": "VehicleDetails"
                       }
                     }
                   }

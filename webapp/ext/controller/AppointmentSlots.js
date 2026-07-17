@@ -12,6 +12,23 @@ sap.ui.define([], function () {
      *     currentSlots: [ ... ]                         // slots for the selected date
      *   }
      */
+    // Locate the time-slot ComboBox that sits next to the given DatePicker so we
+    // can hard-reset its selection when the date changes.
+    function findSlotComboBox(oControl) {
+        var oNode = oControl;
+        while (oNode && !(oNode.isA && oNode.isA("sap.ui.core.mvc.View"))) {
+            oNode = oNode.getParent();
+        }
+        if (!oNode) {
+            return null;
+        }
+        var aFound = oNode.findAggregatedObjects(true, function (o) {
+            return o.isA && o.isA("sap.m.ComboBox") &&
+                o.getId().indexOf("appointmentSlotSelect") !== -1;
+        });
+        return aFound && aFound[0];
+    }
+
     return {
 
         /**
@@ -39,6 +56,14 @@ sap.ui.define([], function () {
             oContext.setProperty("SlotId", "");
             oContext.setProperty("AppointmentFromTime", null);
             oContext.setProperty("AppointmentToTime", null);
+
+            // Hard-reset the dropdown control so no stale slot text lingers.
+            var oCombo = findSlotComboBox(oDatePicker);
+            if (oCombo) {
+                oCombo.setSelectedKey("");
+                oCombo.setSelectedItem(null);
+                oCombo.setValue("");
+            }
 
             if (!bValid || (sDate && aSlots.length === 0)) {
                 oDatePicker.setValueState("Error");

@@ -14,52 +14,44 @@
     <edmx:DataServices>
         <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="local">
             <!--
-                Override of the AppointSpec field group: the editable "Appointment
-                Date" value-help field is removed here because date + time-slot
-                selection is handled by the custom "Appointment Slot" section
-                (AppointmentSlots.fragment.xml). All other appointment fields are
-                reproduced verbatim from the backend so the standard "Appointment
-                Details" section still shows the resulting From/To times, location
-                and request date.
+                Facets override: drop the standard "Appointment Details" collection
+                facet (AppointDetails -> AppointSpec field group) because the whole
+                appointment area is now rendered by the custom "Appointment Details"
+                section (AppointmentSlots.fragment.xml), which combines the date +
+                time-slot picker with the times, location and request date.
+                An override REPLACES the whole UI.Facets collection, so the other two
+                facets (GeneralInfo, VehicleDetails) are reproduced verbatim.
             -->
             <Annotations Target="SAP__self.StickerMasterType">
-                <Annotation Term="UI.FieldGroup" Qualifier="AppointSpec">
-                    <Record>
-                        <PropertyValue Property="Data">
-                            <Collection>
-                                <Record Type="UI.DataField">
-                                    <PropertyValue Property="Label" String="Appointment From Time"/>
-                                    <PropertyValue Property="Value" Path="FromTime"/>
-                                    <Annotation Term="UI.Hidden" Path="HideApp"/>
-                                </Record>
-                                <Record Type="UI.DataField">
-                                    <PropertyValue Property="Label" String="Appointment From Time"/>
-                                    <PropertyValue Property="Value" Path="AppointmentFromTime"/>
-                                </Record>
-                                <Record Type="UI.DataField">
-                                    <PropertyValue Property="Label" String="Appointment To Time"/>
-                                    <PropertyValue Property="Value" Path="ToTime"/>
-                                    <Annotation Term="UI.Hidden" Path="HideApp"/>
-                                </Record>
-                                <Record Type="UI.DataField">
-                                    <PropertyValue Property="Label" String="Appointment To Time"/>
-                                    <PropertyValue Property="Value" Path="AppointmentToTime"/>
-                                </Record>
-                                <Record Type="UI.DataField">
-                                    <PropertyValue Property="Label" String="Appointment Location"/>
-                                    <PropertyValue Property="Value" Path="AppointmentLocation"/>
-                                </Record>
-                                <Record Type="UI.DataField">
-                                    <PropertyValue Property="Label" String="Request Date"/>
-                                    <PropertyValue Property="Value" Path="RequestDate"/>
-                                </Record>
-                                <Record Type="UI.DataField">
-                                    <PropertyValue Property="Label" String="Slot ID"/>
-                                    <PropertyValue Property="Value" Path="SlotId"/>
-                                </Record>
-                            </Collection>
-                        </PropertyValue>
-                    </Record>
+                <Annotation Term="UI.Facets">
+                    <Collection>
+                        <Record Type="UI.CollectionFacet">
+                            <PropertyValue Property="Label" String="Sticker Requestor Information"/>
+                            <PropertyValue Property="ID" String="GeneralInfo"/>
+                            <PropertyValue Property="Facets">
+                                <Collection>
+                                    <Record Type="UI.ReferenceFacet">
+                                        <PropertyValue Property="Label" String="Request Details"/>
+                                        <PropertyValue Property="ID" String="RequestGrpFacet"/>
+                                        <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#RequestGrp"/>
+                                    </Record>
+                                </Collection>
+                            </PropertyValue>
+                        </Record>
+                        <Record Type="UI.CollectionFacet">
+                            <PropertyValue Property="Label" String="Vehicle Information"/>
+                            <PropertyValue Property="ID" String="VehicleDetails"/>
+                            <PropertyValue Property="Facets">
+                                <Collection>
+                                    <Record Type="UI.ReferenceFacet">
+                                        <PropertyValue Property="Label" String="Vehicle Request Details"/>
+                                        <PropertyValue Property="ID" String="VehicleSpecFacet"/>
+                                        <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#VehicleSpec"/>
+                                    </Record>
+                                </Collection>
+                            </PropertyValue>
+                        </Record>
+                    </Collection>
                 </Annotation>
             </Annotations>
         </Schema>
