@@ -165,6 +165,18 @@
                       "name": "com.jhah.zhrjhahsecstk.ext.fragment.ViolatorStrip"
                     }
                   }
+                },
+                "body": {
+                  "sections": {
+                    "appointmentSlotSection": {
+                      "template": "com.jhah.zhrjhahsecstk.ext.fragment.AppointmentSlots",
+                      "title": "Appointment Slot",
+                      "position": {
+                        "placement": "Before",
+                        "anchor": "AppointDetails"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -176,10 +188,10 @@
       "extensions": {
         "sap.ui.controllerExtensions": {
           "sap.fe.templates.ListReport.ListReportController#com.jhah.zhrjhahsecstk::StickerMasterList": {
-            "controllerName": "com.jhah.zhrjhahsecstk.ext.controller.ViolatorControllerExtension"
+            "controllerName": "com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension"
           },
           "sap.fe.templates.ObjectPage.ObjectPageController#com.jhah.zhrjhahsecstk::StickerMasterObjectPage": {
-            "controllerName": "com.jhah.zhrjhahsecstk.ext.controller.ViolatorControllerExtension"
+            "controllerName": "com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension"
           }
         }
       }

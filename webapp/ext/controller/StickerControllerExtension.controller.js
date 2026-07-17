@@ -4,7 +4,7 @@ sap.ui.define([
 ], function (ControllerExtension, JSONModel) {
     "use strict";
 
-    return ControllerExtension.extend("com.jhah.zhrjhahsecstk.ext.controller.ViolatorControllerExtension", {
+    return ControllerExtension.extend("com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension", {
 
         override: {
             onInit: function () {
@@ -23,7 +23,7 @@ sap.ui.define([
                     // only for Sticker admins once the auth check confirms it.
                     this._applyCopyRequestVisibility();
                 } catch (err) {
-                    console.error("Error in ViolatorControllerExtension onInit:", err);
+                    console.error("Error in StickerControllerExtension onInit:", err);
                 }
             },
 
@@ -42,6 +42,10 @@ sap.ui.define([
 
                     // Only act on the Sticker Master object page context
                     if (oBindingContext && oBindingContext.getPath().indexOf("/StickerMaster") !== -1) {
+
+                        // Build the appointment-slot picker data.
+                        this._loadAppointmentSlots(oView, oAppModel, oBindingContext);
+
                         oBindingContext.requestProperty("JhahId").then(function (sJhahId) {
 
                             if (sJhahId && sJhahId.trim() !== "") {
@@ -69,6 +73,60 @@ sap.ui.define([
                     }
                 }
             }
+        },
+
+        /**
+         * Fetch every appointment slot and expose it through the "apptslots" JSON
+         * model used by the custom Appointment Slot section. Groups slots by date,
+         * derives the DatePicker min/max range, and seeds the time dropdown with the
+         * slots for the currently selected date.
+         */
+        _loadAppointmentSlots: function (oView, oAppModel, oBindingContext) {
+            var oSlotModel = oView.getModel("apptslots");
+            if (!oSlotModel) {
+                oSlotModel = new JSONModel({
+                    dates: [], slotsByDate: {}, minDate: null, maxDate: null, currentSlots: []
+                });
+                oView.setModel(oSlotModel, "apptslots");
+            }
+
+            var oSlotBinding = oAppModel.bindList("/AppointmentSlot", null, null, null, { $$groupId: "$direct" });
+            Promise.all([
+                oSlotBinding.requestContexts(0, 1000),
+                oBindingContext.requestProperty("AppointmentDate")
+            ]).then(function (aResult) {
+                var aContexts = aResult[0] || [];
+                var sCurrentDate = aResult[1];
+
+                var mByDate = {};
+                var aDates = [];
+                aContexts.forEach(function (oCtx) {
+                    var oSlot = oCtx.getObject();
+                    var sDate = oSlot.AppointmentDate;
+                    if (!sDate) { return; }
+                    if (!mByDate[sDate]) {
+                        mByDate[sDate] = [];
+                        aDates.push(sDate);
+                    }
+                    mByDate[sDate].push({
+                        SlotId: oSlot.SlotId,
+                        FromTime: oSlot.FromTime,
+                        ToTime: oSlot.ToTime,
+                        label: String(oSlot.FromTime || "").substring(0, 5) + " - " + String(oSlot.ToTime || "").substring(0, 5)
+                    });
+                });
+                aDates.sort();
+
+                oSlotModel.setData({
+                    dates: aDates,
+                    slotsByDate: mByDate,
+                    minDate: aDates.length ? new Date(aDates[0] + "T00:00:00") : null,
+                    maxDate: aDates.length ? new Date(aDates[aDates.length - 1] + "T00:00:00") : null,
+                    currentSlots: (sCurrentDate && mByDate[sCurrentDate]) || []
+                });
+            }).catch(function (err) {
+                console.error("Failed to load appointment slots:", err);
+            });
         },
 
         /**

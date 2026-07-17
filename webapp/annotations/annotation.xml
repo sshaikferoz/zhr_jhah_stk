@@ -13,6 +13,55 @@
     </edmx:Reference>
     <edmx:DataServices>
         <Schema xmlns="http://docs.oasis-open.org/odata/ns/edm" Namespace="local">
+            <!--
+                Override of the AppointSpec field group: the editable "Appointment
+                Date" value-help field is removed here because date + time-slot
+                selection is handled by the custom "Appointment Slot" section
+                (AppointmentSlots.fragment.xml). All other appointment fields are
+                reproduced verbatim from the backend so the standard "Appointment
+                Details" section still shows the resulting From/To times, location
+                and request date.
+            -->
+            <Annotations Target="SAP__self.StickerMasterType">
+                <Annotation Term="UI.FieldGroup" Qualifier="AppointSpec">
+                    <Record>
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Appointment From Time"/>
+                                    <PropertyValue Property="Value" Path="FromTime"/>
+                                    <Annotation Term="UI.Hidden" Path="HideApp"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Appointment From Time"/>
+                                    <PropertyValue Property="Value" Path="AppointmentFromTime"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Appointment To Time"/>
+                                    <PropertyValue Property="Value" Path="ToTime"/>
+                                    <Annotation Term="UI.Hidden" Path="HideApp"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Appointment To Time"/>
+                                    <PropertyValue Property="Value" Path="AppointmentToTime"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Appointment Location"/>
+                                    <PropertyValue Property="Value" Path="AppointmentLocation"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Request Date"/>
+                                    <PropertyValue Property="Value" Path="RequestDate"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Slot ID"/>
+                                    <PropertyValue Property="Value" Path="SlotId"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
         </Schema>
     </edmx:DataServices>
 </edmx:Edmx>
