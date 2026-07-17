@@ -33,6 +33,13 @@
           "localUri": "localService/mainService/metadata.xml",
           "odataVersion": "4.0"
         }
+      },
+      "varService": {
+        "uri": "/sap/opu/odata4/sap/zhr_var_app_srv_bind/srvd/sap/zhr_var_app_srv_defn/0001/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
       }
     }
   },
@@ -80,6 +87,13 @@
           "operationMode": "Server",
           "autoExpandSelect": true,
           "earlyRequests": true
+        }
+      },
+      "varAuth": {
+        "dataSource": "varService",
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true
         }
       },
       "@i18n": {
@@ -161,6 +175,9 @@
     "extends": {
       "extensions": {
         "sap.ui.controllerExtensions": {
+          "sap.fe.templates.ListReport.ListReportController#com.jhah.zhrjhahsecstk::StickerMasterList": {
+            "controllerName": "com.jhah.zhrjhahsecstk.ext.controller.ViolatorControllerExtension"
+          },
           "sap.fe.templates.ObjectPage.ObjectPageController#com.jhah.zhrjhahsecstk::StickerMasterObjectPage": {
             "controllerName": "com.jhah.zhrjhahsecstk.ext.controller.ViolatorControllerExtension"
           }

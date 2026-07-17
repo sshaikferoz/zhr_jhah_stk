@@ -1,4 +1,14 @@
 /* ========================================================= */
+/* 0. COPY REQUEST ACTION VISIBILITY                         */
+/* Hidden for non-admin users (body.hideCopyRequest set by   */
+/* the controller extension based on the StickerAdmin flag). */
+/* ========================================================= */
+body.hideCopyRequest [id*="DataFieldForAction::CopySticker"],
+body.hideCopyRequest [id*="CopySticker"] {
+    display: none !important;
+}
+
+/* ========================================================= */
 /* 1. HEADER STRIP (BLENDED LAYOUT)                          */
 /* ========================================================= */
 .zhrjhahsecstk-app .nativeViolatorStrip {
