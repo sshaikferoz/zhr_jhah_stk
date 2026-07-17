@@ -29,6 +29,18 @@ sap.ui.define([], function () {
         return aFound && aFound[0];
     }
 
+    // FromTime/ToTime (and HideApp) are computed on the backend from the chosen
+    // slot. Writing via Context#setProperty bypasses the FE field wiring, so the
+    // metadata side effects never fire — request them explicitly so the computed
+    // display fields refresh. Queued in the same $auto batch as the patches.
+    function requestAppointmentSideEffects(oContext) {
+        oContext.requestSideEffects([
+            "FromTime", "ToTime", "HideApp", "AppointmentFromTime", "AppointmentToTime"
+        ]).catch(function (err) {
+            console.error("Failed to refresh appointment side effects:", err);
+        });
+    }
+
     return {
 
         /**
@@ -56,6 +68,7 @@ sap.ui.define([], function () {
             oContext.setProperty("SlotId", "");
             oContext.setProperty("AppointmentFromTime", null);
             oContext.setProperty("AppointmentToTime", null);
+            requestAppointmentSideEffects(oContext);
 
             // Hard-reset the dropdown control so no stale slot text lingers.
             var oCombo = findSlotComboBox(oDatePicker);
@@ -91,6 +104,7 @@ sap.ui.define([], function () {
                 oContext.setProperty("SlotId", "");
                 oContext.setProperty("AppointmentFromTime", null);
                 oContext.setProperty("AppointmentToTime", null);
+                requestAppointmentSideEffects(oContext);
                 return;
             }
 
@@ -106,6 +120,7 @@ sap.ui.define([], function () {
             oContext.setProperty("SlotId", oSlot.SlotId);
             oContext.setProperty("AppointmentFromTime", oSlot.FromTime);
             oContext.setProperty("AppointmentToTime", oSlot.ToTime);
+            requestAppointmentSideEffects(oContext);
         }
     };
 });
