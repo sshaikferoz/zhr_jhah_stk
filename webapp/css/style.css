@@ -1,0 +1,97 @@
+/* ========================================================= */
+/* 1. HEADER STRIP (BLENDED LAYOUT)                          */
+/* ========================================================= */
+.zhrjhahsecstk-app .nativeViolatorStrip {
+    flex-basis: 100%;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.zhrjhahsecstk-app .violatorCard {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0.5rem 0 0.5rem 0;
+}
+
+.zhrjhahsecstk-app .violatorCol {
+    flex: 1 1 auto;
+    margin-right: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.zhrjhahsecstk-app .violatorCol:last-child {
+    margin-right: 0;
+}
+
+/* ========================================================= */
+/* 2. ALIGNMENT FOR HEADER STRIP                             */
+/* ========================================================= */
+.zhrjhahsecstk-app .violatorRow {
+    align-items: center !important;
+    margin-bottom: 6px !important;
+}
+
+.zhrjhahsecstk-app .violatorLabel {
+    font-size: 0.8125rem !important;
+    color: #6a6d70 !important;
+    margin-right: 4px !important;
+    line-height: normal !important;
+}
+
+.zhrjhahsecstk-app .violatorValue {
+    font-size: 0.8125rem !important;
+    color: #32363a !important;
+    font-weight: 600 !important;
+    line-height: normal !important;
+}
+
+/* ========================================================= */
+/* 3. FIELD GROUP VALUE ALIGNMENT FIX                        */
+/* Applies ONLY to JHAH custom themes                        */
+/* ========================================================= */
+
+/* Remove the custom theme indentation applied to the value */
+html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] > dd {
+    margin: 0 !important;
+    margin-inline-start: 0 !important;
+    padding: 0 !important;
+    padding-inline-start: 0 !important;
+}
+
+/* Stretch the value container to use the available width */
+html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapUiFormElementContent,
+html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] [id$="Field-content"] {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Ensure the field/value itself starts from the left */
+html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMText,
+html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMTextMaxWidth,
+html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMdcField,
+html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMdcField > * {
+    text-align: left !important;
+    text-align: start !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ========================================================= */
+/* JHAH CUSTOM THEMES ONLY                                   */
+/* Align form content without moving subsection headers       */
+/* ========================================================= */
+
+html[class*="sapUiTheme-JHAH"] .sapUiFormCL {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+html[class*="sapUiTheme-JHAH"] .sapUiFormContainer {
+    padding-left: 0 !important;
+}
+
+html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
+    margin-left: 0 !important;
+}

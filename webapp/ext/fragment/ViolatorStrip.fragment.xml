@@ -1,0 +1,77 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <!-- CLEANED: Standard boolean binding -->
+    <HBox visible="{violator>/isVisible}" width="100%" class="nativeViolatorStrip violatorCard" wrap="Wrap">
+
+        <VBox class="violatorCol">
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="Name:" class="violatorLabel" />
+                <Text text="{violator>/UserName}" class="violatorValue" />
+            </HBox>
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="JHAH ID:" class="violatorLabel" />
+                <Text text="{violator>/Pernr}" class="violatorValue" />
+            </HBox>
+        </VBox>
+
+        <VBox class="violatorCol">
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="Org:" class="violatorLabel" />
+                <Text text="{violator>/OrgText}" class="violatorValue" />
+            </HBox>
+            <HBox class="violatorRow" alignItems="Center">
+                <!-- NOTE: 'PostionText' kept as-is assuming it's an ABAP backend typo -->
+                <Text text="Job:" class="violatorLabel" />
+                <Text text="{violator>/PostionText}" class="violatorValue" />
+            </HBox>
+        </VBox>
+
+        <VBox class="violatorCol">
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="Badge:" class="violatorLabel" />
+                <Text text="{violator>/BadgeNumber}" class="violatorValue" />
+            </HBox>
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="Gov ID:" class="violatorLabel" />
+                <Text text="{violator>/GovernmentID}" class="violatorValue" />
+            </HBox>
+        </VBox>
+
+        <VBox class="violatorCol">
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="Login ID:" class="violatorLabel" />
+                <Text text="{violator>/Usrid}" class="violatorValue" />
+            </HBox>
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="Email:" class="violatorLabel" />
+                <Text text="{violator>/EMail}" class="violatorValue" />
+            </HBox>
+        </VBox>
+
+        <VBox class="violatorCol">
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="Nationality:" class="violatorLabel" />
+                <Text text="{violator>/NationalityDesc}" class="violatorValue" />
+            </HBox>
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="Gender:" class="violatorLabel" />
+                <Text text="{violator>/gender}" class="violatorValue" />
+            </HBox>
+        </VBox>
+
+        <VBox class="violatorCol">
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="Date of Birth:" class="violatorLabel" />
+                <Text text="{= ${violator>/DOB} ? ${violator>/DOB}.substring(4,6) + '/' + ${violator>/DOB}.substring(6,8) + '/' + ${violator>/DOB}.substring(0,4) : '' }" class="violatorValue" />
+            </HBox>
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="Blood Group:" class="violatorLabel" />
+                <Text text="{violator>/BloodGroup}" class="violatorValue" />
+            </HBox>
+        </VBox>
+
+    </HBox>
+
+</core:FragmentDefinition>

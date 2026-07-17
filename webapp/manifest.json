@@ -88,7 +88,11 @@
       }
     },
     "resources": {
-      "css": []
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
     },
     "routing": {
       "config": {},
@@ -138,8 +142,27 @@
           "options": {
             "settings": {
               "editableHeaderContent": false,
-              "contextPath": "/StickerMaster"
+              "contextPath": "/StickerMaster",
+              "content": {
+                "header": {
+                  "facets": {
+                    "customViolatorStrip": {
+                      "type": "XMLFragment",
+                      "name": "com.jhah.zhrjhahsecstk.ext.fragment.ViolatorStrip"
+                    }
+                  }
+                }
+              }
             }
+          }
+        }
+      }
+    },
+    "extends": {
+      "extensions": {
+        "sap.ui.controllerExtensions": {
+          "sap.fe.templates.ObjectPage.ObjectPageController#com.jhah.zhrjhahsecstk::StickerMasterObjectPage": {
+            "controllerName": "com.jhah.zhrjhahsecstk.ext.controller.ViolatorControllerExtension"
           }
         }
       }
