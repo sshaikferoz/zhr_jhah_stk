@@ -82,8 +82,12 @@ sap.ui.define([
             // Hidden by default until proven admin.
             document.body.classList.add("hideCopyRequest");
 
+            // During onInit the view isn't connected to the component tree yet,
+            // so named component models aren't propagated to it. Read the model
+            // from the app component, which owns it, and fall back to the view.
             var oView = this.base.getView();
-            var oVarModel = oView && oView.getModel("varAuth");
+            var oComponent = (typeof this.base.getAppComponent === "function") ? this.base.getAppComponent() : null;
+            var oVarModel = (oComponent && oComponent.getModel("varAuth")) || (oView && oView.getModel("varAuth"));
             if (!oVarModel) {
                 console.error("varAuth model not available for Sticker admin check.");
                 return;
