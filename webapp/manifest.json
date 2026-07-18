@@ -165,16 +165,26 @@
                       "name": "com.jhah.zhrjhahsecstk.ext.fragment.ViolatorStrip"
                     }
                   }
-                },
-                "body": {
-                  "sections": {
-                    "appointmentSlotSection": {
-                      "template": "com.jhah.zhrjhahsecstk.ext.fragment.AppointmentSlots",
-                      "title": "Appointment Details",
+                }
+              },
+              "controlConfiguration": {
+                "@com.sap.vocabularies.UI.v1.FieldGroup#AppointSpec": {
+                  "fields": {
+                    "AppointmentDatePicker": {
+                      "template": "com.jhah.zhrjhahsecstk.ext.fragment.AppointmentDatePicker",
                       "position": {
                         "placement": "After",
-                        "anchor": "VehicleDetails"
-                      }
+                        "anchor": "DataField::AppointmentLocation"
+                      },
+                      "label": "Appointment Date"
+                    },
+                    "TimeSlotSelect": {
+                      "template": "com.jhah.zhrjhahsecstk.ext.fragment.TimeSlotSelect",
+                      "position": {
+                        "placement": "After",
+                        "anchor": "AppointmentDatePicker"
+                      },
+                      "label": "Time Slot"
                     }
                   }
                 }

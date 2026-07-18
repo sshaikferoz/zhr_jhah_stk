@@ -33,6 +33,7 @@ server:
         backend:
           - path: /sap
             url: http://jhah.virtual.ip.dhc:443
+            client: '022'
             destination: s4hanadt_BAS
     - name: sap-fe-mockserver
       beforeMiddleware: csp
@@ -44,6 +45,10 @@ server:
             mockdataPath: ./webapp/localService/mainService/data
             generateMockData: true
             resolveExternalServiceReferences: true
+          - urlPath: /sap/opu/odata4/sap/zhr_var_app_srv_bind/srvd/sap/zhr_var_app_srv_defn/0001
+            metadataPath: ./webapp/localService/varService/metadata.xml
+            mockdataPath: ./webapp/localService/varService/data
+            generateMockData: true
         annotations: []
 builder:
   resources:

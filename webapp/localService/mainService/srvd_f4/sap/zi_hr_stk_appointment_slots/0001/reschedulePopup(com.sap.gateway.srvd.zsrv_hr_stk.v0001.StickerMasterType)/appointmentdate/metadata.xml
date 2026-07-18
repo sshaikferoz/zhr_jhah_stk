@@ -68,6 +68,7 @@
                 <Property Name="Booked" Type="Edm.Int32" Nullable="false"/>
                 <Property Name="Alotted" Type="Edm.String" Nullable="false" MaxLength="1"/>
                 <Property Name="StickerRequest" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="FormatTime" Type="Edm.TimeOfDay" Nullable="false"/>
             </EntityType>
             <EntityContainer Name="Container">
                 <EntitySet Name="ZI_HR_STK_APPOINTMENT_SLOTS" EntityType="com.sap.gateway.srvd_f4.zi_hr_stk_appointment_slots.v0001.ZI_HR_STK_APPOINTMENT_SLOTSType"/>
@@ -240,6 +241,9 @@
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Alotted"/>
                 <Annotation Term="SAP__common.QuickInfo" String="ALOTTED"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/FormatTime">
+                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/FromTime">
                 <Annotation Term="SAP__common.Label" String="From Time"/>

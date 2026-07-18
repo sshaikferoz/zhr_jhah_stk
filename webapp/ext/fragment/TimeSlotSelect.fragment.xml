@@ -1,0 +1,11 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
+    <ComboBox
+        id="appointmentSlotSelect"
+        selectedKey="{SlotId}"
+        editable="{= ${ui>/isEditable} }"
+        placeholder="Select a time slot"
+        items="{ path: 'apptslots>/currentSlots', templateShareable: false }"
+        selectionChange=".extension.com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension.onAppointmentSlotChange">
+        <core:Item key="{apptslots>SlotId}" text="{apptslots>label}" />
+    </ComboBox>
+</core:FragmentDefinition>

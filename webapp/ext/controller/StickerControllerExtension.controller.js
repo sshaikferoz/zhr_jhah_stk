@@ -93,7 +93,7 @@ sap.ui.define([
                     if (oBindingContext && oBindingContext.getPath().indexOf("/StickerMaster") !== -1) {
 
                         // Build the appointment-slot picker data.
-                        this._loadAppointmentSlots(oView, oAppModel, oBindingContext);
+                        // this._loadAppointmentSlots(oView, oAppModel, oBindingContext);
 
                         oBindingContext.requestProperty("JhahId").then(function (sJhahId) {
 

@@ -18,6 +18,7 @@ server:
         backend:
           - path: /sap
             url: http://jhah.virtual.ip.dhc:443
+            client: '022'
             destination: s4hanadt_BAS
     - name: fiori-tools-appreload
       afterMiddleware: compression

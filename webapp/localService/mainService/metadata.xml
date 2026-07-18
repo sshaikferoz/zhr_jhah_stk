@@ -48,6 +48,38 @@
     <edmx:DataServices>
         <Schema Namespace="com.sap.gateway.srvd.zsrv_hr_stk.v0001" Alias="SAP__self">
             <Annotation Term="SAP__core.SchemaVersion" String="1.0.0"/>
+            <EntityType Name="evidenceType">
+                <Key>
+                    <PropertyRef Name="AttachmentUuid"/>
+                    <PropertyRef Name="StkReqId"/>
+                    <PropertyRef Name="DraftUUID"/>
+                    <PropertyRef Name="IsActiveEntity"/>
+                </Key>
+                <Property Name="AttachmentUuid" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="StkReqId" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="Filename" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="MimeType" Type="Edm.String" Nullable="false" MaxLength="128"/>
+                <Property Name="AttachmentContent" Type="Edm.Stream"/>
+                <Property Name="CreatedBy" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="CreatedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="LastChangedBy" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="LastChangedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="LocalLastChangedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="DraftUUID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="ParentDraftUUID" Type="Edm.Guid"/>
+                <Property Name="DraftEntityCreationDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="DraftEntityLastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="HasActiveEntity" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="IsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="__EntityControl" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.EntityControl"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="DraftAdministrativeData" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.I_DraftAdministrativeDataType"/>
+                <NavigationProperty Name="SiblingEntity" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.evidenceType"/>
+                <NavigationProperty Name="_Header" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false" Partner="_Evidence">
+                    <ReferentialConstraint Property="StkReqId" ReferencedProperty="StkReqId"/>
+                </NavigationProperty>
+            </EntityType>
             <EntityType Name="ColorDetailsType">
                 <Key>
                     <PropertyRef Name="Domname"/>
@@ -146,6 +178,7 @@
                 <Property Name="StkTypeDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="BadgeNo" Type="Edm.String" Nullable="false" MaxLength="8"/>
                 <Property Name="JhahId" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="UserId" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="Department" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="DepartmentName" Type="Edm.String" Nullable="false" MaxLength="40"/>
                 <Property Name="CSuiteLevel" Type="Edm.String" Nullable="false" MaxLength="10"/>
@@ -175,6 +208,7 @@
                 <Property Name="PlateNum3" Type="Edm.String" Nullable="false" MaxLength="2"/>
                 <Property Name="PlateNum3Desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="PlateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="PlateNumEng" Type="Edm.String" Nullable="false" MaxLength="20"/>
                 <Property Name="ArabicPlateNum" Type="Edm.String" Nullable="false" MaxLength="20"/>
                 <Property Name="HidePlates" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="AppointmentDate" Type="Edm.Date"/>
@@ -186,6 +220,7 @@
                 <Property Name="ExpireDate" Type="Edm.Date"/>
                 <Property Name="LastChangedAt" Type="Edm.DateTimeOffset" Precision="7"/>
                 <Property Name="LocalLastChangedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="CreatedBy" Type="Edm.String" Nullable="false" MaxLength="12"/>
                 <Property Name="FromTime" Type="Edm.TimeOfDay" Nullable="false"/>
                 <Property Name="ToTime" Type="Edm.TimeOfDay" Nullable="false"/>
                 <Property Name="HideApp" Type="Edm.Boolean" Nullable="false"/>
@@ -195,12 +230,16 @@
                 <Property Name="DraftEntityLastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
                 <Property Name="HasActiveEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="IsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="__CreateByAssociationControl" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterCbAControl"/>
                 <Property Name="__EntityControl" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.EntityControl"/>
                 <Property Name="__FieldControl" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterControl"/>
                 <Property Name="__OperationControl" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterOperationControl"/>
                 <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.SAP__Message)" Nullable="false"/>
                 <NavigationProperty Name="DraftAdministrativeData" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.I_DraftAdministrativeDataType"/>
                 <NavigationProperty Name="SiblingEntity" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType"/>
+                <NavigationProperty Name="_Evidence" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.evidenceType)" Partner="_Header">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
             </EntityType>
             <EntityType Name="I_DraftAdministrativeDataType">
                 <Key>
@@ -242,6 +281,7 @@
                 <Property Name="Booked" Type="Edm.Int32" Nullable="false"/>
                 <Property Name="Alotted" Type="Edm.String" Nullable="false" MaxLength="1"/>
                 <Property Name="StickerRequest" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="FormatTime" Type="Edm.TimeOfDay" Nullable="false"/>
             </EntityType>
             <EntityType Name="EmployeeDetailsType">
                 <Key>
@@ -273,6 +313,10 @@
             <ComplexType Name="StickerMasterControl">
                 <Property Name="AppointmentFromTime" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="AppointmentToTime" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="JhahId" Type="Edm.Byte" Nullable="false"/>
+            </ComplexType>
+            <ComplexType Name="StickerMasterCbAControl">
+                <Property Name="_Evidence" Type="Edm.Boolean" Nullable="false"/>
             </ComplexType>
             <ComplexType Name="StickerMasterOperationControl">
                 <Property Name="Approve" Type="Edm.Boolean" Nullable="false"/>
@@ -375,6 +419,11 @@
                 <EntitySet Name="AppointmentSlot" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.AppointmentSlotType"/>
                 <EntitySet Name="ColorDetails" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ColorDetailsType"/>
                 <EntitySet Name="EmployeeDetails" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.EmployeeDetailsType"/>
+                <EntitySet Name="evidence" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.evidenceType">
+                    <NavigationPropertyBinding Path="DraftAdministrativeData" Target="I_DraftAdministrativeData"/>
+                    <NavigationPropertyBinding Path="SiblingEntity" Target="evidence"/>
+                    <NavigationPropertyBinding Path="_Header" Target="StickerMaster"/>
+                </EntitySet>
                 <EntitySet Name="I_DraftAdministrativeData" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.I_DraftAdministrativeDataType"/>
                 <EntitySet Name="ManufacturerDetails" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ManufacturerDetailsType"/>
                 <EntitySet Name="PlateNum" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.PlateNumType"/>
@@ -382,9 +431,278 @@
                 <EntitySet Name="StickerMaster" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType">
                     <NavigationPropertyBinding Path="DraftAdministrativeData" Target="I_DraftAdministrativeData"/>
                     <NavigationPropertyBinding Path="SiblingEntity" Target="StickerMaster"/>
+                    <NavigationPropertyBinding Path="_Evidence" Target="evidence"/>
                 </EntitySet>
                 <EntitySet Name="StickerTypes" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerTypesType"/>
             </EntityContainer>
+            <Annotations Target="SAP__self.evidenceType/AttachmentUuid">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="UUID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/StkReqId">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/Filename">
+                <Annotation Term="SAP__common.Label" String="File Name"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/MimeType">
+                <Annotation Term="SAP__core.IsMediaType"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/AttachmentContent">
+                <Annotation Term="SAP__core.ContentDisposition">
+                    <Record>
+                        <PropertyValue Property="Filename" Path="Filename"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.MediaType" Path="MimeType"/>
+                <Annotation Term="SAP__core.AcceptableMediaTypes">
+                    <Collection>
+                        <String>application/pdf</String>
+                        <String>image/gif</String>
+                        <String>image/png</String>
+                        <String>image/jpeg</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.Label" String="Attachment"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/CreatedBy">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Created By"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Created By User"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/CreatedAt">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Created On"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Creation Date Time"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/LastChangedBy">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Changed By"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Local Instance Last Changed By User"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/LastChangedAt">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Changed On"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Local Instance Last Change Date Time"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/LocalLastChangedAt">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Changed On"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Last Change Date Time"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/HasDraftEntity">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Has Draft"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Has draft document"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/DraftUUID">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Key"/>
+                <Annotation Term="SAP__common.QuickInfo" String="UUID serving as key (parent key, root key)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/ParentDraftUUID">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Key"/>
+                <Annotation Term="SAP__common.QuickInfo" String="UUID serving as key (parent key, root key)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/DraftEntityCreationDateTime">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Draft Created On"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/DraftEntityLastChangeDateTime">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Draft Last Changed On"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/HasActiveEntity">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Has active"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Has active document"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/IsActiveEntity">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Is active"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Is active document"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/__EntityControl">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/evidence">
+                <Annotation Term="SAP__capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_Header"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.DraftNode">
+                    <Record/>
+                </Annotation>
+                <Annotation Term="SAP__common.DraftActivationVia">
+                    <Collection>
+                        <String>SAP__self.Container/StickerMaster</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="Filterable" Bool="true"/>
+                        <PropertyValue Property="FilterExpressionRestrictions">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="DraftEntityCreationDateTime"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="DraftEntityLastChangeDateTime"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="NonFilterableProperties">
+                            <Collection>
+                                <PropertyPath>__EntityControl</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.SortRestrictions">
+                    <Record>
+                        <PropertyValue Property="NonSortableProperties">
+                            <Collection>
+                                <PropertyPath>__EntityControl</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Path="__EntityControl/Deletable"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Path="__EntityControl/Updatable"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType">
+                <Annotation Term="SAP__common.Label" String="TVS: Projection View for Evidence"/>
+                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_AttachmentContent">
+                    <Record Type="SAP__common.SideEffectsType">
+                        <PropertyValue Property="SourceProperties">
+                            <Collection>
+                                <PropertyPath>AttachmentContent</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="TargetProperties">
+                            <Collection>
+                                <String>Filename</String>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__UI.Facets">
+                    <Collection>
+                        <Record Type="SAP__UI.ReferenceFacet">
+                            <PropertyValue Property="Label" String="Attachment Information"/>
+                            <PropertyValue Property="ID" String="AttachmentDetails"/>
+                            <PropertyValue Property="Target" AnnotationPath="@SAP__UI.Identification"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__UI.HeaderInfo">
+                    <Record>
+                        <PropertyValue Property="TypeName" String="Attachment"/>
+                        <PropertyValue Property="TypeNamePlural" String="Attachments"/>
+                        <PropertyValue Property="Title">
+                            <Record Type="SAP__UI.DataField">
+                                <PropertyValue Property="Value" Path="Filename"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__UI.Identification">
+                    <Collection>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="Filename"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Upload File"/>
+                            <PropertyValue Property="Value" Path="AttachmentContent"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__UI.LineItem">
+                    <Collection>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="Filename"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="File"/>
+                            <PropertyValue Property="Value" Path="AttachmentContent"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="Communication.Contact">
+                    <Record/>
+                </Annotation>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
             <Annotations Target="SAP__self.ColorDetailsType/Domname">
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -437,7 +755,8 @@
             <Annotations Target="SAP__self.Container/ColorDetails">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="false"/>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -664,7 +983,8 @@
             <Annotations Target="SAP__self.Container/ManufacturerDetails">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="false"/>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -731,7 +1051,8 @@
             <Annotations Target="SAP__self.Container/PlateNum">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="false"/>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -790,6 +1111,7 @@
             <Annotations Target="SAP__self.StickerMasterType/JhahId">
                 <Annotation Term="SAP__common.Label" String="Employee Number"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Employee badge No."/>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/JhahId"/>
                 <Annotation Term="SAP__common.IsDigitSequence"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
@@ -798,12 +1120,18 @@
                 </Annotation>
                 <Annotation Term="SAP__common.Heading" String="Pers.No."/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/UserId">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="System ID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Communication Identification/Number"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/Department">
                 <Annotation Term="SAP__common.Label" String="Department"/>
                 <Annotation Term="SAP__common.Text" Path="DepartmentName">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
+                <Annotation Term="SAP__core.Computed"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
                         <String>../../../../srvd_f4/sap/zi_hr_stk_dept_vh/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.et-zc_hr_stk_mstr.department'/$metadata</String>
@@ -817,6 +1145,7 @@
                 <Annotation Term="SAP__common.Text" Path="CSuiteName">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
+                <Annotation Term="SAP__core.Computed"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
                         <String>../../../../srvd_f4/sap/zi_hr_tvs_vh_csuite/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.et-zc_hr_stk_mstr.csuitelevel'/$metadata</String>
@@ -830,6 +1159,7 @@
                 <Annotation Term="SAP__common.Text" Path="OrgText">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
+                <Annotation Term="SAP__core.Computed"/>
                 <Annotation Term="SAP__common.IsDigitSequence"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
@@ -841,6 +1171,7 @@
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/Name">
                 <Annotation Term="SAP__common.Label" String="Requestor Name"/>
+                <Annotation Term="SAP__core.Computed"/>
                 <Annotation Term="SAP__common.Heading" String="Name of employee or applicant"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Formatted Name of Employee or Applicant"/>
             </Annotations>
@@ -911,6 +1242,7 @@
                         <String>../../../../srvd_f4/sap/zi_stk_manufacturer/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.et-zc_hr_stk_mstr.manufacturer'/$metadata</String>
                     </Collection>
                 </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Manufacturer"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/Color">
@@ -925,6 +1257,7 @@
                         <String>../../../../srvd_f4/sap/zi_stk_color/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.et-zc_hr_stk_mstr.color'/$metadata</String>
                     </Collection>
                 </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Color"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/PlateNum1">
@@ -938,6 +1271,7 @@
                         <String>../../../../srvd_f4/sap/zi_stk_platenum/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.et-zc_hr_stk_mstr.platenum1'/$metadata</String>
                     </Collection>
                 </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__UI.Hidden" Path="HidePlates"/>
                 <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
@@ -952,6 +1286,7 @@
                         <String>../../../../srvd_f4/sap/zi_stk_platenum/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.et-zc_hr_stk_mstr.platenum2'/$metadata</String>
                     </Collection>
                 </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__UI.Hidden" Path="HidePlates"/>
                 <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
@@ -966,6 +1301,7 @@
                         <String>../../../../srvd_f4/sap/zi_stk_platenum/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.et-zc_hr_stk_mstr.platenum3'/$metadata</String>
                     </Collection>
                 </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__UI.Hidden" Path="HidePlates"/>
                 <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
@@ -974,6 +1310,9 @@
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__common.Label" String="License Plate Number"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/PlateNumEng">
+                <Annotation Term="SAP__core.Computed"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/ArabicPlateNum">
                 <Annotation Term="SAP__common.Label" String="Arabic Plate Number"/>
@@ -1011,6 +1350,12 @@
                 <Annotation Term="SAP__core.Computed"/>
                 <Annotation Term="SAP__common.Label" String="Changed On"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Last Change Date Time"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/CreatedBy">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Created By"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Created By User"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/FromTime">
                 <Annotation Term="SAP__core.Computed"/>
@@ -1058,6 +1403,11 @@
                 <Annotation Term="SAP__common.Label" String="Is active"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Is active document"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__CreateByAssociationControl">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/__EntityControl">
                 <Annotation Term="SAP__core.Computed"/>
                 <Annotation Term="SAP__UI.HiddenFilter"/>
@@ -1073,7 +1423,26 @@
                 <Annotation Term="SAP__UI.HiddenFilter"/>
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/_Evidence">
+                <Annotation Term="SAP__common.Composition"/>
+            </Annotations>
             <Annotations Target="SAP__self.Container/StickerMaster">
+                <Annotation Term="SAP__capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_Evidence"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Path="__CreateByAssociationControl/_Evidence"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
                 <Annotation Term="SAP__common.DraftRoot">
                     <Record>
                         <PropertyValue Property="ActivationAction" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.Activate"/>
@@ -1098,6 +1467,7 @@
                             <Collection>
                                 <PropertyPath>FromTime</PropertyPath>
                                 <PropertyPath>ToTime</PropertyPath>
+                                <PropertyPath>__CreateByAssociationControl</PropertyPath>
                                 <PropertyPath>__EntityControl</PropertyPath>
                                 <PropertyPath>__FieldControl</PropertyPath>
                                 <PropertyPath>__OperationControl</PropertyPath>
@@ -1124,6 +1494,7 @@
                             <Collection>
                                 <PropertyPath>FromTime</PropertyPath>
                                 <PropertyPath>ToTime</PropertyPath>
+                                <PropertyPath>__CreateByAssociationControl</PropertyPath>
                                 <PropertyPath>__EntityControl</PropertyPath>
                                 <PropertyPath>__FieldControl</PropertyPath>
                                 <PropertyPath>__OperationControl</PropertyPath>
@@ -1205,6 +1576,11 @@
                             <Collection>
                                 <String>_it/StatsCriticality</String>
                                 <String>_it/Status</String>
+                                <String>_it/__OperationControl/Approve</String>
+                                <String>_it/__OperationControl/Edit</String>
+                                <String>_it/__OperationControl/Reject</String>
+                                <String>_it/__OperationControl/reschedulePopup</String>
+                                <String>_it/__EntityControl/Deletable</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1218,6 +1594,11 @@
                             <Collection>
                                 <String>_it/StatsCriticality</String>
                                 <String>_it/Status</String>
+                                <String>_it/__OperationControl/Approve</String>
+                                <String>_it/__OperationControl/Edit</String>
+                                <String>_it/__OperationControl/Reject</String>
+                                <String>_it/__OperationControl/reschedulePopup</String>
+                                <String>_it/__EntityControl/Deletable</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1269,6 +1650,20 @@
                         </PropertyValue>
                     </Record>
                 </Annotation>
+                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_JhahId">
+                    <Record Type="SAP__common.SideEffectsType">
+                        <PropertyValue Property="SourceProperties">
+                            <Collection>
+                                <PropertyPath>JhahId</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="TargetEntities">
+                            <Collection>
+                                <NavigationPropertyPath/>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
                 <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_PlateNum">
                     <Record Type="SAP__common.SideEffectsType">
                         <PropertyValue Property="SourceProperties">
@@ -1279,6 +1674,7 @@
                         <PropertyValue Property="TargetProperties">
                             <Collection>
                                 <String>ArabicPlateNum</String>
+                                <String>PlateNumEng</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1293,6 +1689,7 @@
                         <PropertyValue Property="TargetProperties">
                             <Collection>
                                 <String>ArabicPlateNum</String>
+                                <String>PlateNumEng</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1307,6 +1704,7 @@
                         <PropertyValue Property="TargetProperties">
                             <Collection>
                                 <String>ArabicPlateNum</String>
+                                <String>PlateNumEng</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1321,6 +1719,7 @@
                         <PropertyValue Property="TargetProperties">
                             <Collection>
                                 <String>ArabicPlateNum</String>
+                                <String>PlateNumEng</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1334,6 +1733,7 @@
                         </PropertyValue>
                         <PropertyValue Property="TargetProperties">
                             <Collection>
+                                <String>ArabicPlateNum</String>
                                 <String>HidePlates</String>
                                 <String>PlateNum</String>
                                 <String>PlateNum1</String>
@@ -1342,6 +1742,7 @@
                                 <String>PlateNum2Desc</String>
                                 <String>PlateNum3</String>
                                 <String>PlateNum3Desc</String>
+                                <String>PlateNumEng</String>
                                 <String>SAP__Messages</String>
                             </Collection>
                         </PropertyValue>
@@ -1379,6 +1780,14 @@
                         <PropertyValue Property="Value" Path="StkTypeDesc"/>
                         <PropertyValue Property="Title" String="Request Type"/>
                     </Record>
+                </Annotation>
+                <Annotation Term="SAP__UI.HeaderFacets">
+                    <Collection>
+                        <Record Type="SAP__UI.ReferenceFacet">
+                            <PropertyValue Property="ID" String="Status"/>
+                            <PropertyValue Property="Target" AnnotationPath="@SAP__UI.DataPoint#RequestGrp"/>
+                        </Record>
+                    </Collection>
                 </Annotation>
                 <Annotation Term="SAP__UI.Facets">
                     <Collection>
@@ -1421,13 +1830,10 @@
                                 </Collection>
                             </PropertyValue>
                         </Record>
-                    </Collection>
-                </Annotation>
-                <Annotation Term="SAP__UI.HeaderFacets">
-                    <Collection>
                         <Record Type="SAP__UI.ReferenceFacet">
-                            <PropertyValue Property="ID" String="Status"/>
-                            <PropertyValue Property="Target" AnnotationPath="@SAP__UI.DataPoint#RequestGrp"/>
+                            <PropertyValue Property="Label" String="Evidence"/>
+                            <PropertyValue Property="ID" String="EvidenceTab"/>
+                            <PropertyValue Property="Target" AnnotationPath="_Evidence/@SAP__UI.LineItem"/>
                         </Record>
                     </Collection>
                 </Annotation>
@@ -1546,6 +1952,10 @@
                                     <PropertyValue Property="Value" Path="PlateNum"/>
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Label" String="English Plate Number"/>
+                                    <PropertyValue Property="Value" Path="PlateNumEng"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Label" String="Arabic Plate Number"/>
                                     <PropertyValue Property="Value" Path="ArabicPlateNum"/>
                                 </Record>
@@ -1608,10 +2018,13 @@
                             <PropertyValue Property="Value" Path="PlateNum"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
-                            <PropertyValue Property="Value" Path="ArabicPlateNum"/>
+                            <PropertyValue Property="Value" Path="PlateNumEng"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="Organization"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="ArabicPlateNum"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="Department"/>
@@ -2138,6 +2551,9 @@
                 <Annotation Term="SAP__common.Label" String="Alotted"/>
                 <Annotation Term="SAP__common.QuickInfo" String="ALOTTED"/>
             </Annotations>
+            <Annotations Target="SAP__self.AppointmentSlotType/FormatTime">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerTypesType/Ddlanguage">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Lang."/>
@@ -2167,6 +2583,16 @@
                 <Annotation Term="SAP__common.Label" String="Lang."/>
                 <Annotation Term="SAP__common.Heading" String="Ln"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Language Key"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/__EntityControl/Deletable">
+                <Annotation Term="SAP__common.Label" String="Dyn. Method Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Method Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Method Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/__EntityControl/Updatable">
+                <Annotation Term="SAP__common.Label" String="Dyn. Method Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Method Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Method Property"/>
             </Annotations>
             <Annotations Target="SAP__self.ColorDetailsType/ColorText">
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
@@ -2203,6 +2629,11 @@
             <Annotations Target="SAP__self.StickerMasterType/ExpireDate">
                 <Annotation Term="SAP__common.Label" String="Expire Date"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__CreateByAssociationControl/_Evidence">
+                <Annotation Term="SAP__common.Label" String="Dynamic CbA-Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Create by Association Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Create via Association Control Property"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/__EntityControl/Deletable">
                 <Annotation Term="SAP__common.Label" String="Dyn. Method Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Method Control"/>
@@ -2219,6 +2650,11 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/__FieldControl/AppointmentToTime">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/JhahId">
                 <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
@@ -2300,6 +2736,16 @@
                 <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/JhahId">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterCbAControl/_Evidence">
+                <Annotation Term="SAP__common.Label" String="Dynamic CbA-Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Create by Association Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Create via Association Control Property"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterOperationControl/Approve">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>

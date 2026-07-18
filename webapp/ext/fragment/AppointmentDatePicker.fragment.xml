@@ -1,0 +1,10 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
+    <DatePicker
+        id="appointmentDatePicker"
+        value="{ path: 'AppointmentDate', type: 'sap.ui.model.odata.type.Date', formatOptions: { style: 'medium' } }"
+        minDate="{apptslots>/minDate}"
+        maxDate="{apptslots>/maxDate}"
+        editable="{= ${ui>/isEditable} }"
+        placeholder="Choose an available date"
+        change=".extension.com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension.onAppointmentDateChange" />
+</core:FragmentDefinition>
