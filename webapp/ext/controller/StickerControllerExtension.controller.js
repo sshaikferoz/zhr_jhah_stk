@@ -92,8 +92,9 @@ sap.ui.define([
                     // Only act on the Sticker Master object page context
                     if (oBindingContext && oBindingContext.getPath().indexOf("/StickerMaster") !== -1) {
 
-                        // Build the appointment-slot picker data.
-                        // this._loadAppointmentSlots(oView, oAppModel, oBindingContext);
+                        // Build the appointment-slot picker data used by the
+                        // AppointmentDatePicker / TimeSlotSelect custom fields.
+                        this._loadAppointmentSlots(oView, oAppModel, oBindingContext);
 
                         oBindingContext.requestProperty("JhahId").then(function (sJhahId) {
 
@@ -180,7 +181,7 @@ sap.ui.define([
 
         /**
          * Fired when the user picks an appointment date (invoked from
-         * AppointmentSlots.fragment.xml via the .extension handler syntax).
+         * AppointmentDatePicker.fragment.xml via the .extension handler syntax).
          * Refreshes the time-slot dropdown to the slots for that date and clears
          * any previous slot pick, or flags an error if the date has no slots.
          */
@@ -225,7 +226,7 @@ sap.ui.define([
 
         /**
          * Fired when the user picks a time slot (invoked from
-         * AppointmentSlots.fragment.xml via the .extension handler syntax).
+         * TimeSlotSelect.fragment.xml via the .extension handler syntax).
          * Writes the slot's times and id back to the Sticker Master entity.
          */
         onAppointmentSlotChange: function (oEvent) {
