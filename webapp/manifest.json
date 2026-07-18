@@ -38,6 +38,8 @@
         "uri": "/sap/opu/odata4/sap/zhr_var_app_srv_bind/srvd/sap/zhr_var_app_srv_defn/0001/",
         "type": "OData",
         "settings": {
+          "annotations": [],
+          "localUri": "localService/varService/metadata.xml",
           "odataVersion": "4.0"
         }
       }
@@ -99,6 +101,15 @@
       "@i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "uri": "i18n/i18n.properties"
+      },
+      "varService": {
+        "dataSource": "varService",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
       }
     },
     "resources": {
@@ -184,7 +195,7 @@
                         "placement": "After",
                         "anchor": "AppointmentDatePicker"
                       },
-                      "label": "Time Slot"
+                      "label": "{i18n>appointmentTime}"
                     }
                   }
                 }

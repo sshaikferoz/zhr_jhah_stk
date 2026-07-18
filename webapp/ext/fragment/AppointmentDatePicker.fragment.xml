@@ -1,10 +1,22 @@
 <core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
+    <!--
+        Appointment date, rendered as two sibling form fields toggled by edit mode
+        (no layout container: ColumnLayout only accepts sap.ui.core.IFormContent,
+        which VBox/HBox do not implement).
+        Display mode shows the plain value; edit mode shows a date picker
+        restricted to the dates that actually have appointment slots.
+    -->
+    <Text
+        id="appointmentDateText"
+        text="{ path: 'AppointmentDate', type: 'sap.ui.model.odata.type.Date', formatOptions: { style: 'medium' } }"
+        visible="{= !${ui>/isEditable} }" />
+
     <DatePicker
         id="appointmentDatePicker"
+        visible="{= ${ui>/isEditable} }"
         value="{ path: 'AppointmentDate', type: 'sap.ui.model.odata.type.Date', formatOptions: { style: 'medium' } }"
         minDate="{apptslots>/minDate}"
         maxDate="{apptslots>/maxDate}"
-        editable="{= ${ui>/isEditable} }"
-        placeholder="Choose an available date"
+        placeholder="Choose a date"
         change=".extension.com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension.onAppointmentDateChange" />
 </core:FragmentDefinition>

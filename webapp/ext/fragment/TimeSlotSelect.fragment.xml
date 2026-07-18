@@ -1,11 +1,32 @@
 <core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
+    <!--
+        Start-time picker, rendered as two sibling form fields toggled by edit mode
+        (no layout container: ColumnLayout only accepts sap.ui.core.IFormContent,
+        which VBox/HBox do not implement).
+        Display mode shows the plain value; edit mode shows a dropdown of the start
+        times available for the chosen date, and picking one carries its matching
+        end time along (onAppointmentSlotChange).
+        The key is synthetic (SlotId + "#" + FromTime) because the backend reuses a
+        single SlotId for every interval of a day (e.g. "SLOT:20260718"), so SlotId
+        alone cannot identify the picked slot.
+    -->
+    <Text
+        id="appointmentSlotText"
+        text="{ path: 'AppointmentFromTime', type: 'sap.ui.model.odata.type.TimeOfDay', formatOptions: { pattern: 'h:mm a' } }"
+        visible="{= !${ui>/isEditable} }" />
+
     <ComboBox
         id="appointmentSlotSelect"
-        selectedKey="{SlotId}"
-        editable="{= ${ui>/isEditable} }"
-        placeholder="Select a time slot"
+        visible="{= ${ui>/isEditable} }"
+        width="10rem"
+        selectedKey="{= ${SlotId} &amp;&amp; ${AppointmentFromTime} ? ${SlotId} + '#' + ${AppointmentFromTime} : '' }"
+        placeholder="Start time"
+        tooltip="{apptslots>label}"
         items="{ path: 'apptslots>/currentSlots', templateShareable: false }"
         selectionChange=".extension.com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension.onAppointmentSlotChange">
-        <core:Item key="{apptslots>SlotId}" text="{apptslots>label}" />
+        <core:Item
+            id="appointmentSlotItem"
+            key="{apptslots>key}"
+            text="{apptslots>fromLabel}" />
     </ComboBox>
 </core:FragmentDefinition>

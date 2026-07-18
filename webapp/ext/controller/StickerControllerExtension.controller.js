@@ -166,6 +166,9 @@ sap.ui.define([
                         SlotId: oSlot.SlotId,
                         FromTime: oSlot.FromTime,
                         ToTime: oSlot.ToTime,
+                        // The dropdown lists start times only; picking one carries
+                        // its ToTime along. label kept for the tooltip/full range.
+                        fromLabel: formatTime12h(oSlot.FromTime),
                         label: formatTime12h(oSlot.FromTime) + " - " + formatTime12h(oSlot.ToTime)
                     });
                 });
@@ -207,8 +210,8 @@ sap.ui.define([
 
             // Reset the previously chosen slot whenever the date changes.
             oContext.setProperty("SlotId", "");
-            oContext.setProperty("AppointmentFromTime", null);
-            oContext.setProperty("AppointmentToTime", null);
+            oContext.setProperty("AppointmentFromTime", "00:00:00");
+            oContext.setProperty("AppointmentToTime", "00:00:00");
             requestAppointmentSideEffects(oContext);
 
             // Hard-reset the dropdown control so no stale slot text lingers.
@@ -244,22 +247,24 @@ sap.ui.define([
 
             if (!oItem) {
                 oContext.setProperty("SlotId", "");
-                oContext.setProperty("AppointmentFromTime", null);
-                oContext.setProperty("AppointmentToTime", null);
+                oContext.setProperty("AppointmentFromTime", "00:00:00");
+                oContext.setProperty("AppointmentToTime", "00:00:00");
                 requestAppointmentSideEffects(oContext);
                 return;
             }
 
-            var sSlotId = oItem.getKey();
-            var aSlots = oSlotModel.getProperty("/currentSlots") || [];
-            var oSlot = aSlots.filter(function (s) {
-                return s.SlotId === sSlotId;
-            })[0];
+            // Read the slot straight off the selected item's binding context.
+            // A key lookup would be ambiguous: the backend reuses one SlotId for
+            // every interval of a day (e.g. "SLOT:20260718"), so matching on
+            // SlotId alone always resolves to that date's first slot.
+            var oItemContext = oItem.getBindingContext("apptslots");
+            var oSlot = oItemContext && oItemContext.getObject();
             if (!oSlot) {
                 return;
             }
 
             oContext.setProperty("SlotId", oSlot.SlotId);
+            console.log("Selected slot:", oSlot.SlotId, oSlot.FromTime, oSlot.ToTime);
             oContext.setProperty("AppointmentFromTime", oSlot.FromTime);
             oContext.setProperty("AppointmentToTime", oSlot.ToTime);
             requestAppointmentSideEffects(oContext);

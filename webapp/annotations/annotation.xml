@@ -19,17 +19,7 @@
                                 </Record>
                                 <Record Type="UI.DataField">
                                     <PropertyValue Property="Label" String="Appointment From Time"/>
-                                    <PropertyValue Property="Value" Path="FromTime"/>
-                                    <Annotation Term="UI.Hidden"/>
-                                </Record>
-                                <Record Type="UI.DataField">
-                                    <PropertyValue Property="Label" String="Appointment From Time"/>
                                     <PropertyValue Property="Value" Path="AppointmentFromTime"/>
-                                </Record>
-                                <Record Type="UI.DataField">
-                                    <PropertyValue Property="Label" String="Appointment To Time"/>
-                                    <PropertyValue Property="Value" Path="ToTime"/>
-                                    <Annotation Term="UI.Hidden"/>
                                 </Record>
                                 <Record Type="UI.DataField">
                                     <PropertyValue Property="Label" String="Appointment To Time"/>
@@ -38,6 +28,14 @@
                                 <Record Type="UI.DataField">
                                     <PropertyValue Property="Label" String="Appointment Location"/>
                                     <PropertyValue Property="Value" Path="AppointmentLocation"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Appointment From Time"/>
+                                    <PropertyValue Property="Value" Path="FromTime"/>
+                                </Record>
+                                <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Appointment To Time"/>
+                                    <PropertyValue Property="Value" Path="ToTime"/>
                                 </Record>
                                 <Record Type="UI.DataField">
                                     <PropertyValue Property="Label" String="Request Date"/>
