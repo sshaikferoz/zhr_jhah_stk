@@ -159,6 +159,10 @@ sap.ui.define([
                         aDates.push(sDate);
                     }
                     mByDate[sDate].push({
+                        // SlotId is only unique per DATE in the backend (e.g.
+                        // "SLOT:20260718" for every interval of that day), so a
+                        // synthetic key including FromTime disambiguates the items.
+                        key: oSlot.SlotId + "#" + oSlot.FromTime,
                         SlotId: oSlot.SlotId,
                         FromTime: oSlot.FromTime,
                         ToTime: oSlot.ToTime,
