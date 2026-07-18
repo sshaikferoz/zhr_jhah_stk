@@ -2,18 +2,18 @@
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
     xmlns:form="sap.ui.layout.form"
-    xmlns:macros="sap.fe.macros"
-    core:require="{ handler: 'com/jhah/zhrjhahsecstk/ext/controller/AppointmentSlots' }">
+    xmlns:macros="sap.fe.macros">
 
     <!--
-        Unified "Appointment Information" section. The appointment date + time-slot
-        picker sit together with the resulting times, location and request date.
+        Unified "Appointment Information" section.
         - Appointment Date: DatePicker restricted to the dates in AppointmentSlot.
         - Time Slot: dropdown of every slot (12h AM/PM labels) for the chosen date.
         Picking writes back AppointmentDate, AppointmentFromTime, AppointmentToTime,
         SlotId (raw HH:MM:SS values); changing the date clears the slot.
-        Location and Request Date use FE building blocks so the value help/formatting
-        stay intact. Slot data comes from the "apptslots" JSON model.
+        Event handlers live in StickerControllerExtension and are invoked through
+        the Fiori elements .extension handler syntax. The slot data comes from the
+        "apptslots" JSON model, also populated by StickerControllerExtension.
+        The computed From/To time fields are intentionally not displayed.
     -->
     <form:SimpleForm
         layout="ResponsiveGridLayout"
@@ -36,7 +36,7 @@
                 maxDate="{apptslots>/maxDate}"
                 editable="{= ${ui>/isEditable} }"
                 placeholder="Choose an available date"
-                change="handler.onAppointmentDateChange" />
+                change=".extension.com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension.onAppointmentDateChange" />
 
             <Label text="Time Slot" labelFor="appointmentSlotSelect" />
             <ComboBox
@@ -45,15 +45,9 @@
                 editable="{= ${ui>/isEditable} }"
                 placeholder="Select a time slot"
                 items="{ path: 'apptslots>/currentSlots', templateShareable: false }"
-                selectionChange="handler.onAppointmentSlotChange">
+                selectionChange=".extension.com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension.onAppointmentSlotChange">
                 <core:Item key="{apptslots>SlotId}" text="{apptslots>label}" />
             </ComboBox>
-
-            <Label text="Appointment From Time" />
-            <Text text="{FromTime}" visible="{= !${HideApp} }" />
-
-            <Label text="Appointment To Time" />
-            <Text text="{ToTime}" visible="{= !${HideApp} }" />
 
             <Label text="Appointment Location" />
             <macros:Field metaPath="AppointmentLocation" />
