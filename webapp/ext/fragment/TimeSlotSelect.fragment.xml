@@ -14,7 +14,6 @@
     <Input
         id="appointmentSlotInput"
         visible="{= ${ui>/isEditable} }"
-        width="10rem"
         value="{apptslots>/selectedLabel}"
         placeholder="Start time"
         showValueHelp="true"
