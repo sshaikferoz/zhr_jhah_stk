@@ -1,29 +1,12 @@
 sap.ui.define([
     "sap/ui/core/mvc/ControllerExtension",
     "sap/ui/core/Fragment",
-    "sap/ui/model/json/JSONModel"
-], function (ControllerExtension, Fragment, JSONModel) {
+    "sap/ui/model/json/JSONModel",
+    "com/jhah/zhrjhahsecstk/ext/util/SlotTimeFormat"
+], function (ControllerExtension, Fragment, JSONModel, SlotTimeFormat) {
     "use strict";
 
-    // "HH:MM:SS" (Edm.TimeOfDay) -> "H:MM AM/PM" for slot chip labels only.
-    // The raw value is kept for saving.
-    function formatTime12h(sTime) {
-        if (!sTime) {
-            return "";
-        }
-        var aParts = String(sTime).split(":");
-        var iHour = parseInt(aParts[0], 10);
-        var sMin = aParts[1] || "00";
-        if (isNaN(iHour)) {
-            return String(sTime);
-        }
-        var sMeridiem = iHour >= 12 ? "PM" : "AM";
-        var iHour12 = iHour % 12;
-        if (iHour12 === 0) {
-            iHour12 = 12;
-        }
-        return iHour12 + ":" + sMin + " " + sMeridiem;
-    }
+    var formatTime12h = SlotTimeFormat.formatTime12h;
 
     // FromTime/ToTime (and HideApp) are computed on the backend from the chosen
     // slot. Writing via Context#setProperty bypasses the FE field wiring, so the

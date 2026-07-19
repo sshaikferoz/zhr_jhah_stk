@@ -1,14 +1,16 @@
 <core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
     <!--
         Start-time picker, rendered as sibling form fields toggled by edit mode.
-        Display mode shows the plain value; edit mode shows a value-help-only
-        input (typing disabled). Clicking it opens the TimeSlotPopover fragment,
+        Display mode shows the from-to range (SlotTimeFormat.range); edit mode
+        shows a value-help-only input (typing disabled) with the same range.
+        Clicking it opens the TimeSlotPopover fragment,
         a fixed-height popover with a grid of start-time chips for the chosen
         date (onAppointmentSlotValueHelp / onAppointmentSlotPress).
     -->
     <Text
         id="appointmentSlotText"
-        text="{ path: 'AppointmentFromTime', type: 'sap.ui.model.odata.type.TimeOfDay', formatOptions: { pattern: 'h:mm a' } }"
+        core:require="{SlotTimeFormat: 'com/jhah/zhrjhahsecstk/ext/util/SlotTimeFormat'}"
+        text="{ parts: [{ path: 'AppointmentFromTime' }, { path: 'AppointmentToTime' }], formatter: 'SlotTimeFormat.range' }"
         visible="{= !${ui>/isEditable} }" />
 
     <Input
