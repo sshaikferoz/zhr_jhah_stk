@@ -52,9 +52,10 @@ sap.ui.define([
                     oView.addStyleClass("zhrjhahsecstk-app");
                     document.body.classList.add("zhrjhahsecstk-app");
 
-                    // Hide the "Copy Request" action by default; it is revealed
-                    // only for Sticker admins once the auth check confirms it.
-                    this._applyCopyRequestVisibility();
+                    // Hide the Create/Copy/Edit/Delete actions by default; they
+                    // are revealed only for Sticker admins once the auth check
+                    // confirms it.
+                    this._applyAdminActionVisibility();
                 } catch (err) {
                     console.error("Error in StickerControllerExtension onInit:", err);
                 }
@@ -316,15 +317,17 @@ sap.ui.define([
         },
 
         /**
-         * Toggle visibility of the "Copy Request" action based on the logged-in
-         * user's Sticker-admin flag. The flag lives on the VAR service's
-         * EmployeeHeader entity (StickerAdmin = "X" for admins), exposed here via
-         * the "varAuth" model. The button is hidden by default so non-admins never
-         * see it flash in, and is only shown once StickerAdmin is confirmed as "X".
+         * Toggle visibility of the maintenance actions (Create, Copy Request,
+         * Edit, Delete) based on the logged-in user's Sticker-admin flag. The
+         * flag lives on the VAR service's EmployeeHeader entity (StickerAdmin =
+         * "X" for admins), exposed here via the "varAuth" model. The actions are
+         * hidden by default (body.hideAdminActions + css/style.css) so
+         * non-admins never see them flash in, and are only shown once
+         * StickerAdmin is confirmed as "X".
          */
-        _applyCopyRequestVisibility: function () {
+        _applyAdminActionVisibility: function () {
             // Hidden by default until proven admin.
-            document.body.classList.add("hideCopyRequest");
+            document.body.classList.add("hideAdminActions");
 
             // During onInit the view isn't connected to the component tree yet,
             // so named component models aren't propagated to it. Read the model
@@ -346,9 +349,9 @@ sap.ui.define([
                         bIsStickerAdmin = oUserData && oUserData.StickerAdmin === "X";
                     }
                     if (bIsStickerAdmin) {
-                        document.body.classList.remove("hideCopyRequest");
+                        document.body.classList.remove("hideAdminActions");
                     } else {
-                        document.body.classList.add("hideCopyRequest");
+                        document.body.classList.add("hideAdminActions");
                     }
                 }).catch(function (err) {
                     console.error("Sticker admin check fetch failed:", err);

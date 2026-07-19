@@ -1,10 +1,15 @@
 /* ========================================================= */
-/* 0. COPY REQUEST ACTION VISIBILITY                         */
-/* Hidden for non-admin users (body.hideCopyRequest set by   */
-/* the controller extension based on the StickerAdmin flag). */
+/* 0. ADMIN-ONLY ACTION VISIBILITY                           */
+/* Create / Copy Request / Edit / Delete are reserved for    */
+/* Sticker admins (StickerAdmin = "X" on EmployeeHeader).    */
+/* body.hideAdminActions is set by the controller extension  */
+/* and only removed once the auth check confirms admin.      */
 /* ========================================================= */
-body.hideCopyRequest [id*="DataFieldForAction::CopySticker"],
-body.hideCopyRequest [id*="CopySticker"] {
+body.hideAdminActions [id*="DataFieldForAction::CopySticker"],
+body.hideAdminActions [id*="CopySticker"],
+body.hideAdminActions [id*="StandardAction::Create"],
+body.hideAdminActions [id*="StandardAction::Edit"],
+body.hideAdminActions [id*="StandardAction::Delete"] {
     display: none !important;
 }
 
