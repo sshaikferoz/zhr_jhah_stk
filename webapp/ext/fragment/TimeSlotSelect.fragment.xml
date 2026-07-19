@@ -19,7 +19,7 @@
         id="appointmentSlotSelect"
         visible="{= ${ui>/isEditable} }"
         width="10rem"
-        selectedKey="{= ${SlotId} &amp;&amp; ${AppointmentFromTime} ? ${SlotId} + '#' + ${AppointmentFromTime} : '' }"
+        selectedKey="{apptslots>/selectedKey}"
         placeholder="Start time"
         tooltip="{apptslots>label}"
         items="{ path: 'apptslots>/currentSlots', templateShareable: false }"

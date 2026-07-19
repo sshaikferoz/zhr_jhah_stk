@@ -143,10 +143,16 @@ sap.ui.define([
             var oSlotBinding = oAppModel.bindList("/AppointmentSlot", null, null, null, { $$groupId: "$direct" });
             Promise.all([
                 oSlotBinding.requestContexts(0, 1000),
-                oBindingContext.requestProperty("AppointmentDate")
+                oBindingContext.requestProperty("AppointmentDate"),
+                oBindingContext.requestProperty("AppointmentFromTime"),
+                oBindingContext.requestProperty("SlotId")
             ]).then(function (aResult) {
                 var aContexts = aResult[0] || [];
                 var sCurrentDate = aResult[1];
+                var sCurrentTime = aResult[2];
+                var sCurrentSlotId = aResult[3];
+
+
 
                 var mByDate = {};
                 var aDates = [];
@@ -181,6 +187,11 @@ sap.ui.define([
                     maxDate: aDates.length ? new Date(aDates[aDates.length - 1] + "T00:00:00") : null,
                     currentSlots: (sCurrentDate && mByDate[sCurrentDate]) || []
                 });
+                oSlotModel.setProperty(
+                    "/selectedKey",
+                    sCurrentSlotId + "#" + sCurrentTime
+                );
+
             }).catch(function (err) {
                 console.error("Failed to load appointment slots:", err);
             });

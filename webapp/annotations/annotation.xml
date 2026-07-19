@@ -13,6 +13,10 @@
                         <PropertyValue Property="Data">
                             <Collection>
                                 <Record Type="UI.DataField">
+                                    <PropertyValue Property="Label" String="Appointment Location"/>
+                                    <PropertyValue Property="Value" Path="AppointmentLocation"/>
+                                </Record>
+                                <Record Type="UI.DataField">
                                     <PropertyValue Property="Label" String="Appointment Date"/>
                                     <PropertyValue Property="Value" Path="AppointmentDate"/>
                                     <Annotation Term="UI.Hidden"/>
@@ -26,20 +30,18 @@
                                     <PropertyValue Property="Value" Path="AppointmentToTime"/>
                                 </Record>
                                 <Record Type="UI.DataField">
-                                    <PropertyValue Property="Label" String="Appointment Location"/>
-                                    <PropertyValue Property="Value" Path="AppointmentLocation"/>
+                                    <PropertyValue Property="Label" String="Request Date"/>
+                                    <PropertyValue Property="Value" Path="RequestDate"/>
                                 </Record>
                                 <Record Type="UI.DataField">
                                     <PropertyValue Property="Label" String="Appointment From Time"/>
                                     <PropertyValue Property="Value" Path="FromTime"/>
+                                    <Annotation Term="UI.Hidden"/>
                                 </Record>
                                 <Record Type="UI.DataField">
                                     <PropertyValue Property="Label" String="Appointment To Time"/>
                                     <PropertyValue Property="Value" Path="ToTime"/>
-                                </Record>
-                                <Record Type="UI.DataField">
-                                    <PropertyValue Property="Label" String="Request Date"/>
-                                    <PropertyValue Property="Value" Path="RequestDate"/>
+                                    <Annotation Term="UI.Hidden"/>
                                 </Record>
                                 <Record Type="UI.DataField">
                                     <PropertyValue Property="Label" String="Slot ID"/>
