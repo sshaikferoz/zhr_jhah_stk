@@ -1,11 +1,14 @@
-<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:control="com.jhah.zhrjhahsecstk.ext.control">
     <!--
-        Start-time picker, rendered as two sibling form fields toggled by edit mode
-        (no layout container: ColumnLayout only accepts sap.ui.core.IFormContent,
-        which VBox/HBox do not implement).
-        Display mode shows the plain value; edit mode shows a dropdown of the start
-        times available for the chosen date, and picking one carries its matching
-        end time along (onAppointmentSlotChange).
+        Start-time picker, rendered as sibling form fields toggled by edit mode.
+        Display mode shows the plain value; edit mode shows a grid of start-time
+        chips for the chosen date (SlotGrid: a custom IFormContent wrapper,
+        because ColumnLayout rejects VBox/HBox). The selected chip is Emphasized,
+        full slots are disabled, and picking a chip carries its matching end time
+        along (onAppointmentSlotPress).
         The key is synthetic (SlotId + "#" + FromTime) because the backend reuses a
         single SlotId for every interval of a day (e.g. "SLOT:20260718"), so SlotId
         alone cannot identify the picked slot.
@@ -15,18 +18,21 @@
         text="{ path: 'AppointmentFromTime', type: 'sap.ui.model.odata.type.TimeOfDay', formatOptions: { pattern: 'h:mm a' } }"
         visible="{= !${ui>/isEditable} }" />
 
-    <ComboBox
-        id="appointmentSlotSelect"
+    <Text
+        id="appointmentSlotEmptyText"
+        text="Select a date to view the available time slots."
+        visible="{= ${ui>/isEditable} &amp;&amp; !${apptslots>/currentSlots}.length }" />
+
+    <control:SlotGrid
+        id="appointmentSlotGrid"
         visible="{= ${ui>/isEditable} }"
-        width="10rem"
-        selectedKey="{apptslots>/selectedKey}"
-        placeholder="Start time"
-        tooltip="{apptslots>label}"
-        items="{ path: 'apptslots>/currentSlots', templateShareable: false }"
-        selectionChange=".extension.com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension.onAppointmentSlotChange">
-        <core:Item
-            id="appointmentSlotItem"
-            key="{apptslots>key}"
-            text="{apptslots>fromLabel}" />
-    </ComboBox>
+        content="{ path: 'apptslots>/currentSlots', templateShareable: false }">
+        <Button
+            id="appointmentSlotChip"
+            text="{apptslots>fromLabel}"
+            tooltip="{apptslots>label}"
+            enabled="{= !${apptslots>full} }"
+            type="{= ${apptslots>key} === ${apptslots>/selectedKey} ? 'Emphasized' : 'Default' }"
+            press=".extension.com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension.onAppointmentSlotPress" />
+    </control:SlotGrid>
 </core:FragmentDefinition>

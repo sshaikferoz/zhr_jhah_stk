@@ -105,3 +105,28 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormContainer {
 html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
     margin-left: 0 !important;
 }
+
+/* ========================================================= */
+/* 4. APPOINTMENT TIME-SLOT GRID                             */
+/* Chip buttons rendered by ext/control/SlotGrid.js; the     */
+/* column count adapts to the width of the form field.       */
+/* ========================================================= */
+.zhrjhahsecstk-app .zhrSlotGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.25rem 0;
+}
+
+.zhrjhahsecstk-app .zhrSlotGrid .sapMBtn {
+    width: 100%;
+    padding: 0;
+    height: auto;
+    min-height: 2.25rem;
+}
+
+.zhrjhahsecstk-app .zhrSlotGrid .sapMBtnInner {
+    width: 100%;
+    min-width: 0;
+}

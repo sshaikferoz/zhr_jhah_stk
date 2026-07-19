@@ -4,7 +4,7 @@ sap.ui.define([
 ], function (ControllerExtension, JSONModel) {
     "use strict";
 
-    // "HH:MM:SS" (Edm.TimeOfDay) -> "H:MM AM/PM" for slot dropdown labels only.
+    // "HH:MM:SS" (Edm.TimeOfDay) -> "H:MM AM/PM" for slot chip labels only.
     // The raw value is kept for saving.
     function formatTime12h(sTime) {
         if (!sTime) {
@@ -22,23 +22,6 @@ sap.ui.define([
             iHour12 = 12;
         }
         return iHour12 + ":" + sMin + " " + sMeridiem;
-    }
-
-    // Locate the time-slot ComboBox that sits next to the given DatePicker so we
-    // can hard-reset its selection when the date changes.
-    function findSlotComboBox(oControl) {
-        var oNode = oControl;
-        while (oNode && !(oNode.isA && oNode.isA("sap.ui.core.mvc.View"))) {
-            oNode = oNode.getParent();
-        }
-        if (!oNode) {
-            return null;
-        }
-        var aFound = oNode.findAggregatedObjects(true, function (o) {
-            return o.isA && o.isA("sap.m.ComboBox") &&
-                o.getId().indexOf("appointmentSlotSelect") !== -1;
-        });
-        return aFound && aFound[0];
     }
 
     // FromTime/ToTime (and HideApp) are computed on the backend from the chosen
@@ -128,8 +111,8 @@ sap.ui.define([
         /**
          * Fetch every appointment slot and expose it through the "apptslots" JSON
          * model used by the custom Appointment Slot section. Groups slots by date,
-         * derives the DatePicker min/max range, and seeds the time dropdown with the
-         * slots for the currently selected date.
+         * derives the DatePicker min/max range, and seeds the time-chip grid with
+         * the slots for the currently selected date.
          */
         _loadAppointmentSlots: function (oView, oAppModel, oBindingContext) {
             var oSlotModel = oView.getModel("apptslots");
@@ -164,6 +147,9 @@ sap.ui.define([
                         mByDate[sDate] = [];
                         aDates.push(sDate);
                     }
+                    // A slot with exhausted capacity stays visible but its chip
+                    // is disabled. Capacity 0 means "not maintained", not full.
+                    var bFull = oSlot.Capacity > 0 && oSlot.Booked >= oSlot.Capacity;
                     mByDate[sDate].push({
                         // SlotId is only unique per DATE in the backend (e.g.
                         // "SLOT:20260718" for every interval of that day), so a
@@ -172,10 +158,12 @@ sap.ui.define([
                         SlotId: oSlot.SlotId,
                         FromTime: oSlot.FromTime,
                         ToTime: oSlot.ToTime,
-                        // The dropdown lists start times only; picking one carries
+                        full: bFull,
+                        // The chips show start times only; picking one carries
                         // its ToTime along. label kept for the tooltip/full range.
                         fromLabel: formatTime12h(oSlot.FromTime),
-                        label: formatTime12h(oSlot.FromTime) + " - " + formatTime12h(oSlot.ToTime)
+                        label: formatTime12h(oSlot.FromTime) + " - " + formatTime12h(oSlot.ToTime) +
+                            (bFull ? " (fully booked)" : "")
                     });
                 });
                 aDates.sort();
@@ -200,7 +188,7 @@ sap.ui.define([
         /**
          * Fired when the user picks an appointment date (invoked from
          * AppointmentDatePicker.fragment.xml via the .extension handler syntax).
-         * Refreshes the time-slot dropdown to the slots for that date and clears
+         * Refreshes the time-chip grid to the slots for that date and clears
          * any previous slot pick, or flags an error if the date has no slots.
          */
         onAppointmentDateChange: function (oEvent) {
@@ -219,19 +207,14 @@ sap.ui.define([
 
             oSlotModel.setProperty("/currentSlots", aSlots);
 
-            // Reset the previously chosen slot whenever the date changes.
+            // Reset the previously chosen slot whenever the date changes; the
+            // chip highlight follows /selectedKey, so clearing it un-selects
+            // every chip in the grid.
+            oSlotModel.setProperty("/selectedKey", "");
             oContext.setProperty("SlotId", "");
             oContext.setProperty("AppointmentFromTime", "00:00:00");
             oContext.setProperty("AppointmentToTime", "00:00:00");
             requestAppointmentSideEffects(oContext);
-
-            // Hard-reset the dropdown control so no stale slot text lingers.
-            var oCombo = findSlotComboBox(oDatePicker);
-            if (oCombo) {
-                oCombo.setSelectedKey("");
-                oCombo.setSelectedItem(null);
-                oCombo.setValue("");
-            }
 
             if (!bValid || (sDate && aSlots.length === 0)) {
                 oDatePicker.setValueState("Error");
@@ -243,39 +226,31 @@ sap.ui.define([
         },
 
         /**
-         * Fired when the user picks a time slot (invoked from
+         * Fired when the user presses a time-slot chip in the grid (invoked from
          * TimeSlotSelect.fragment.xml via the .extension handler syntax).
-         * Writes the slot's times and id back to the Sticker Master entity.
+         * Highlights the chip via /selectedKey and writes the slot's times and
+         * id back to the Sticker Master entity.
          */
-        onAppointmentSlotChange: function (oEvent) {
-            var oComboBox = oEvent.getSource();
-            var oItem = oEvent.getParameter("selectedItem");
-            var oContext = oComboBox.getBindingContext();
-            var oSlotModel = oComboBox.getModel("apptslots");
+        onAppointmentSlotPress: function (oEvent) {
+            var oButton = oEvent.getSource();
+            var oContext = oButton.getBindingContext();
+            var oSlotModel = oButton.getModel("apptslots");
             if (!oContext || !oSlotModel) {
                 return;
             }
 
-            if (!oItem) {
-                oContext.setProperty("SlotId", "");
-                oContext.setProperty("AppointmentFromTime", "00:00:00");
-                oContext.setProperty("AppointmentToTime", "00:00:00");
-                requestAppointmentSideEffects(oContext);
-                return;
-            }
-
-            // Read the slot straight off the selected item's binding context.
+            // Read the slot straight off the pressed chip's binding context.
             // A key lookup would be ambiguous: the backend reuses one SlotId for
             // every interval of a day (e.g. "SLOT:20260718"), so matching on
             // SlotId alone always resolves to that date's first slot.
-            var oItemContext = oItem.getBindingContext("apptslots");
+            var oItemContext = oButton.getBindingContext("apptslots");
             var oSlot = oItemContext && oItemContext.getObject();
             if (!oSlot) {
                 return;
             }
 
+            oSlotModel.setProperty("/selectedKey", oSlot.key);
             oContext.setProperty("SlotId", oSlot.SlotId);
-            console.log("Selected slot:", oSlot.SlotId, oSlot.FromTime, oSlot.ToTime);
             oContext.setProperty("AppointmentFromTime", oSlot.FromTime);
             oContext.setProperty("AppointmentToTime", oSlot.ToTime);
             requestAppointmentSideEffects(oContext);
