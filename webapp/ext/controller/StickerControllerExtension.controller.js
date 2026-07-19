@@ -130,12 +130,14 @@ sap.ui.define([
                 oSlotBinding.requestContexts(0, 1000),
                 oBindingContext.requestProperty("AppointmentDate"),
                 oBindingContext.requestProperty("AppointmentFromTime"),
-                oBindingContext.requestProperty("SlotId")
+                oBindingContext.requestProperty("SlotId"),
+                oBindingContext.requestProperty("AppointmentToTime")
             ]).then(function (aResult) {
                 var aContexts = aResult[0] || [];
                 var sCurrentDate = aResult[1];
                 var sCurrentTime = aResult[2];
                 var sCurrentSlotId = aResult[3];
+                var sCurrentToTime = aResult[4];
 
 
 
@@ -169,9 +171,8 @@ sap.ui.define([
                         FromTime: oSlot.FromTime,
                         ToTime: oSlot.ToTime,
                         full: bFull,
-                        // The chips show the from-to range; the value-help
-                        // input shows the start time only (fromLabel).
-                        fromLabel: formatTime12h(oSlot.FromTime),
+                        // The chips and the value-help input both show the
+                        // from-to range; label adds the booked hint for tooltips.
                         rangeLabel: sRange,
                         label: sRange + (bFull ? " (fully booked)" : "")
                     });
@@ -199,7 +200,9 @@ sap.ui.define([
                 // Value shown in the value-help input; empty until a slot is chosen.
                 oSlotModel.setProperty(
                     "/selectedLabel",
-                    sCurrentSlotId ? formatTime12h(sCurrentTime) : ""
+                    sCurrentSlotId
+                        ? formatTime12h(sCurrentTime) + " - " + formatTime12h(sCurrentToTime)
+                        : ""
                 );
 
             }).catch(function (err) {
@@ -308,7 +311,7 @@ sap.ui.define([
             }
 
             oSlotModel.setProperty("/selectedKey", oSlot.key);
-            oSlotModel.setProperty("/selectedLabel", oSlot.fromLabel);
+            oSlotModel.setProperty("/selectedLabel", oSlot.rangeLabel);
             oContext.setProperty("SlotId", oSlot.SlotId);
             oContext.setProperty("AppointmentFromTime", oSlot.FromTime);
             oContext.setProperty("AppointmentToTime", oSlot.ToTime);
