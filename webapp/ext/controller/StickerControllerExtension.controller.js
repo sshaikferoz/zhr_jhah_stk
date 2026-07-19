@@ -140,10 +140,17 @@ sap.ui.define([
 
                 var mByDate = {};
                 var aDates = [];
+                var mSeen = {};
                 aContexts.forEach(function (oCtx) {
                     var oSlot = oCtx.getObject();
                     var sDate = oSlot.AppointmentDate;
                     if (!sDate) { return; }
+                    // The entity key also spans Apps/StickerRequest, so the
+                    // backend can return the same physical interval as several
+                    // rows; keep only the first row per slot.
+                    var sSeenKey = sDate + "#" + oSlot.SlotId + "#" + oSlot.FromTime;
+                    if (mSeen[sSeenKey]) { return; }
+                    mSeen[sSeenKey] = true;
                     if (!mByDate[sDate]) {
                         mByDate[sDate] = [];
                         aDates.push(sDate);
@@ -168,6 +175,13 @@ sap.ui.define([
                     });
                 });
                 aDates.sort();
+                // Chronological chips regardless of backend row order
+                // ("HH:MM:SS" sorts lexicographically).
+                Object.keys(mByDate).forEach(function (sKey) {
+                    mByDate[sKey].sort(function (a, b) {
+                        return a.FromTime < b.FromTime ? -1 : (a.FromTime > b.FromTime ? 1 : 0);
+                    });
+                });
 
                 oSlotModel.setData({
                     dates: aDates,
