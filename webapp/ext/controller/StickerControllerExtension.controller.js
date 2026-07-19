@@ -159,6 +159,7 @@ sap.ui.define([
                     // A slot with exhausted capacity stays visible but its chip
                     // is disabled. Capacity 0 means "not maintained", not full.
                     var bFull = oSlot.Capacity > 0 && oSlot.Booked >= oSlot.Capacity;
+                    var sRange = formatTime12h(oSlot.FromTime) + " - " + formatTime12h(oSlot.ToTime);
                     mByDate[sDate].push({
                         // SlotId is only unique per DATE in the backend (e.g.
                         // "SLOT:20260718" for every interval of that day), so a
@@ -168,11 +169,11 @@ sap.ui.define([
                         FromTime: oSlot.FromTime,
                         ToTime: oSlot.ToTime,
                         full: bFull,
-                        // The chips show start times only; picking one carries
-                        // its ToTime along. label kept for the tooltip/full range.
+                        // The chips show the from-to range; the value-help
+                        // input shows the start time only (fromLabel).
                         fromLabel: formatTime12h(oSlot.FromTime),
-                        label: formatTime12h(oSlot.FromTime) + " - " + formatTime12h(oSlot.ToTime) +
-                            (bFull ? " (fully booked)" : "")
+                        rangeLabel: sRange,
+                        label: sRange + (bFull ? " (fully booked)" : "")
                     });
                 });
                 aDates.sort();

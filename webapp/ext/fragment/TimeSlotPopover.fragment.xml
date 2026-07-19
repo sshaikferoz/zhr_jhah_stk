@@ -15,7 +15,7 @@
         id="appointmentSlotPopover"
         title="Available Time Slots"
         placement="VerticalPreferredBottom"
-        contentWidth="24rem"
+        contentWidth="30rem"
         contentHeight="18rem"
         class="sapUiContentPadding">
         <Text
@@ -27,7 +27,7 @@
             content="{ path: 'apptslots>/currentSlots', templateShareable: false }">
             <Button
                 id="appointmentSlotChip"
-                text="{apptslots>fromLabel}"
+                text="{apptslots>rangeLabel}"
                 tooltip="{apptslots>label}"
                 enabled="{= !${apptslots>full} }"
                 type="{= ${apptslots>key} === ${apptslots>/selectedKey} ? 'Emphasized' : 'Default' }"

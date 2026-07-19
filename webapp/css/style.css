@@ -121,7 +121,7 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
 /* ========================================================= */
 .zhrjhahsecstk-app .zhrSlotGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr));
     gap: 0.5rem;
     width: 100%;
     padding: 0.25rem 0;
