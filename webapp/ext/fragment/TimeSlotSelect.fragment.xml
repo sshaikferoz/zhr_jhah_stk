@@ -1,38 +1,23 @@
-<core:FragmentDefinition
-    xmlns:core="sap.ui.core"
-    xmlns="sap.m"
-    xmlns:control="com.jhah.zhrjhahsecstk.ext.control">
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
     <!--
         Start-time picker, rendered as sibling form fields toggled by edit mode.
-        Display mode shows the plain value; edit mode shows a grid of start-time
-        chips for the chosen date (SlotGrid: a custom IFormContent wrapper,
-        because ColumnLayout rejects VBox/HBox). The selected chip is Emphasized,
-        full slots are disabled, and picking a chip carries its matching end time
-        along (onAppointmentSlotPress).
-        The key is synthetic (SlotId + "#" + FromTime) because the backend reuses a
-        single SlotId for every interval of a day (e.g. "SLOT:20260718"), so SlotId
-        alone cannot identify the picked slot.
+        Display mode shows the plain value; edit mode shows a value-help-only
+        input (typing disabled). Clicking it opens the TimeSlotPopover fragment,
+        a fixed-height popover with a grid of start-time chips for the chosen
+        date (onAppointmentSlotValueHelp / onAppointmentSlotPress).
     -->
     <Text
         id="appointmentSlotText"
         text="{ path: 'AppointmentFromTime', type: 'sap.ui.model.odata.type.TimeOfDay', formatOptions: { pattern: 'h:mm a' } }"
         visible="{= !${ui>/isEditable} }" />
 
-    <Text
-        id="appointmentSlotEmptyText"
-        text="Select a date to view the available time slots."
-        visible="{= ${ui>/isEditable} &amp;&amp; !${apptslots>/currentSlots}.length }" />
-
-    <control:SlotGrid
-        id="appointmentSlotGrid"
+    <Input
+        id="appointmentSlotInput"
         visible="{= ${ui>/isEditable} }"
-        content="{ path: 'apptslots>/currentSlots', templateShareable: false }">
-        <Button
-            id="appointmentSlotChip"
-            text="{apptslots>fromLabel}"
-            tooltip="{apptslots>label}"
-            enabled="{= !${apptslots>full} }"
-            type="{= ${apptslots>key} === ${apptslots>/selectedKey} ? 'Emphasized' : 'Default' }"
-            press=".extension.com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension.onAppointmentSlotPress" />
-    </control:SlotGrid>
+        width="10rem"
+        value="{apptslots>/selectedLabel}"
+        placeholder="Start time"
+        showValueHelp="true"
+        valueHelpOnly="true"
+        valueHelpRequest=".extension.com.jhah.zhrjhahsecstk.ext.controller.StickerControllerExtension.onAppointmentSlotValueHelp" />
 </core:FragmentDefinition>

@@ -108,8 +108,10 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
 
 /* ========================================================= */
 /* 4. APPOINTMENT TIME-SLOT GRID                             */
-/* Chip buttons rendered by ext/control/SlotGrid.js; the     */
-/* column count adapts to the width of the form field.       */
+/* Chip buttons rendered by ext/control/SlotGrid.js inside   */
+/* the TimeSlotPopover value help; the column count adapts   */
+/* to the popover width. Scoping via .zhrjhahsecstk-app on   */
+/* <body> still matches the popover's static-area DOM.       */
 /* ========================================================= */
 .zhrjhahsecstk-app .zhrSlotGrid {
     display: grid;

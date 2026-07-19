@@ -5,9 +5,9 @@ sap.ui.define([
 
     /**
      * Wrapper that lays out its content in a responsive CSS grid
-     * (css/style.css: .zhrSlotGrid). It exists because the object-page form's
-     * ColumnLayout only accepts sap.ui.core.IFormContent as field content, which
-     * the standard layout containers (VBox/HBox/FlexBox) do not implement.
+     * (css/style.css: .zhrSlotGrid); hosts the time-slot chips in the
+     * TimeSlotPopover value help. Declares IFormContent so it could also sit
+     * directly inside a form's ColumnLayout, which rejects VBox/HBox.
      */
     return Control.extend("com.jhah.zhrjhahsecstk.ext.control.SlotGrid", {
         metadata: {

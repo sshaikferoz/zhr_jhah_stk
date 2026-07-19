@@ -1,0 +1,43 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:control="com.jhah.zhrjhahsecstk.ext.control">
+    <!--
+        Value-help popover for the appointment start time, opened by the input in
+        TimeSlotSelect.fragment.xml (loaded lazily in onAppointmentSlotValueHelp,
+        handlers resolve against the controller extension). Shows the slots of
+        the chosen date as a grid of chips inside a fixed-height, scrollable
+        popover; the selected chip is Emphasized and full slots are disabled.
+        ResponsivePopover turns into a full-screen dialog on phones, hence the
+        Cancel endButton.
+    -->
+    <ResponsivePopover
+        id="appointmentSlotPopover"
+        title="Available Time Slots"
+        placement="VerticalPreferredBottom"
+        contentWidth="24rem"
+        contentHeight="18rem"
+        class="sapUiContentPadding">
+        <Text
+            id="appointmentSlotEmptyText"
+            text="Select a date to view the available time slots."
+            visible="{= !${apptslots>/currentSlots}.length }" />
+        <control:SlotGrid
+            id="appointmentSlotGrid"
+            content="{ path: 'apptslots>/currentSlots', templateShareable: false }">
+            <Button
+                id="appointmentSlotChip"
+                text="{apptslots>fromLabel}"
+                tooltip="{apptslots>label}"
+                enabled="{= !${apptslots>full} }"
+                type="{= ${apptslots>key} === ${apptslots>/selectedKey} ? 'Emphasized' : 'Default' }"
+                press=".onAppointmentSlotPress" />
+        </control:SlotGrid>
+        <endButton>
+            <Button
+                id="appointmentSlotPopoverCancel"
+                text="Cancel"
+                press=".onAppointmentSlotPopoverCancel" />
+        </endButton>
+    </ResponsivePopover>
+</core:FragmentDefinition>

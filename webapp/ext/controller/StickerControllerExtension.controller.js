@@ -1,7 +1,8 @@
 sap.ui.define([
     "sap/ui/core/mvc/ControllerExtension",
+    "sap/ui/core/Fragment",
     "sap/ui/model/json/JSONModel"
-], function (ControllerExtension, JSONModel) {
+], function (ControllerExtension, Fragment, JSONModel) {
     "use strict";
 
     // "HH:MM:SS" (Edm.TimeOfDay) -> "H:MM AM/PM" for slot chip labels only.
@@ -179,6 +180,11 @@ sap.ui.define([
                     "/selectedKey",
                     sCurrentSlotId + "#" + sCurrentTime
                 );
+                // Value shown in the value-help input; empty until a slot is chosen.
+                oSlotModel.setProperty(
+                    "/selectedLabel",
+                    sCurrentSlotId ? formatTime12h(sCurrentTime) : ""
+                );
 
             }).catch(function (err) {
                 console.error("Failed to load appointment slots:", err);
@@ -208,9 +214,10 @@ sap.ui.define([
             oSlotModel.setProperty("/currentSlots", aSlots);
 
             // Reset the previously chosen slot whenever the date changes; the
-            // chip highlight follows /selectedKey, so clearing it un-selects
-            // every chip in the grid.
+            // chip highlight follows /selectedKey and the input text follows
+            // /selectedLabel, so clearing them resets the whole picker.
             oSlotModel.setProperty("/selectedKey", "");
+            oSlotModel.setProperty("/selectedLabel", "");
             oContext.setProperty("SlotId", "");
             oContext.setProperty("AppointmentFromTime", "00:00:00");
             oContext.setProperty("AppointmentToTime", "00:00:00");
@@ -226,15 +233,50 @@ sap.ui.define([
         },
 
         /**
-         * Fired when the user presses a time-slot chip in the grid (invoked from
-         * TimeSlotSelect.fragment.xml via the .extension handler syntax).
-         * Highlights the chip via /selectedKey and writes the slot's times and
-         * id back to the Sticker Master entity.
+         * Fired when the user clicks the time-slot value-help input (invoked
+         * from TimeSlotSelect.fragment.xml via the .extension handler syntax).
+         * Lazily loads the TimeSlotPopover fragment and opens it by the input.
+         */
+        onAppointmentSlotValueHelp: function (oEvent) {
+            var oInput = oEvent.getSource();
+            var oView = this.base.getView();
+
+            if (!this._pSlotPopover) {
+                this._pSlotPopover = Fragment.load({
+                    id: oView.getId() + "--slotPopover",
+                    name: "com.jhah.zhrjhahsecstk.ext.fragment.TimeSlotPopover",
+                    controller: this
+                }).then(function (oPopover) {
+                    // Dependent of the view so the apptslots model and the
+                    // StickerMaster binding context propagate into the popover.
+                    oView.addDependent(oPopover);
+                    return oPopover;
+                });
+            }
+            this._pSlotPopover.then(function (oPopover) {
+                oPopover.openBy(oInput);
+            });
+        },
+
+        onAppointmentSlotPopoverCancel: function () {
+            if (this._pSlotPopover) {
+                this._pSlotPopover.then(function (oPopover) {
+                    oPopover.close();
+                });
+            }
+        },
+
+        /**
+         * Fired when the user presses a time-slot chip in the popover grid
+         * (TimeSlotPopover.fragment.xml). Highlights the chip via /selectedKey,
+         * writes the slot's times and id back to the Sticker Master entity and
+         * closes the popover.
          */
         onAppointmentSlotPress: function (oEvent) {
             var oButton = oEvent.getSource();
-            var oContext = oButton.getBindingContext();
-            var oSlotModel = oButton.getModel("apptslots");
+            var oView = this.base.getView();
+            var oContext = oButton.getBindingContext() || oView.getBindingContext();
+            var oSlotModel = oView.getModel("apptslots");
             if (!oContext || !oSlotModel) {
                 return;
             }
@@ -250,10 +292,13 @@ sap.ui.define([
             }
 
             oSlotModel.setProperty("/selectedKey", oSlot.key);
+            oSlotModel.setProperty("/selectedLabel", oSlot.fromLabel);
             oContext.setProperty("SlotId", oSlot.SlotId);
             oContext.setProperty("AppointmentFromTime", oSlot.FromTime);
             oContext.setProperty("AppointmentToTime", oSlot.ToTime);
             requestAppointmentSideEffects(oContext);
+
+            this.onAppointmentSlotPopoverCancel();
         },
 
         /**
