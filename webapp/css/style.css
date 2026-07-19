@@ -1,15 +1,16 @@
 /* ========================================================= */
-/* 0. ADMIN-ONLY ACTION VISIBILITY                           */
-/* Create / Copy Request / Edit / Delete are reserved for    */
-/* Sticker admins (StickerAdmin = "X" on EmployeeHeader).    */
-/* body.hideAdminActions is set by the controller extension  */
-/* and only removed once the auth check confirms admin.      */
+/* 0. MAINTENANCE ACTION VISIBILITY                          */
+/* Create / Copy Request / Edit / Delete are hidden from     */
+/* Sticker admins (StickerAdmin = "X" on EmployeeHeader),    */
+/* who get a read-only view; everyone else keeps them.       */
+/* body.hideMaintenanceActions is set by the controller      */
+/* extension and removed once the check confirms non-admin.  */
 /* ========================================================= */
-body.hideAdminActions [id*="DataFieldForAction::CopySticker"],
-body.hideAdminActions [id*="CopySticker"],
-body.hideAdminActions [id*="StandardAction::Create"],
-body.hideAdminActions [id*="StandardAction::Edit"],
-body.hideAdminActions [id*="StandardAction::Delete"] {
+body.hideMaintenanceActions [id*="DataFieldForAction::CopySticker"],
+body.hideMaintenanceActions [id*="CopySticker"],
+body.hideMaintenanceActions [id*="StandardAction::Create"],
+body.hideMaintenanceActions [id*="StandardAction::Edit"],
+body.hideMaintenanceActions [id*="StandardAction::Delete"] {
     display: none !important;
 }
 
