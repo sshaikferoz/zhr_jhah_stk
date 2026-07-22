@@ -76,7 +76,7 @@
                 <Property Name="GovernmentID" Type="Edm.String" Nullable="false" MaxLength="20"/>
                 <Property Name="BloodGroup" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="gender" Type="Edm.String" Nullable="false" MaxLength="80"/>
-                <Property Name="BadgeNumber" Type="Edm.String" Nullable="false" MaxLength="13"/>
+                <Property Name="BadgeNumber" Type="Edm.String" Nullable="false" MaxLength="30"/>
             </EntityType>
             <EntityContainer Name="Container">
                 <EntitySet Name="ZHR_I_EMPLOYEE_DETAILS" EntityType="com.sap.gateway.srvd_f4.zhr_i_employee_details.v0001.ZHR_I_EMPLOYEE_DETAILSType"/>
@@ -147,6 +147,11 @@
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__common.Label" String="Blood Group"/>
                 <Annotation Term="SAP__common.Heading" String="Blood Grp"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/BadgeNumber">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Identity Number"/>
+                <Annotation Term="SAP__common.Heading" String="ID Number"/>
             </Annotations>
             <Annotations Target="SAP__ParentService.StickerMasterType/JhahId">
                 <Annotation Term="SAP__common.ValueListMapping">
