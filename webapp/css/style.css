@@ -1,13 +1,12 @@
 /* ========================================================= */
 /* 0. MAINTENANCE ACTION VISIBILITY                          */
-/* Create / Copy Request / Edit / Delete are hidden from     */
-/* Sticker admins (StickerAdmin = "X" on EmployeeHeader),    */
-/* who get a read-only view; everyone else keeps them.       */
+/* Create / Edit / Delete are hidden from Sticker admins     */
+/* (StickerAdmin = "X" on EmployeeHeader), who get a         */
+/* read-only view; everyone else keeps them.                 */
 /* body.hideMaintenanceActions is set by the controller      */
 /* extension and removed once the check confirms non-admin.  */
+/* (Copy Request is NOT here — it is admin-only, see 0b.)     */
 /* ========================================================= */
-body.hideMaintenanceActions [id*="DataFieldForAction::CopySticker"],
-body.hideMaintenanceActions [id*="CopySticker"],
 body.hideMaintenanceActions [id*="StandardAction::Create"],
 body.hideMaintenanceActions [id*="StandardAction::Edit"],
 body.hideMaintenanceActions [id*="StandardAction::Delete"] {
@@ -15,17 +14,18 @@ body.hideMaintenanceActions [id*="StandardAction::Delete"] {
 }
 
 /* ========================================================= */
-/* 0b. MAINTAIN APPOINTMENT LOCATIONS (ADMIN-ONLY)           */
-/* The "Maintain Appointment Locations" intent-based action  */
-/* (SemanticObject MaintAppointmentLocation) is shown ONLY   */
-/* to Sticker admins. body.hideMaintLocationAction is set by */
-/* the controller extension and removed only once the check  */
-/* confirms StickerAdmin = "X"; hidden for everyone else.    */
-/* The MDC table bakes the fully-qualified intent name into  */
-/* the button id, so we match the "MaintAppointmentLocation" */
-/* substring (unique to this action) rather than a prefix.   */
+/* 0b. ADMIN-ONLY ACTIONS                                    */
+/* "Copy Request" (CopySticker) and "Maintain Appointment    */
+/* Locations" (SemanticObject MaintAppointmentLocation) are  */
+/* shown ONLY to Sticker admins. body.hideAdminOnlyActions   */
+/* is set by the controller extension and removed only once  */
+/* the check confirms StickerAdmin = "X"; hidden otherwise.  */
+/* The MDC table bakes the fully-qualified action/intent name */
+/* into the button id, so we match the distinctive           */
+/* "CopySticker" / "MaintAppointmentLocation" substrings.    */
 /* ========================================================= */
-body.hideMaintLocationAction [id*="MaintAppointmentLocation"] {
+body.hideAdminOnlyActions [id*="CopySticker"],
+body.hideAdminOnlyActions [id*="MaintAppointmentLocation"] {
     display: none !important;
 }
 
