@@ -15,6 +15,21 @@ body.hideMaintenanceActions [id*="StandardAction::Delete"] {
 }
 
 /* ========================================================= */
+/* 0b. MAINTAIN APPOINTMENT LOCATIONS (ADMIN-ONLY)           */
+/* The "Maintain Appointment Locations" intent-based action  */
+/* (SemanticObject MaintAppointmentLocation) is shown ONLY   */
+/* to Sticker admins. body.hideMaintLocationAction is set by */
+/* the controller extension and removed only once the check  */
+/* confirms StickerAdmin = "X"; hidden for everyone else.    */
+/* The MDC table bakes the fully-qualified intent name into  */
+/* the button id, so we match the "MaintAppointmentLocation" */
+/* substring (unique to this action) rather than a prefix.   */
+/* ========================================================= */
+body.hideMaintLocationAction [id*="MaintAppointmentLocation"] {
+    display: none !important;
+}
+
+/* ========================================================= */
 /* 1. HEADER STRIP (BLENDED LAYOUT)                          */
 /* ========================================================= */
 .zhrjhahsecstk-app .nativeViolatorStrip {

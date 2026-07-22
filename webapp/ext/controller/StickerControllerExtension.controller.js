@@ -304,18 +304,29 @@ sap.ui.define([
         },
 
         /**
-         * Toggle visibility of the maintenance actions (Create, Copy Request,
-         * Edit, Delete) based on the logged-in user's Sticker-admin flag. The
-         * flag lives on the VAR service's EmployeeHeader entity (StickerAdmin =
-         * "X" for admins), exposed here via the "varAuth" model. Admins get a
-         * read-only view: the actions are hidden for them
-         * (body.hideMaintenanceActions + css/style.css) and shown to everyone
-         * else. Hidden by default until the check resolves, so admins never see
-         * them flash in; on a failed check they stay hidden (safe default).
+         * Toggle visibility of the role-gated actions based on the logged-in
+         * user's Sticker-admin flag. The flag lives on the VAR service's
+         * EmployeeHeader entity (StickerAdmin = "X" for admins), exposed here
+         * via the "varAuth" model. Two independent, opposite gates are applied:
+         *
+         *   1. Maintenance actions (Create, Copy Request, Edit, Delete):
+         *      hidden FROM admins — admins get a read-only view
+         *      (body.hideMaintenanceActions + css/style.css), shown to everyone
+         *      else.
+         *   2. "Maintain Appointment Locations" (intent-based navigation,
+         *      SemanticObject MaintAppointmentLocation): shown ONLY to admins
+         *      (body.hideMaintLocationAction + css/style.css), hidden for
+         *      everyone else.
+         *
+         * Both are set to their safe default (hidden) until the check resolves,
+         * so nothing flashes in; on a failed check they stay at that default.
          */
         _applyMaintenanceActionVisibility: function () {
-            // Hidden until the role is known.
+            // Safe defaults until the role is known: maintenance actions hidden
+            // (revealed for non-admins) and the maintain-locations action hidden
+            // (revealed only for admins).
             document.body.classList.add("hideMaintenanceActions");
+            document.body.classList.add("hideMaintLocationAction");
 
             // During onInit the view isn't connected to the component tree yet,
             // so named component models aren't propagated to it. Read the model
@@ -337,13 +348,17 @@ sap.ui.define([
                         bIsStickerAdmin = oUserData && oUserData.StickerAdmin === "X";
                     }
                     if (bIsStickerAdmin) {
+                        // Admins: read-only (maintenance hidden), but can maintain locations.
                         document.body.classList.add("hideMaintenanceActions");
+                        document.body.classList.remove("hideMaintLocationAction");
                     } else {
+                        // Non-admins: full maintenance, but no maintain-locations action.
                         document.body.classList.remove("hideMaintenanceActions");
+                        document.body.classList.add("hideMaintLocationAction");
                     }
                 }).catch(function (err) {
                     console.error("Sticker admin check fetch failed:", err);
-                    // Keep it hidden on failure (safe default).
+                    // Keep both at their safe default (hidden) on failure.
                 });
             } catch (err) {
                 console.error("Error running Sticker admin check:", err);
