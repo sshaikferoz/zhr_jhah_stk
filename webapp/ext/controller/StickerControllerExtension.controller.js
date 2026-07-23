@@ -321,47 +321,60 @@ sap.ui.define([
          * so nothing flashes in; on a failed check they stay at that default.
          */
         _applyMaintenanceActionVisibility: function () {
-            // Safe defaults until the role is known: maintenance actions hidden
-            // (revealed for non-admins) and the admin-only actions hidden
-            // (revealed only for admins).
+            // Safe default: hide everything until authorization is known
             document.body.classList.add("hideMaintenanceActions");
             document.body.classList.add("hideAdminOnlyActions");
 
-            // During onInit the view isn't connected to the component tree yet,
-            // so named component models aren't propagated to it. Read the model
-            // from the app component, which owns it, and fall back to the view.
             var oView = this.base.getView();
-            var oComponent = (typeof this.base.getAppComponent === "function") ? this.base.getAppComponent() : null;
-            var oVarModel = (oComponent && oComponent.getModel("varAuth")) || (oView && oView.getModel("varAuth"));
+            var oComponent = this.base.getAppComponent?.();
+
+            var oVarModel =
+                (oComponent && oComponent.getModel("varAuth")) ||
+                (oView && oView.getModel("varAuth"));
+
             if (!oVarModel) {
-                console.error("varAuth model not available for Sticker admin check.");
+                console.error("varAuth model not available.");
                 return;
             }
 
             try {
-                var oListBinding = oVarModel.bindList("/EmployeeHeader", null, null, null, { $$groupId: "$direct" });
-                oListBinding.requestContexts(0, 1).then(function (aContexts) {
+                var oBinding = oVarModel.bindList(
+                    "/EmployeeHeader",
+                    null,
+                    null,
+                    null,
+                    { $$groupId: "$direct" }
+                );
+
+                oBinding.requestContexts(0, 1).then(function (aContexts) {
+
                     var bIsStickerAdmin = false;
-                    if (aContexts && aContexts.length > 0) {
-                        var oUserData = aContexts[0].getObject();
-                        bIsStickerAdmin = oUserData && oUserData.StickerAdmin === "X";
+
+                    if (aContexts.length) {
+                        bIsStickerAdmin =
+                            aContexts[0].getObject()?.StickerAdmin === "X";
                     }
+
                     if (bIsStickerAdmin) {
-                        // Admins: read-only (Create/Edit/Delete hidden), but keep
-                        // the admin-only actions (Copy Request, Maintain Locations).
+                        // Admin:
+                        // Hide Create/Edit/Delete/Copy
+                        // Show Maintain Appointment Location
                         document.body.classList.add("hideMaintenanceActions");
                         document.body.classList.remove("hideAdminOnlyActions");
                     } else {
-                        // Non-admins: full maintenance, but no admin-only actions.
+                        // Non Admin:
+                        // Show Create/Edit/Delete/Copy
+                        // Hide Maintain Appointment Location
                         document.body.classList.remove("hideMaintenanceActions");
                         document.body.classList.add("hideAdminOnlyActions");
                     }
+
                 }).catch(function (err) {
-                    console.error("Sticker admin check fetch failed:", err);
-                    // Keep both at their safe default (hidden) on failure.
+                    console.error(err);
                 });
+
             } catch (err) {
-                console.error("Error running Sticker admin check:", err);
+                console.error(err);
             }
         }
     });

@@ -1,30 +1,35 @@
 /* ========================================================= */
 /* 0. MAINTENANCE ACTION VISIBILITY                          */
-/* Create / Edit / Delete are hidden from Sticker admins     */
-/* (StickerAdmin = "X" on EmployeeHeader), who get a         */
-/* read-only view; everyone else keeps them.                 */
-/* body.hideMaintenanceActions is set by the controller      */
-/* extension and removed once the check confirms non-admin.  */
-/* (Copy Request is NOT here — it is admin-only, see 0b.)     */
+/*                                                          */
+/* Sticker Admin (StickerAdmin = "X")                       */
+/*   Disable Create                                               */
+/*   Disable Edit                                                 */
+/*   Disable Delete                                               */
+/*   Disable Request                                         */
+/*   Enable Maintain Appointment Location                        */
+/*                                                          */
+/* Non-Admin                                                */
+/*   Enable Create                                               */
+/*   Enable Edit                                                 */
+/*   Enable Delete                                               */
+/*   Enable Copy Request                                         */
+/*   Disable Maintain Appointment Location                        */
 /* ========================================================= */
+
+/* Hide maintenance actions for Sticker Admins */
 body.hideMaintenanceActions [id*="StandardAction::Create"],
 body.hideMaintenanceActions [id*="StandardAction::Edit"],
-body.hideMaintenanceActions [id*="StandardAction::Delete"] {
+body.hideMaintenanceActions [id*="StandardAction::Delete"],
+body.hideMaintenanceActions [id*="CopySticker"] {
     display: none !important;
 }
 
 /* ========================================================= */
-/* 0b. ADMIN-ONLY ACTIONS                                    */
-/* "Copy Request" (CopySticker) and "Maintain Appointment    */
-/* Locations" (SemanticObject MaintAppointmentLocation) are  */
-/* shown ONLY to Sticker admins. body.hideAdminOnlyActions   */
-/* is set by the controller extension and removed only once  */
-/* the check confirms StickerAdmin = "X"; hidden otherwise.  */
-/* The MDC table bakes the fully-qualified action/intent name */
-/* into the button id, so we match the distinctive           */
-/* "CopySticker" / "MaintAppointmentLocation" substrings.    */
+/* 0b. ADMIN-ONLY ACTIONS                                   */
+/* Maintain Appointment Location is visible ONLY for        */
+/* Sticker Admins.                                          */
 /* ========================================================= */
-body.hideAdminOnlyActions [id*="CopySticker"],
+
 body.hideAdminOnlyActions [id*="MaintAppointmentLocation"] {
     display: none !important;
 }
@@ -32,6 +37,7 @@ body.hideAdminOnlyActions [id*="MaintAppointmentLocation"] {
 /* ========================================================= */
 /* 1. HEADER STRIP (BLENDED LAYOUT)                          */
 /* ========================================================= */
+
 .zhrjhahsecstk-app .nativeViolatorStrip {
     flex-basis: 100%;
     width: 100%;
@@ -42,7 +48,7 @@ body.hideAdminOnlyActions [id*="MaintAppointmentLocation"] {
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 0.5rem 0 0.5rem 0;
+    padding: 0.5rem 0;
 }
 
 .zhrjhahsecstk-app .violatorCol {
@@ -56,8 +62,9 @@ body.hideAdminOnlyActions [id*="MaintAppointmentLocation"] {
 }
 
 /* ========================================================= */
-/* 2. ALIGNMENT FOR HEADER STRIP                             */
+/* 2. HEADER STRIP ALIGNMENT                                 */
 /* ========================================================= */
+
 .zhrjhahsecstk-app .violatorRow {
     align-items: center !important;
     margin-bottom: 6px !important;
@@ -78,11 +85,11 @@ body.hideAdminOnlyActions [id*="MaintAppointmentLocation"] {
 }
 
 /* ========================================================= */
-/* 3. FIELD GROUP VALUE ALIGNMENT FIX                        */
-/* Applies ONLY to JHAH custom themes                        */
+/* 3. FIELD GROUP VALUE ALIGNMENT                            */
+/* Applies only to JHAH custom themes                        */
 /* ========================================================= */
 
-/* Remove the custom theme indentation applied to the value */
+/* Remove custom indentation from form values */
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] > dd {
     margin: 0 !important;
     margin-inline-start: 0 !important;
@@ -90,7 +97,7 @@ html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] > dd {
     padding-inline-start: 0 !important;
 }
 
-/* Stretch the value container to use the available width */
+/* Stretch value container */
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapUiFormElementContent,
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] [id$="Field-content"] {
     width: 100% !important;
@@ -98,20 +105,19 @@ html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] [id$="Field-content"] {
     padding: 0 !important;
 }
 
-/* Ensure the field/value itself starts from the left */
+/* Align field values */
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMText,
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMTextMaxWidth,
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMdcField,
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMdcField > * {
-    text-align: left !important;
     text-align: start !important;
     margin: 0 !important;
     padding: 0 !important;
 }
 
 /* ========================================================= */
-/* JHAH CUSTOM THEMES ONLY                                   */
-/* Align form content without moving subsection headers       */
+/* JHAH CUSTOM THEMES                                        */
+/* Align form content without moving subsection headers      */
 /* ========================================================= */
 
 html[class*="sapUiTheme-JHAH"] .sapUiFormCL {
@@ -128,12 +134,9 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
 }
 
 /* ========================================================= */
-/* 4. APPOINTMENT TIME-SLOT GRID                             */
-/* Chip buttons rendered by ext/control/SlotGrid.js inside   */
-/* the TimeSlotPopover value help; the column count adapts   */
-/* to the popover width. Scoping via .zhrjhahsecstk-app on   */
-/* <body> still matches the popover's static-area DOM.       */
+/* 4. APPOINTMENT TIME SLOT GRID                             */
 /* ========================================================= */
+
 .zhrjhahsecstk-app .zhrSlotGrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr));
