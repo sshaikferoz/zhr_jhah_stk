@@ -30,7 +30,10 @@ body.hideMaintenanceActions [id*="CopySticker"] {
 /* Sticker Admins.                                          */
 /* ========================================================= */
 
-body.hideAdminOnlyActions [id*="MaintAppointmentLocation"] {
+body.hideAdminOnlyActions [id*="MaintAppointmentLocation"],
+body.hideAdminOnlyActions [id*="Approve"],
+body.hideAdminOnlyActions [id*="Reject"]  
+{
     display: none !important;
 }
 
