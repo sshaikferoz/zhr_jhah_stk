@@ -205,6 +205,7 @@
                 </Key>
                 <Property Name="StkReqId" Type="Edm.String" Nullable="false" MaxLength="8"/>
                 <Property Name="StkReqIdStr" Type="Edm.String" Nullable="false" MaxLength="24"/>
+                <Property Name="StickerNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
                 <Property Name="StkType" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="StkTypeDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="BadgeNo" Type="Edm.String" Nullable="false" MaxLength="8"/>
@@ -250,6 +251,7 @@
                 <Property Name="RequestDate" Type="Edm.Date"/>
                 <Property Name="ExpireDate" Type="Edm.Date"/>
                 <Property Name="ValidityDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Remarks" Type="Edm.String" Nullable="false" MaxLength="255"/>
                 <Property Name="HideExpireDate" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="LastChangedAt" Type="Edm.DateTimeOffset" Precision="7"/>
                 <Property Name="LocalLastChangedAt" Type="Edm.DateTimeOffset" Precision="7"/>
@@ -366,7 +368,16 @@
                 <Property Name="AppointmentFromTime" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="AppointmentLocation" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="AppointmentToTime" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Color" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="JhahId" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Location" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Manufacturer" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="PlateNum" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="PlateNum1" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="PlateNum2" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="PlateNum3" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="PlateTyp" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="StkType" Type="Edm.Byte" Nullable="false"/>
             </ComplexType>
             <ComplexType Name="StickerMasterCbAControl">
                 <Property Name="_Evidence" Type="Edm.Boolean" Nullable="false"/>
@@ -376,6 +387,7 @@
             </ComplexType>
             <ComplexType Name="StickerMasterOperationControl">
                 <Property Name="Approve" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="CancelRequest" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="CopySticker" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="Edit" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="ImmediateValidationsOnEnter" Type="Edm.Boolean" Nullable="false"/>
@@ -439,6 +451,12 @@
             </ComplexType>
             <Action Name="RenewSticker" EntitySetPath="_it" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
+                <Parameter Name="stkreqid" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Parameter Name="appointmentdate" Type="Edm.Date" Nullable="true"/>
+                <Parameter Name="appointmentfromtime" Type="Edm.TimeOfDay" Nullable="false"/>
+                <Parameter Name="appointmenttotime" Type="Edm.TimeOfDay" Nullable="false"/>
+                <Parameter Name="appointmentlocation" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Parameter Name="slotid" Type="Edm.String" Nullable="false" MaxLength="15"/>
                 <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="true"/>
             </Action>
             <Action Name="onStickerCreateExt" IsBound="true">
@@ -473,6 +491,10 @@
             </Action>
             <Action Name="Resume" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
+            </Action>
+            <Action Name="CancelRequest" IsBound="true">
+                <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
+                <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ZHR_STK_RETURN_PRM" Nullable="true"/>
             </Action>
             <Action Name="Activate" EntitySetPath="_it" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
@@ -1577,13 +1599,18 @@
                 <Annotation Term="SAP__common.Label" String="SMS Request No."/>
                 <Annotation Term="SAP__common.QuickInfo" String="Unique Request No. for the sticker management system"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/StickerNumber">
+                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
+                <Annotation Term="SAP__common.Heading" String="Sticker Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Sticker Number"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/StkType">
                 <Annotation Term="SAP__common.Label" String="Type of Request"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Request types"/>
                 <Annotation Term="SAP__common.Text" Path="StkTypeDesc">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/StkType"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
                         <String>../../../../srvd_f4/sap/zi_hr_stk_types/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.et-zc_hr_stk_mstr.stktype'/$metadata</String>
@@ -1673,7 +1700,7 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Employee's Name (Sortable by LAST NAME FIRST NAME)"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/Location">
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/Location"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__common.Label" String="Visitor Location"/>
             </Annotations>
@@ -1716,7 +1743,7 @@
                 <Annotation Term="SAP__common.Text" Path="PlateTypDesc">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/PlateTyp"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
@@ -1731,7 +1758,7 @@
                 <Annotation Term="SAP__common.Text" Path="ManufacturerDesc">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/Manufacturer"/>
                 <Annotation Term="SAP__common.IsDigitSequence"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
@@ -1746,7 +1773,7 @@
                 <Annotation Term="SAP__common.Text" Path="ColorDesc">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/Color"/>
                 <Annotation Term="SAP__common.IsDigitSequence"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
@@ -1761,6 +1788,7 @@
                 <Annotation Term="SAP__common.Text" Path="PlateNum1Desc">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/PlateNum1"/>
                 <Annotation Term="SAP__common.IsDigitSequence"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
@@ -1776,6 +1804,7 @@
                 <Annotation Term="SAP__common.Text" Path="PlateNum2Desc">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/PlateNum2"/>
                 <Annotation Term="SAP__common.IsDigitSequence"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
@@ -1791,6 +1820,7 @@
                 <Annotation Term="SAP__common.Text" Path="PlateNum3Desc">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/PlateNum3"/>
                 <Annotation Term="SAP__common.IsDigitSequence"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
@@ -1802,7 +1832,7 @@
                 <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/PlateNum">
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/PlateNum"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__common.Label" String="License Plate Number"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
@@ -1864,6 +1894,11 @@
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/Remarks">
+                <Annotation Term="SAP__common.Label" String="Sticker Expire Remarks"/>
+                <Annotation Term="SAP__common.Heading" String="Sticker Expire Remarks"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Sticker Expire Date Remarks"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/LastChangedAt">
                 <Annotation Term="SAP__core.Computed"/>
@@ -2045,6 +2080,33 @@
                     <Collection/>
                 </Annotation>
             </Annotations>
+            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/appointmentdate">
+                <Annotation Term="SAP__common.Label" String="Appointment Date"/>
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Collection>
+                        <String>../../../../srvd_f4/sap/zi_hr_stk_appointment_slots/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.renewsticker.appointmentdate.StickerMasterType'/$metadata</String>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/appointmentfromtime">
+                <Annotation Term="SAP__common.Label" String="Appointment From Time"/>
+            </Annotations>
+            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/appointmenttotime">
+                <Annotation Term="SAP__common.Label" String="Appointment To Time"/>
+            </Annotations>
+            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/appointmentlocation">
+                <Annotation Term="SAP__common.Label" String="Appointment Location"/>
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Collection>
+                        <String>../../../../srvd_f4/sap/zhr_stk_location_vh/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.renewsticker.appointmentlocation.StickerMasterType'/$metadata</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+            </Annotations>
+            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/slotid">
+                <Annotation Term="SAP__common.Label" String="Slot ID"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
             <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)">
                 <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/RenewSticker"/>
                 <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Action_RenewSticker">
@@ -2071,6 +2133,9 @@
             </Annotations>
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/action">
                 <Annotation Term="SAP__common.Label" String="Action"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CancelRequest(SAP__self.StickerMasterType)">
+                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/CancelRequest"/>
             </Annotations>
             <Annotations Target="SAP__self.reschedulePopup(SAP__self.StickerMasterType)/appointmentdate">
                 <Annotation Term="SAP__common.Label" String="Appointment Date"/>
@@ -2141,8 +2206,12 @@
                         </PropertyValue>
                         <PropertyValue Property="TargetProperties">
                             <Collection>
+                                <String>_it/ExpireDate</String>
+                                <String>_it/HideExpireDate</String>
+                                <String>_it/Remarks</String>
                                 <String>_it/StatsCriticality</String>
                                 <String>_it/Status</String>
+                                <String>_it/StickerNumber</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -2157,8 +2226,6 @@
                     <Record Type="SAP__common.SideEffectsType">
                         <PropertyValue Property="TargetProperties">
                             <Collection>
-                                <String>_it/ExpireDate</String>
-                                <String>_it/HideExpireDate</String>
                                 <String>_it/StatsCriticality</String>
                                 <String>_it/Status</String>
                                 <String>_it/__OperationControl/Approve</String>
@@ -2352,6 +2419,12 @@
                         <PropertyValue Property="Criticality" Path="StatsCriticality"/>
                     </Record>
                 </Annotation>
+                <Annotation Term="SAP__UI.DataPoint" Qualifier="StickNo">
+                    <Record>
+                        <PropertyValue Property="Value" Path="StickerNumber"/>
+                        <PropertyValue Property="Title" String="Issued Sticker No."/>
+                    </Record>
+                </Annotation>
                 <Annotation Term="SAP__UI.DataPoint" Qualifier="Type">
                     <Record>
                         <PropertyValue Property="Value" Path="StkTypeDesc"/>
@@ -2363,6 +2436,10 @@
                         <Record Type="SAP__UI.ReferenceFacet">
                             <PropertyValue Property="ID" String="Status"/>
                             <PropertyValue Property="Target" AnnotationPath="@SAP__UI.DataPoint#RequestGrp"/>
+                        </Record>
+                        <Record Type="SAP__UI.ReferenceFacet">
+                            <PropertyValue Property="ID" String="StickerNumber"/>
+                            <PropertyValue Property="Target" AnnotationPath="@SAP__UI.DataPoint#StickNo"/>
                         </Record>
                     </Collection>
                 </Annotation>
@@ -2488,6 +2565,10 @@
                                     <PropertyValue Property="Value" Path="VendorName"/>
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="StickerNumber"/>
+                                    <Annotation Term="SAP__UI.Hidden" Path="HideExpireDate"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Value" Path="Department"/>
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
@@ -2501,6 +2582,10 @@
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Value" Path="ExpireDate"/>
+                                    <Annotation Term="SAP__UI.Hidden" Path="HideExpireDate"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="Remarks"/>
                                     <Annotation Term="SAP__UI.Hidden" Path="HideExpireDate"/>
                                 </Record>
                             </Collection>
@@ -2609,6 +2694,10 @@
                             <PropertyValue Property="Value" Path="PlateNumEng"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="StickerNumber"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="ArabicPlateNum"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
@@ -2640,6 +2729,11 @@
                         <Record Type="SAP__UI.DataFieldForAction">
                             <PropertyValue Property="Label" String="Renew Sticker"/>
                             <PropertyValue Property="Action" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.RenewSticker(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)"/>
+                            <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataFieldForAction">
+                            <PropertyValue Property="Label" String="Cancel Request"/>
+                            <PropertyValue Property="Action" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.CancelRequest(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)"/>
                             <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
                         </Record>
                     </Collection>
@@ -2676,10 +2770,18 @@
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="StickerNumber"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Criticality" Path="StatsCriticality"/>
                             <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithIcon"/>
                             <PropertyValue Property="Value" Path="Status"/>
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataFieldForAction">
+                            <PropertyValue Property="Label" String="Cancel Request"/>
+                            <PropertyValue Property="Action" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.CancelRequest(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)"/>
+                            <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
                         </Record>
                         <Record Type="SAP__UI.DataFieldForAction">
                             <PropertyValue Property="Label" String="Copy Request"/>
@@ -3098,6 +3200,12 @@
                 <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
             </Annotations>
+            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/stkreqid">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
+                <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
+            </Annotations>
             <Annotations Target="SAP__self.I_DraftAdministrativeDataType/DraftUUID">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Draft (Technical ID)"/>
@@ -3361,12 +3469,62 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/Color">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/__FieldControl/JhahId">
                 <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/Location">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/Manufacturer">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/PlateNum">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/PlateNum1">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/PlateNum2">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/PlateNum3">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/PlateTyp">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/StkType">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/__OperationControl/Approve">
+                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__OperationControl/CancelRequest">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
@@ -3468,7 +3626,52 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/Color">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterControl/JhahId">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/Location">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/Manufacturer">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/PlateNum">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/PlateNum1">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/PlateNum2">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/PlateNum3">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/PlateTyp">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/StkType">
                 <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
@@ -3484,6 +3687,11 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterOperationControl/Approve">
+                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterOperationControl/CancelRequest">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
@@ -3632,11 +3840,11 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Method Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Method Property"/>
             </Annotations>
-            <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_1/Evidence/AttachmentUuid">
+            <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_2/Evidence/AttachmentUuid">
                 <Annotation Term="SAP__common.Label" String="UUID"/>
                 <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)"/>
             </Annotations>
-            <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_1/Evidence/stkreqid">
+            <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_2/Evidence/stkreqid">
                 <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
                 <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>

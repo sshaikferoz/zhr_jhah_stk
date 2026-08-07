@@ -49,61 +49,50 @@
         <edmx:Include Namespace="com.sap.gateway.srvd.zsrv_hr_stk.v0001" Alias="SAP__ParentService"/>
     </edmx:Reference>
     <edmx:DataServices>
-        <Schema Namespace="com.sap.gateway.srvd_f4.zhr_stk_validity_period_vh.v0001" Alias="SAP__self">
+        <Schema Namespace="com.sap.gateway.srvd_f4.zhr_stk_location_vh.v0001" Alias="SAP__self">
             <Annotation Term="SAP__core.SchemaVersion" String="1.0.0"/>
-            <EntityType Name="ZHR_STK_VALIDITY_PERIOD_VHType">
+            <EntityType Name="ZHR_STK_LOCATION_VHType">
                 <Key>
-                    <PropertyRef Name="ValidityValue"/>
+                    <PropertyRef Name="Uuid"/>
+                    <PropertyRef Name="LocationValue"/>
                 </Key>
-                <Property Name="ValidityValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
-                <Property Name="ValidityDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Uuid" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="LocationValue" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="LocationDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
             </EntityType>
             <EntityContainer Name="Container">
-                <EntitySet Name="ZHR_STK_VALIDITY_PERIOD_VH" EntityType="com.sap.gateway.srvd_f4.zhr_stk_validity_period_vh.v0001.ZHR_STK_VALIDITY_PERIOD_VHType"/>
+                <EntitySet Name="ZHR_STK_LOCATION_VH" EntityType="com.sap.gateway.srvd_f4.zhr_stk_location_vh.v0001.ZHR_STK_LOCATION_VHType"/>
             </EntityContainer>
-            <Annotations Target="SAP__self.ZHR_STK_VALIDITY_PERIOD_VHType/ValidityValue">
-                <Annotation Term="SAP__common.Text" Path="ValidityDesc"/>
+            <Annotations Target="SAP__self.ZHR_STK_LOCATION_VHType/LocationValue">
+                <Annotation Term="SAP__common.Text" Path="LocationDesc"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
-                <Annotation Term="SAP__UI.Hidden"/>
-                <Annotation Term="SAP__common.Label" String="Lower Value"/>
-                <Annotation Term="SAP__common.Heading" String="Fixed"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Values for Domains: Single Value/Lower Limit"/>
+                <Annotation Term="SAP__common.Label" String="Sticker Location"/>
+                <Annotation Term="SAP__common.Heading" String="Maintenance of Sticker Location"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Maintenance of Sticker Location"/>
             </Annotations>
-            <Annotations Target="SAP__ParentService.IssueSticker(SAP__ParentService.StickerMasterType)/ValidityPeriod">
+            <Annotations Target="SAP__ParentService.RenewSticker(SAP__ParentService.StickerMasterType)/appointmentlocation">
                 <Annotation Term="SAP__common.ValueListMapping">
                     <Record>
-                        <PropertyValue Property="Label" String="Vaidity Period of the Request"/>
-                        <PropertyValue Property="CollectionPath" String="ZHR_STK_VALIDITY_PERIOD_VH"/>
+                        <PropertyValue Property="Label" String="Location Details of the Request"/>
+                        <PropertyValue Property="CollectionPath" String="ZHR_STK_LOCATION_VH"/>
                         <PropertyValue Property="Parameters">
                             <Collection>
                                 <Record Type="SAP__common.ValueListParameterInOut">
-                                    <PropertyValue Property="LocalDataProperty" PropertyPath="ValidityPeriod"/>
-                                    <PropertyValue Property="ValueListProperty" String="ValidityValue"/>
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="appointmentlocation"/>
+                                    <PropertyValue Property="ValueListProperty" String="LocationValue"/>
                                 </Record>
                                 <Record Type="SAP__common.ValueListParameterDisplayOnly">
-                                    <PropertyValue Property="ValueListProperty" String="ValidityDesc"/>
+                                    <PropertyValue Property="ValueListProperty" String="LocationDesc"/>
                                 </Record>
                             </Collection>
                         </PropertyValue>
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="SAP__self.ZHR_STK_VALIDITY_PERIOD_VHType">
-                <Annotation Term="SAP__common.Label" String="Vaidity Period of the Request"/>
-                <Annotation Term="SAP__UI.PresentationVariant">
-                    <Record>
-                        <PropertyValue Property="SortOrder">
-                            <Collection>
-                                <Record Type="SAP__common.SortOrderType">
-                                    <PropertyValue Property="Property" PropertyPath="ValidityDesc"/>
-                                    <PropertyValue Property="Descending" Bool="true"/>
-                                </Record>
-                            </Collection>
-                        </PropertyValue>
-                    </Record>
-                </Annotation>
+            <Annotations Target="SAP__self.ZHR_STK_LOCATION_VHType">
+                <Annotation Term="SAP__common.Label" String="Location Details of the Request"/>
             </Annotations>
-            <Annotations Target="SAP__self.Container/ZHR_STK_VALIDITY_PERIOD_VH">
+            <Annotations Target="SAP__self.Container/ZHR_STK_LOCATION_VH">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
                         <PropertyValue Property="Searchable" Bool="false"/>
@@ -191,9 +180,14 @@
                 <Annotation Term="SAP__capabilities.KeyAsSegmentSupported"/>
                 <Annotation Term="SAP__capabilities.AsynchronousRequestsSupported"/>
             </Annotations>
-            <Annotations Target="SAP__self.ZHR_STK_VALIDITY_PERIOD_VHType/ValidityDesc">
-                <Annotation Term="SAP__common.Label" String="Short Description"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            <Annotations Target="SAP__self.ZHR_STK_LOCATION_VHType/Uuid">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="UUID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_STK_LOCATION_VHType/LocationDesc">
+                <Annotation Term="SAP__common.Label" String="Short text"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Explanatory Short Text"/>
             </Annotations>
         </Schema>
     </edmx:DataServices>

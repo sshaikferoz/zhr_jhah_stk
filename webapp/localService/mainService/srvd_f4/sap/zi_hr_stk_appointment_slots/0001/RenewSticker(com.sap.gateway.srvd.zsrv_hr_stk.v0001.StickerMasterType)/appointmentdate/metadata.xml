@@ -49,61 +49,87 @@
         <edmx:Include Namespace="com.sap.gateway.srvd.zsrv_hr_stk.v0001" Alias="SAP__ParentService"/>
     </edmx:Reference>
     <edmx:DataServices>
-        <Schema Namespace="com.sap.gateway.srvd_f4.zhr_stk_validity_period_vh.v0001" Alias="SAP__self">
+        <Schema Namespace="com.sap.gateway.srvd_f4.zi_hr_stk_appointment_slots.v0001" Alias="SAP__self">
             <Annotation Term="SAP__core.SchemaVersion" String="1.0.0"/>
-            <EntityType Name="ZHR_STK_VALIDITY_PERIOD_VHType">
+            <EntityType Name="ZI_HR_STK_APPOINTMENT_SLOTSType">
                 <Key>
-                    <PropertyRef Name="ValidityValue"/>
+                    <PropertyRef Name="Apps"/>
+                    <PropertyRef Name="AppointmentDate"/>
+                    <PropertyRef Name="FromTime"/>
+                    <PropertyRef Name="ToTime"/>
+                    <PropertyRef Name="SlotId"/>
                 </Key>
-                <Property Name="ValidityValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
-                <Property Name="ValidityDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Apps" Type="Edm.String" Nullable="false" MaxLength="7"/>
+                <Property Name="AppointmentDate" Type="Edm.Date" Nullable="false"/>
+                <Property Name="FromTime" Type="Edm.TimeOfDay" Nullable="false"/>
+                <Property Name="ToTime" Type="Edm.TimeOfDay" Nullable="false"/>
+                <Property Name="SlotId" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="Capacity" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="Booked" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="Alotted" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="StickerRequest" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="FormatTime" Type="Edm.TimeOfDay" Nullable="false"/>
             </EntityType>
             <EntityContainer Name="Container">
-                <EntitySet Name="ZHR_STK_VALIDITY_PERIOD_VH" EntityType="com.sap.gateway.srvd_f4.zhr_stk_validity_period_vh.v0001.ZHR_STK_VALIDITY_PERIOD_VHType"/>
+                <EntitySet Name="ZI_HR_STK_APPOINTMENT_SLOTS" EntityType="com.sap.gateway.srvd_f4.zi_hr_stk_appointment_slots.v0001.ZI_HR_STK_APPOINTMENT_SLOTSType"/>
             </EntityContainer>
-            <Annotations Target="SAP__self.ZHR_STK_VALIDITY_PERIOD_VHType/ValidityValue">
-                <Annotation Term="SAP__common.Text" Path="ValidityDesc"/>
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/AppointmentDate">
+                <Annotation Term="SAP__common.Label" String="Appointment Date"/>
+                <Annotation Term="SAP__common.Heading" String="Appointment Date"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Appointment Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/StickerRequest">
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__UI.Hidden"/>
-                <Annotation Term="SAP__common.Label" String="Lower Value"/>
-                <Annotation Term="SAP__common.Heading" String="Fixed"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Values for Domains: Single Value/Lower Limit"/>
+                <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
+                <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
             </Annotations>
-            <Annotations Target="SAP__ParentService.IssueSticker(SAP__ParentService.StickerMasterType)/ValidityPeriod">
+            <Annotations Target="SAP__ParentService.RenewSticker(SAP__ParentService.StickerMasterType)/appointmentdate">
                 <Annotation Term="SAP__common.ValueListMapping">
                     <Record>
-                        <PropertyValue Property="Label" String="Vaidity Period of the Request"/>
-                        <PropertyValue Property="CollectionPath" String="ZHR_STK_VALIDITY_PERIOD_VH"/>
+                        <PropertyValue Property="Label" String="Display the Appointment Slots"/>
+                        <PropertyValue Property="CollectionPath" String="ZI_HR_STK_APPOINTMENT_SLOTS"/>
                         <PropertyValue Property="Parameters">
                             <Collection>
                                 <Record Type="SAP__common.ValueListParameterInOut">
-                                    <PropertyValue Property="LocalDataProperty" PropertyPath="ValidityPeriod"/>
-                                    <PropertyValue Property="ValueListProperty" String="ValidityValue"/>
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="appointmentdate"/>
+                                    <PropertyValue Property="ValueListProperty" String="AppointmentDate"/>
                                 </Record>
-                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
-                                    <PropertyValue Property="ValueListProperty" String="ValidityDesc"/>
+                                <Record Type="SAP__common.ValueListParameterOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="appointmentfromtime"/>
+                                    <PropertyValue Property="ValueListProperty" String="FromTime"/>
                                 </Record>
-                            </Collection>
-                        </PropertyValue>
-                    </Record>
-                </Annotation>
-            </Annotations>
-            <Annotations Target="SAP__self.ZHR_STK_VALIDITY_PERIOD_VHType">
-                <Annotation Term="SAP__common.Label" String="Vaidity Period of the Request"/>
-                <Annotation Term="SAP__UI.PresentationVariant">
-                    <Record>
-                        <PropertyValue Property="SortOrder">
-                            <Collection>
-                                <Record Type="SAP__common.SortOrderType">
-                                    <PropertyValue Property="Property" PropertyPath="ValidityDesc"/>
-                                    <PropertyValue Property="Descending" Bool="true"/>
+                                <Record Type="SAP__common.ValueListParameterOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="appointmenttotime"/>
+                                    <PropertyValue Property="ValueListProperty" String="ToTime"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="slotid"/>
+                                    <PropertyValue Property="ValueListProperty" String="SlotId"/>
                                 </Record>
                             </Collection>
                         </PropertyValue>
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="SAP__self.Container/ZHR_STK_VALIDITY_PERIOD_VH">
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType">
+                <Annotation Term="SAP__common.Label" String="Display the Appointment Slots"/>
+                <Annotation Term="SAP__UI.LineItem">
+                    <Collection>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="AppointmentDate"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="FromTime"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="ToTime"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/ZI_HR_STK_APPOINTMENT_SLOTS">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
                         <PropertyValue Property="Searchable" Bool="false"/>
@@ -191,9 +217,39 @@
                 <Annotation Term="SAP__capabilities.KeyAsSegmentSupported"/>
                 <Annotation Term="SAP__capabilities.AsynchronousRequestsSupported"/>
             </Annotations>
-            <Annotations Target="SAP__self.ZHR_STK_VALIDITY_PERIOD_VHType/ValidityDesc">
-                <Annotation Term="SAP__common.Label" String="Short Description"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/Apps">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="JHAH Applications"/>
+                <Annotation Term="SAP__common.QuickInfo" String="JHAHA Security Applications"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/SlotId">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Slot ID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="SLOTS"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/Capacity">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Capacity"/>
+                <Annotation Term="SAP__common.QuickInfo" String="CAPACITY"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/Booked">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Booked"/>
+                <Annotation Term="SAP__common.QuickInfo" String="BOOKED"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/Alotted">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Alotted"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ALOTTED"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/FormatTime">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/FromTime">
+                <Annotation Term="SAP__common.Label" String="From Time"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_HR_STK_APPOINTMENT_SLOTSType/ToTime">
+                <Annotation Term="SAP__common.Label" String="To Time"/>
             </Annotations>
         </Schema>
     </edmx:DataServices>

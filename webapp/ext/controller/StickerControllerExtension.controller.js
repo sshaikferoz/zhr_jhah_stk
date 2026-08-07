@@ -415,8 +415,6 @@ sap.ui.define([
             ];
 
             var oBinding = oModel.bindList("/StickerMaster", null, null, aFilters, {
-                $count: true,
-                $$groupId: "$direct"
             });
 
             // Sends $count=true&$top=0 — the count only, no entity payload.
