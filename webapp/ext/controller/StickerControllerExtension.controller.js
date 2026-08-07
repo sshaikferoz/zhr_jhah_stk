@@ -96,23 +96,6 @@ sap.ui.define([
                 }
             },
 
-            editFlow: {
-                // Rejecting stops the Create; see _checkActiveStickerLimit.
-                onBeforeCreate: function (mParameters) {
-                    // This extension is registered on the object page too, where
-                    // inline creation in the Evidence table ("…/_Evidence") runs
-                    // through the same hook. Only a new Sticker Master request is
-                    // subject to the limit.
-                    var sContextPath = (mParameters && mParameters.contextPath) || "/StickerMaster";
-                    var aSegments = sContextPath.replace(/\/$/, "").split("/");
-
-                    if (aSegments[aSegments.length - 1] !== "StickerMaster") {
-                        return Promise.resolve();
-                    }
-                    return this._checkActiveStickerLimit();
-                }
-            },
-
             routing: {
                 onAfterBinding: function (oBindingContext) {
                     var oView = this.base.getView();

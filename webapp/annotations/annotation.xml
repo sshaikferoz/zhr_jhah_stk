@@ -2,6 +2,9 @@
     <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
         <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="UI"/>
     </edmx:Reference>
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common"/>
+    </edmx:Reference>
     <edmx:Reference Uri="/sap/opu/odata4/sap/zui_hr_stk/srvd/sap/zsrv_hr_stk/0001/$metadata">
         <edmx:Include Namespace="com.sap.gateway.srvd.zsrv_hr_stk.v0001" Alias="SAP__self"/>
     </edmx:Reference>
@@ -54,6 +57,30 @@
             </Annotations>
             <Annotations Target="SAP__self.Container/StickerMaster">
                 <Annotation Term="UI.DeleteHidden" Bool="true"/>
+            </Annotations>
+
+            <!--
+                Appointment Location is read-only once the request is in process.
+                There is no boolean control field for this on StickerMaster, so the
+                status is compared here; FieldControl takes an If expression as well
+                as a plain path. 'In-Process' is the same literal the appointment
+                fragments compare against, so the three stay in step.
+
+                The else branch keeps the backend's own field control rather than a
+                fixed EnumMember — the service maintains __FieldControl and refreshes
+                it through side effects, and a constant here would override that.
+            -->
+            <Annotations Target="SAP__self.StickerMasterType/AppointmentLocation">
+                <Annotation Term="Common.FieldControl">
+                    <If>
+                        <Eq>
+                            <Path>Status</Path>
+                            <String>In-Process</String>
+                        </Eq>
+                        <EnumMember>Common.FieldControlType/ReadOnly</EnumMember>
+                        <Path>__FieldControl/AppointmentLocation</Path>
+                    </If>
+                </Annotation>
             </Annotations>
         </Schema>
     </edmx:DataServices>
