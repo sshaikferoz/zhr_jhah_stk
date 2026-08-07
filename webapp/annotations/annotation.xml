@@ -52,6 +52,9 @@
                     </Record>
                 </Annotation>
             </Annotations>
+            <Annotations Target="SAP__self.Container/StickerMaster">
+                <Annotation Term="UI.DeleteHidden" Bool="true"/>
+            </Annotations>
         </Schema>
     </edmx:DataServices>
 </edmx:Edmx>

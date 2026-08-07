@@ -16,6 +16,7 @@
     <Input
         id="appointmentSlotInput"
         visible="{= ${ui>/isEditable} }"
+        editable="{= %{Status} !== 'In-Process' &amp;&amp; %{RenewSticker} }"
         value="{apptslots>/selectedLabel}"
         placeholder="Start time"
         showValueHelp="true"

@@ -14,6 +14,7 @@
     <DatePicker
         id="appointmentDatePicker"
         visible="{= ${ui>/isEditable} }"
+        editable="{= %{Status} !== 'In-Process' &amp;&amp; %{RenewSticker} }"
         value="{ path: 'AppointmentDate', type: 'sap.ui.model.odata.type.Date', formatOptions: { style: 'medium' } }"
         minDate="{apptslots>/minDate}"
         maxDate="{apptslots>/maxDate}"
