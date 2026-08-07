@@ -1,12 +1,52 @@
 sap.ui.define([
     "sap/ui/core/mvc/ControllerExtension",
     "sap/ui/core/Fragment",
+    "sap/ui/core/format/DateFormat",
     "sap/ui/model/json/JSONModel",
+    "sap/m/MessageBox",
     "com/jhah/zhrjhahsecstk/ext/util/SlotTimeFormat"
-], function (ControllerExtension, Fragment, JSONModel, SlotTimeFormat) {
+], function (ControllerExtension, Fragment, DateFormat, JSONModel, MessageBox, SlotTimeFormat) {
     "use strict";
 
     var formatTime12h = SlotTimeFormat.formatTime12h;
+
+    var MS_PER_HOUR = 60 * 60 * 1000;
+    var MS_PER_DAY = 24 * MS_PER_HOUR;
+
+    // Rescheduling closes this many hours before the appointment starts, and a
+    // sticker can only be renewed inside this many days before it expires.
+    var RESCHEDULE_CUTOFF_HOURS = 24;
+    var RENEW_WINDOW_DAYS = 30;
+
+    // Marks a toolbar button whose press handler has already been wrapped, so
+    // repeated onPageReady calls don't guard the same button twice.
+    var GUARD_FLAG = "zhrActionGuarded";
+
+    var oDateFormat = DateFormat.getDateInstance({ style: "medium" });
+
+    function formatDate(oDate) {
+        return oDate ? oDateFormat.format(oDate) : "";
+    }
+
+    // Edm.Date reaches the client as "yyyy-MM-dd" and Edm.TimeOfDay as
+    // "HH:mm:ss"; both are wall-clock values, so they are read as local time.
+    function toLocalDate(sDate, sTime) {
+        if (!sDate) { return null; }
+        var oDate = new Date(sDate + "T" + (sTime || "00:00:00"));
+        return isNaN(oDate.getTime()) ? null : oDate;
+    }
+
+    function startOfToday() {
+        var oToday = new Date();
+        oToday.setHours(0, 0, 0, 0);
+        return oToday;
+    }
+
+    function addDays(oDate, iDays) {
+        var oResult = new Date(oDate.getTime());
+        oResult.setDate(oResult.getDate() + iDays);
+        return oResult;
+    }
 
     // FromTime/ToTime (and HideApp) are computed on the backend from the chosen
     // slot. Writing via Context#setProperty bypasses the FE field wiring, so the
@@ -44,6 +84,16 @@ sap.ui.define([
                 }
             },
 
+            // Fires once the page is rendered and bound — the point at which the
+            // annotation-driven toolbar buttons exist and can be guarded.
+            onPageReady: function () {
+                try {
+                    this._applyActionGuards();
+                } catch (err) {
+                    console.error("Failed to apply action guards:", err);
+                }
+            },
+
             routing: {
                 onAfterBinding: function (oBindingContext) {
                     var oView = this.base.getView();
@@ -63,6 +113,13 @@ sap.ui.define([
                         // Build the appointment-slot picker data used by the
                         // AppointmentDatePicker / TimeSlotSelect custom fields.
                         this._loadAppointmentSlots(oView, oAppModel, oBindingContext);
+
+                        // ExpireDate is annotated as hidden on the object page, so
+                        // warm its cache entry here — the Renew guard reads it
+                        // synchronously while handling the button press.
+                        oBindingContext.requestProperty("ExpireDate").catch(function (err) {
+                            console.error("Failed to read ExpireDate property:", err);
+                        });
 
                         oBindingContext.requestProperty("JhahId").then(function (sJhahId) {
 
@@ -304,6 +361,128 @@ sap.ui.define([
         },
 
         /**
+         * Wrap the press handler of the annotation-driven "Reschedule" and
+         * "Renew Sticker" buttons so a business rule is checked BEFORE Fiori
+         * Elements opens the action dialog. On a violation the FE handlers are
+         * never reached, so the user sees the error instead of the popup.
+         *
+         * Idempotent: buttons already wrapped are skipped, and buttons that do
+         * not carry a press handler yet are retried on the next onPageReady.
+         */
+        _applyActionGuards: function () {
+            this._guardActionButton("reschedulePopup", this._validateReschedule);
+            this._guardActionButton("RenewSticker", this._validateRenew);
+        },
+
+        /**
+         * @param {string} sActionName  Fragment of the FE-generated button id —
+         *        action buttons carry the unbound action name (see css/style.css,
+         *        which gates the same buttons by id).
+         * @param {function} fnValidate Called with the button's binding context;
+         *        returns an error text to block the action, or null to allow it.
+         *        Must be synchronous — the press event object is pooled by UI5
+         *        and cannot be replayed after an await.
+         */
+        _guardActionButton: function (sActionName, fnValidate) {
+            var that = this;
+            var oView = this.base.getView();
+
+            var aButtons = oView.findAggregatedObjects(true, function (oControl) {
+                return oControl.isA("sap.m.Button") &&
+                    oControl.getId().indexOf(sActionName) !== -1;
+            });
+
+            aButtons.forEach(function (oButton) {
+                if (oButton.data(GUARD_FLAG)) { return; }
+
+                // FE attaches its own press handler when it builds the button;
+                // detach it, put ours in front, and replay it only when the
+                // validation passes. UI5 has no way to stop later handlers of
+                // the same event, so wrapping is the only ordering that works.
+                var aHandlers = ((oButton.mEventRegistry && oButton.mEventRegistry.press) || []).slice();
+                if (!aHandlers.length) { return; }
+
+                aHandlers.forEach(function (oHandler) {
+                    oButton.detachPress(oHandler.fFunction, oHandler.oListener);
+                });
+
+                oButton.attachPress(function (oEvent) {
+                    var oContext = oButton.getBindingContext() || oView.getBindingContext();
+                    var sError = oContext ? fnValidate.call(that, oContext) : null;
+
+                    if (sError) {
+                        MessageBox.error(sError);
+                        return;
+                    }
+
+                    aHandlers.forEach(function (oHandler) {
+                        oHandler.fFunction.call(oHandler.oListener || oButton, oEvent, oHandler.oData);
+                    });
+                });
+
+                oButton.data(GUARD_FLAG, true);
+            });
+        },
+
+        /**
+         * An appointment may not be rescheduled once it is less than 24 hours
+         * away. Sticker admins are exempt and may reschedule at any time; while
+         * the admin check is still pending the rule is enforced, matching the
+         * restrictive default used for the action visibility.
+         */
+        _validateReschedule: function (oContext) {
+            if (this._bIsStickerAdmin) { return null; }
+
+            var oAppointment = toLocalDate(
+                oContext.getProperty("AppointmentDate"),
+                oContext.getProperty("AppointmentFromTime")
+            );
+            // No appointment booked yet — nothing to protect.
+            if (!oAppointment) { return null; }
+
+            var iHoursLeft = (oAppointment.getTime() - Date.now()) / MS_PER_HOUR;
+            if (iHoursLeft < RESCHEDULE_CUTOFF_HOURS) {
+                // Empty for a cleared slot (stored as 00:00:00), so the message
+                // falls back to the date alone.
+                var sSlot = SlotTimeFormat.range(
+                    oContext.getProperty("AppointmentFromTime"),
+                    oContext.getProperty("AppointmentToTime")
+                );
+                return "Please note that appointments can only be rescheduled or canceled up to 24 hours before the approved appointment date and time.";
+            }
+            return null;
+        },
+
+        /**
+         * A sticker can only be renewed inside the last 30 days of its validity:
+         * not earlier than 30 days before ExpireDate, and not after it has
+         * expired. Renewing on the expiry date itself is still allowed.
+         */
+        _validateRenew: function (oContext) {
+            var oExpire = toLocalDate(oContext.getProperty("ExpireDate"));
+            if (!oExpire) {
+                return "This request cannot be renewed because it has no expiry date.";
+            }
+
+            var oToday = startOfToday();
+            // Day difference rather than a raw ms division, so a DST switch
+            // inside the window cannot shift the boundary by an hour.
+            var iDaysLeft = Math.round((oExpire.getTime() - oToday.getTime()) / MS_PER_DAY);
+
+            if (iDaysLeft < 0) {
+                return "This sticker expired on " + formatDate(oExpire) +
+                    " and can no longer be renewed.";
+            }
+            if (iDaysLeft > RENEW_WINDOW_DAYS) {
+                return "This sticker expires on " + formatDate(oExpire) +
+                    ". Renewal is only possible within " + RENEW_WINDOW_DAYS +
+                    " days before the expiry date, from " +
+                    formatDate(addDays(oExpire, -RENEW_WINDOW_DAYS)) + ".";
+            }
+            return null;
+        },
+
+        /**
          * Toggle visibility of the role-gated actions based on the logged-in
          * user's Sticker-admin flag. The flag lives on the VAR service's
          * EmployeeHeader entity (StickerAdmin = "X" for admins), exposed here
@@ -324,6 +503,11 @@ sap.ui.define([
             // Safe default: hide everything until authorization is known
             document.body.classList.add("hideMaintenanceActions");
             document.body.classList.add("hideAdminOnlyActions");
+
+            var that = this;
+            // Same restrictive default for the admin exemption in
+            // _validateReschedule: not an admin until proven otherwise.
+            this._bIsStickerAdmin = false;
 
             var oView = this.base.getView();
             var oComponent = this.base.getAppComponent?.();
@@ -354,6 +538,8 @@ sap.ui.define([
                         bIsStickerAdmin =
                             aContexts[0].getObject()?.StickerAdmin === "X";
                     }
+
+                    that._bIsStickerAdmin = bIsStickerAdmin;
 
                     if (bIsStickerAdmin) {
                         // Admin:

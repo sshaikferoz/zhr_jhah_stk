@@ -20,7 +20,8 @@
 body.hideMaintenanceActions [id*="StandardAction::Create"],
 body.hideMaintenanceActions [id*="StandardAction::Edit"],
 body.hideMaintenanceActions [id*="StandardAction::Delete"],
-body.hideMaintenanceActions [id*="CopySticker"] {
+body.hideMaintenanceActions [id*="CopySticker"]
+ {
     display: none !important;
 }
 
@@ -31,6 +32,7 @@ body.hideMaintenanceActions [id*="CopySticker"] {
 /* ========================================================= */
 
 body.hideAdminOnlyActions [id*="MaintAppointmentLocation"],
+body.hideAdminOnlyActions [id*="IssueSticker"],
 body.hideAdminOnlyActions [id*="Approve"],
 body.hideAdminOnlyActions [id*="Reject"]  
 {
