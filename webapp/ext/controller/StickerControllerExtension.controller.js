@@ -2,10 +2,12 @@ sap.ui.define([
     "sap/ui/core/mvc/ControllerExtension",
     "sap/ui/core/Fragment",
     "sap/ui/core/format/DateFormat",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "com/jhah/zhrjhahsecstk/ext/util/SlotTimeFormat"
-], function (ControllerExtension, Fragment, DateFormat, JSONModel, MessageBox, SlotTimeFormat) {
+], function (ControllerExtension, Fragment, DateFormat, Filter, FilterOperator, JSONModel, MessageBox, SlotTimeFormat) {
     "use strict";
 
     var formatTime12h = SlotTimeFormat.formatTime12h;
@@ -18,11 +20,21 @@ sap.ui.define([
     var RESCHEDULE_CUTOFF_HOURS = 24;
     var RENEW_WINDOW_DAYS = 30;
 
+    // A requester may hold at most this many stickers that are issued and not
+    // yet expired; a further request is rejected before the draft is created.
+    // "Issued" has no dedicated flag on StickerMaster — the status is expressed
+    // through StatsCriticality, where 3 is the positive (issued) value.
+    var MAX_ACTIVE_STICKERS = 2;
+    var ISSUED_CRITICALITY = 3;
+
     // Marks a toolbar button whose press handler has already been wrapped, so
-    // repeated onPageReady calls don't guard the same button twice.
+    // re-binding the page doesn't guard the same button twice.
     var GUARD_FLAG = "zhrActionGuarded";
 
     var oDateFormat = DateFormat.getDateInstance({ style: "medium" });
+    // Edm.Date literal for $filter. Formatted rather than derived from
+    // toISOString(), which would shift the day for negative UTC offsets.
+    var oEdmDateFormat = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd", calendarType: "Gregorian" });
 
     function formatDate(oDate) {
         return oDate ? oDateFormat.format(oDate) : "";
@@ -84,13 +96,20 @@ sap.ui.define([
                 }
             },
 
-            // Fires once the page is rendered and bound — the point at which the
-            // annotation-driven toolbar buttons exist and can be guarded.
-            onPageReady: function () {
-                try {
-                    this._applyActionGuards();
-                } catch (err) {
-                    console.error("Failed to apply action guards:", err);
+            editFlow: {
+                // Rejecting stops the Create; see _checkActiveStickerLimit.
+                onBeforeCreate: function (mParameters) {
+                    // This extension is registered on the object page too, where
+                    // inline creation in the Evidence table ("…/_Evidence") runs
+                    // through the same hook. Only a new Sticker Master request is
+                    // subject to the limit.
+                    var sContextPath = (mParameters && mParameters.contextPath) || "/StickerMaster";
+                    var aSegments = sContextPath.replace(/\/$/, "").split("/");
+
+                    if (aSegments[aSegments.length - 1] !== "StickerMaster") {
+                        return Promise.resolve();
+                    }
+                    return this._checkActiveStickerLimit();
                 }
             },
 
@@ -98,6 +117,14 @@ sap.ui.define([
                 onAfterBinding: function (oBindingContext) {
                     var oView = this.base.getView();
                     var oAppModel = oView.getModel();
+
+                    // The annotation-driven toolbar buttons exist by the time the
+                    // page is bound, so this is where they get their guards.
+                    try {
+                        this._applyActionGuards();
+                    } catch (err) {
+                        console.error("Failed to apply action guards:", err);
+                    }
 
                     if (!oAppModel) return;
 
@@ -361,13 +388,79 @@ sap.ui.define([
         },
 
         /**
+         * Count the requester's stickers that are issued (StatsCriticality = 3)
+         * and not yet expired, i.e. the same set as
+         *
+         *   /StickerMaster/$count?$filter=ExpireDate gt <today>
+         *                                 and StatsCriticality eq 3
+         *
+         * The service scopes StickerMaster to the logged-in user, so no
+         * requester filter is added here.
+         *
+         * @returns {Promise<number>} the number of active stickers
+         */
+        _requestActiveStickerCount: function () {
+            var oModel = this.base.getView().getModel();
+            if (!oModel) {
+                return Promise.reject(new Error("Main OData model not available."));
+            }
+
+            var aFilters = [
+                new Filter("StatsCriticality", FilterOperator.EQ, ISSUED_CRITICALITY),
+                new Filter("ExpireDate", FilterOperator.GT, oEdmDateFormat.format(startOfToday())),
+                // StickerMaster is draft-enabled, so it also holds the draft
+                // siblings of issued stickers — without this an issued sticker
+                // that is currently being edited would be counted twice.
+                new Filter("IsActiveEntity", FilterOperator.EQ, true)
+            ];
+
+            var oBinding = oModel.bindList("/StickerMaster", null, null, aFilters, {
+                $count: true,
+                $$groupId: "$direct"
+            });
+
+            // Sends $count=true&$top=0 — the count only, no entity payload.
+            return oBinding.getHeaderContext().requestProperty("$count");
+        },
+
+        /**
+         * Block the creation of a new request once the requester already holds
+         * the maximum number of active stickers. Called from editFlow's
+         * onBeforeCreate hook, which stops the Create when the returned promise
+         * rejects — so the error is shown instead of the draft being created.
+         *
+         * If the count cannot be read the create is let through; the backend
+         * still enforces the limit and a failed lookup should not lock the user
+         * out of the app.
+         */
+        _checkActiveStickerLimit: function () {
+            return this._requestActiveStickerCount().then(function (iCount) {
+                if (iCount < MAX_ACTIVE_STICKERS) {
+                    return;
+                }
+
+                MessageBox.error(
+                    "You already have " + iCount + " active stickers. A maximum of " +
+                    MAX_ACTIVE_STICKERS + " is allowed, so a new request can only be " +
+                    "created once one of them expires."
+                );
+
+                // FE only inspects whether the promise rejects; the reason is
+                // never surfaced, the MessageBox above is what the user sees.
+                return Promise.reject(new Error("Active sticker limit reached."));
+            }, function (err) {
+                console.error("Failed to read the active sticker count:", err);
+            });
+        },
+
+        /**
          * Wrap the press handler of the annotation-driven "Reschedule" and
          * "Renew Sticker" buttons so a business rule is checked BEFORE Fiori
          * Elements opens the action dialog. On a violation the FE handlers are
          * never reached, so the user sees the error instead of the popup.
          *
          * Idempotent: buttons already wrapped are skipped, and buttons that do
-         * not carry a press handler yet are retried on the next onPageReady.
+         * not carry a press handler yet are retried on the next binding.
          */
         _applyActionGuards: function () {
             this._guardActionButton("reschedulePopup", this._validateReschedule);
