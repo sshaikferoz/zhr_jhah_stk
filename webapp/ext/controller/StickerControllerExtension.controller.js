@@ -2,12 +2,13 @@ sap.ui.define([
     "sap/ui/core/mvc/ControllerExtension",
     "sap/ui/core/Fragment",
     "sap/ui/core/format/DateFormat",
+    "sap/ui/base/Event",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "com/jhah/zhrjhahsecstk/ext/util/SlotTimeFormat"
-], function (ControllerExtension, Fragment, DateFormat, Filter, FilterOperator, JSONModel, MessageBox, SlotTimeFormat) {
+], function (ControllerExtension, Fragment, DateFormat, Event, Filter, FilterOperator, JSONModel, MessageBox, SlotTimeFormat) {
     "use strict";
 
     var formatTime12h = SlotTimeFormat.formatTime12h;
@@ -15,9 +16,10 @@ sap.ui.define([
     var MS_PER_HOUR = 60 * 60 * 1000;
     var MS_PER_DAY = 24 * MS_PER_HOUR;
 
-    // Rescheduling closes this many hours before the appointment starts, and a
-    // sticker can only be renewed inside this many days before it expires.
-    var RESCHEDULE_CUTOFF_HOURS = 24;
+    // Rescheduling and cancelling both close this many hours before the
+    // appointment starts, and a sticker can only be renewed inside this many
+    // days before it expires.
+    var APPOINTMENT_CUTOFF_HOURS = 24;
     var RENEW_WINDOW_DAYS = 30;
 
     // A requester may hold at most this many stickers that are issued and not
@@ -30,6 +32,13 @@ sap.ui.define([
     // Marks a toolbar button whose press handler has already been wrapped, so
     // re-binding the page doesn't guard the same button twice.
     var GUARD_FLAG = "zhrActionGuarded";
+
+    // Properties the guarded rules read. Neither the object page nor the list
+    // report table necessarily has them in its $select — ExpireDate is
+    // annotated as hidden, and the appointment fields are not columns — so the
+    // guard loads them for the affected rows before it validates.
+    var APPOINTMENT_PROPERTIES = ["AppointmentDate", "AppointmentFromTime"];
+    var RENEW_PROPERTIES = ["ExpireDate"];
 
     var oDateFormat = DateFormat.getDateInstance({ style: "medium" });
     // Edm.Date literal for $filter. Formatted rather than derived from
@@ -123,13 +132,6 @@ sap.ui.define([
                         // Build the appointment-slot picker data used by the
                         // AppointmentDatePicker / TimeSlotSelect custom fields.
                         this._loadAppointmentSlots(oView, oAppModel, oBindingContext);
-
-                        // ExpireDate is annotated as hidden on the object page, so
-                        // warm its cache entry here — the Renew guard reads it
-                        // synchronously while handling the button press.
-                        oBindingContext.requestProperty("ExpireDate").catch(function (err) {
-                            console.error("Failed to read ExpireDate property:", err);
-                        });
 
                         oBindingContext.requestProperty("JhahId").then(function (sJhahId) {
 
@@ -435,29 +437,49 @@ sap.ui.define([
         },
 
         /**
-         * Wrap the press handler of the annotation-driven "Reschedule" and
-         * "Renew Sticker" buttons so a business rule is checked BEFORE Fiori
-         * Elements opens the action dialog. On a violation the FE handlers are
-         * never reached, so the user sees the error instead of the popup.
+         * Wrap the press handler of the annotation-driven "Reschedule", "Renew
+         * Sticker" and "Cancel Request" buttons so a business rule is checked
+         * BEFORE Fiori Elements opens the action dialog or fires the action. On
+         * a violation the FE handlers are never reached, so the user sees the
+         * error instead of the popup.
          *
          * Idempotent: buttons already wrapped are skipped, and buttons that do
          * not carry a press handler yet are retried on the next binding.
          */
         _applyActionGuards: function () {
-            this._guardActionButton("reschedulePopup", this._validateReschedule);
-            this._guardActionButton("RenewSticker", this._validateRenew);
+            this._guardActionButton("reschedulePopup", {
+                properties: APPOINTMENT_PROPERTIES,
+                validate: this._validateAppointmentChange
+            });
+            this._guardActionButton("RenewSticker", {
+                properties: RENEW_PROPERTIES,
+                validate: this._validateRenew
+            });
+            // Cancel Request runs straight away — FE opens no dialog of its own
+            // for a parameterless action — and cannot be undone, so it is also
+            // confirmed once it passes the same cutoff Reschedule uses.
+            this._guardActionButton("CancelRequest", {
+                properties: APPOINTMENT_PROPERTIES,
+                validate: this._validateAppointmentChange,
+                confirm: this._confirmCancel
+            });
         },
 
         /**
-         * @param {string} sActionName  Fragment of the FE-generated button id —
+         * @param {string} sActionName Fragment of the FE-generated button id —
          *        action buttons carry the unbound action name (see css/style.css,
          *        which gates the same buttons by id).
-         * @param {function} fnValidate Called with the button's binding context;
-         *        returns an error text to block the action, or null to allow it.
-         *        Must be synchronous — the press event object is pooled by UI5
-         *        and cannot be replayed after an await.
+         * @param {object} mGuard
+         * @param {string[]} mGuard.properties Properties the rule reads; loaded
+         *        for every affected row before the rule runs.
+         * @param {function} mGuard.validate Called with each context the action
+         *        would run on; returns an error text to block the action, or
+         *        null to allow it.
+         * @param {function} [mGuard.confirm] Called with those contexts once the
+         *        validation passed; returns the text of a Yes/No confirmation to
+         *        put in front of the action, or null to run it straight away.
          */
-        _guardActionButton: function (sActionName, fnValidate) {
+        _guardActionButton: function (sActionName, mGuard) {
             var that = this;
             var oView = this.base.getView();
 
@@ -481,16 +503,52 @@ sap.ui.define([
                 });
 
                 oButton.attachPress(function (oEvent) {
-                    var oContext = oButton.getBindingContext() || oView.getBindingContext();
-                    var sError = oContext ? fnValidate.call(that, oContext) : null;
+                    var aContexts = that._resolveActionContexts(oButton);
 
-                    if (sError) {
-                        MessageBox.error(sError);
-                        return;
-                    }
+                    // The press event belongs to UI5 and may be recycled once
+                    // this handler returns, while the checks below hand control
+                    // back to the event loop first — so the replay gets its own
+                    // copy carrying the same id, source and parameters.
+                    var oReplayEvent = new Event(
+                        oEvent.getId(), oEvent.getSource(), Object.assign({}, oEvent.getParameters())
+                    );
+                    var fnReplay = function () {
+                        aHandlers.forEach(function (oHandler) {
+                            oHandler.fFunction.call(oHandler.oListener || oButton, oReplayEvent, oHandler.oData);
+                        });
+                    };
 
-                    aHandlers.forEach(function (oHandler) {
-                        oHandler.fFunction.call(oHandler.oListener || oButton, oEvent, oHandler.oData);
+                    that._requestGuardProperties(aContexts, mGuard.properties).then(function () {
+                        var sError = null;
+                        // Every affected row has to pass; the first offender is
+                        // the one reported.
+                        aContexts.some(function (oContext) {
+                            sError = mGuard.validate.call(that, oContext);
+                            return !!sError;
+                        });
+
+                        if (sError) {
+                            MessageBox.error(sError);
+                            return;
+                        }
+
+                        var sConfirm = mGuard.confirm ? mGuard.confirm.call(that, aContexts) : null;
+                        if (!sConfirm) {
+                            fnReplay();
+                            return;
+                        }
+
+                        // Yes/No rather than OK/Cancel: a "Cancel" button in a
+                        // dialog about cancelling a request reads both ways.
+                        MessageBox.confirm(sConfirm, {
+                            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                            emphasizedAction: MessageBox.Action.YES,
+                            onClose: function (sAction) {
+                                if (sAction === MessageBox.Action.YES) {
+                                    fnReplay();
+                                }
+                            }
+                        });
                     });
                 });
 
@@ -499,12 +557,57 @@ sap.ui.define([
         },
 
         /**
-         * An appointment may not be rescheduled once it is less than 24 hours
-         * away. Sticker admins are exempt and may reschedule at any time; while
-         * the admin check is still pending the rule is enforced, matching the
-         * restrictive default used for the action visibility.
+         * The contexts a pressed action applies to: the page's own context for
+         * an object page header button, or the selected rows for a table
+         * toolbar button in the list report.
          */
-        _validateReschedule: function (oContext) {
+        _resolveActionContexts: function (oButton) {
+            var oContext = oButton.getBindingContext();
+            if (oContext) { return [oContext]; }
+
+            var oParent = oButton.getParent();
+            while (oParent) {
+                if (oParent.isA("sap.ui.mdc.Table")) {
+                    return oParent.getSelectedContexts() || [];
+                }
+                oParent = oParent.getParent();
+            }
+
+            oContext = this.base.getView().getBindingContext();
+            return oContext ? [oContext] : [];
+        },
+
+        /**
+         * Load the properties a rule reads so it can then run synchronously off
+         * the context. Values already in the model resolve without a request.
+         * A property that cannot be read is logged and left undefined, which
+         * lands the rule on its "nothing to check" branch rather than blocking
+         * the user on a failed lookup.
+         */
+        _requestGuardProperties: function (aContexts, aProperties) {
+            var aRequests = [];
+
+            aContexts.forEach(function (oContext) {
+                aProperties.forEach(function (sProperty) {
+                    aRequests.push(
+                        oContext.requestProperty(sProperty).catch(function (err) {
+                            console.error("Failed to read " + sProperty + " for the action guard:", err);
+                        })
+                    );
+                });
+            });
+
+            return Promise.all(aRequests);
+        },
+
+        /**
+         * An appointment may neither be rescheduled nor cancelled once it is
+         * less than 24 hours away. Sticker admins are exempt and may do both at
+         * any time; while the admin check is still pending the rule is
+         * enforced, matching the restrictive default used for the action
+         * visibility.
+         */
+        _validateAppointmentChange: function (oContext) {
             if (this._bIsStickerAdmin) { return null; }
 
             var oAppointment = toLocalDate(
@@ -515,16 +618,24 @@ sap.ui.define([
             if (!oAppointment) { return null; }
 
             var iHoursLeft = (oAppointment.getTime() - Date.now()) / MS_PER_HOUR;
-            if (iHoursLeft < RESCHEDULE_CUTOFF_HOURS) {
-                // Empty for a cleared slot (stored as 00:00:00), so the message
-                // falls back to the date alone.
-                var sSlot = SlotTimeFormat.range(
-                    oContext.getProperty("AppointmentFromTime"),
-                    oContext.getProperty("AppointmentToTime")
-                );
-                return "Please note that appointments can only be rescheduled or canceled up to 24 hours before the approved appointment date and time.";
+            if (iHoursLeft < APPOINTMENT_CUTOFF_HOURS) {
+                return "Please note that appointments can only be rescheduled or canceled up to " +
+                    APPOINTMENT_CUTOFF_HOURS +
+                    " hours before the approved appointment date and time.";
             }
             return null;
+        },
+
+        /**
+         * Confirmation text for Cancel Request. The list report allows several
+         * rows to be selected at once, so the count is spelled out.
+         */
+        _confirmCancel: function (aContexts) {
+            if (aContexts.length > 1) {
+                return "Are you sure you want to cancel the " + aContexts.length +
+                    " selected requests? This cannot be undone.";
+            }
+            return "Are you sure you want to cancel this request? This cannot be undone.";
         },
 
         /**
@@ -580,7 +691,7 @@ sap.ui.define([
 
             var that = this;
             // Same restrictive default for the admin exemption in
-            // _validateReschedule: not an admin until proven otherwise.
+            // _validateAppointmentChange: not an admin until proven otherwise.
             this._bIsStickerAdmin = false;
 
             var oView = this.base.getView();
