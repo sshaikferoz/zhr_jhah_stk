@@ -60,6 +60,32 @@
             </Annotations>
 
             <!--
+                Issue Sticker dialog: Expire Date is only asked for when the
+                validity period is "Others" (OT) — every other period derives the
+                expiry date on the backend.
+
+                UI.Hidden on an action parameter takes a dynamic expression that
+                may read a sibling parameter, so the field appears and disappears
+                as the Validity Period dropdown changes. Written as If/Eq rather
+                than a negation because only If, Eq, Or, Path and the literal
+                types are documented as supported.
+
+                'OT' is the ValidityPeriod code, not the ValidityDesc text the
+                dropdown displays.
+            -->
+            <Annotations Target="SAP__self.IssueSticker(SAP__self.StickerMasterType)/ExpireDate">
+                <Annotation Term="UI.Hidden">
+                    <If>
+                        <Eq>
+                            <Path>ValidityPeriod</Path>
+                            <String>OT</String>
+                        </Eq>
+                        <Bool>false</Bool>
+                        <Bool>true</Bool>
+                    </If>
+                </Annotation>
+            </Annotations>
+            <!--
                 Appointment Location is read-only once the request is in process.
                 There is no boolean control field for this on StickerMaster, so the
                 status is compared here; FieldControl takes an If expression as well
