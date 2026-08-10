@@ -20,6 +20,7 @@
 body.hideMaintenanceActions [id*="StandardAction::Create"],
 body.hideMaintenanceActions [id*="StandardAction::Edit"],
 body.hideMaintenanceActions [id*="StandardAction::Delete"],
+body.hideMaintenanceActions [id*="RemoveSticker"],
 body.hideMaintenanceActions [id*="Renew"],
 body.hideMaintenanceActions [id*="CopySticker"]
  {
