@@ -276,6 +276,24 @@
                     <OnDelete Action="Cascade"/>
                 </NavigationProperty>
             </EntityType>
+            <EntityType Name="StickerStatusType">
+                <Key>
+                    <PropertyRef Name="Domname"/>
+                    <PropertyRef Name="Ddlanguage"/>
+                    <PropertyRef Name="As4local"/>
+                    <PropertyRef Name="Valpos"/>
+                    <PropertyRef Name="As4vers"/>
+                </Key>
+                <Property Name="Domname" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="Ddlanguage" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="As4local" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Valpos" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="As4vers" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="StatusValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="StatusText" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="DomvalLd" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="DomvalHd" Type="Edm.String" Nullable="false" MaxLength="10"/>
+            </EntityType>
             <EntityType Name="I_DraftAdministrativeDataType">
                 <Key>
                     <PropertyRef Name="DraftUUID"/>
@@ -605,6 +623,7 @@
                     <NavigationPropertyBinding Path="SiblingEntity" Target="StickerMaster"/>
                     <NavigationPropertyBinding Path="_Evidence" Target="evidence"/>
                 </EntitySet>
+                <EntitySet Name="StickerStatus" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerStatusType"/>
                 <EntitySet Name="StickerTypes" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerTypesType"/>
                 <EntitySet Name="ValidityValueHelp" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ValidityValueHelpType"/>
             </EntityContainer>
@@ -2566,7 +2585,7 @@
                             <PropertyValue Property="Facets">
                                 <Collection>
                                     <Record Type="SAP__UI.ReferenceFacet">
-                                        <PropertyValue Property="Label" String="Note: A valid proof of ownership must be attached to confirm that the provided vehicle belongs to the requestor."/>
+                                        <PropertyValue Property="Label" String="Note: Requestor Should Attach the proof of Valid Vehicle Registration and Valid Driving Licence."/>
                                         <PropertyValue Property="ID" String="EvidenceNote"/>
                                         <PropertyValue Property="Target" AnnotationPath="@SAP__UI.FieldGroup#Dummy"/>
                                     </Record>
@@ -2798,7 +2817,7 @@
                             <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
                         </Record>
                         <Record Type="SAP__UI.DataFieldForAction">
-                            <PropertyValue Property="Label" String="Issue Sticker"/>
+                            <PropertyValue Property="Label" String="Process Sticker Request"/>
                             <PropertyValue Property="Action" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.IssueSticker(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)"/>
                             <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
                         </Record>
@@ -2905,6 +2924,85 @@
                     <Record/>
                 </Annotation>
                 <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerStatusType/Domname">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Domain name"/>
+                <Annotation Term="SAP__common.Heading" String="Domain"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerStatusType/As4local">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Activation State"/>
+                <Annotation Term="SAP__common.Heading" String="Ac"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Activation State of Repository Object"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerStatusType/Valpos">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Value key"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Domain value key"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerStatusType/As4vers">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Version"/>
+                <Annotation Term="SAP__common.Heading" String="Vers"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Version of the entry (not used)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerStatusType/StatusValue">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Lower Value"/>
+                <Annotation Term="SAP__common.Heading" String="Fixed"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Values for Domains: Single Value/Lower Limit"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerStatusType/DomvalLd">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Lower limit"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Language-specific values for domains, lower limit"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerStatusType/DomvalHd">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Upper Limit"/>
+                <Annotation Term="SAP__common.Heading" String="Uppr Limit"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Language-specific values for domains, upper limit"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerStatusType">
+                <Annotation Term="SAP__common.Label" String="Status of the Sticker Request"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/StickerStatus">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
             </Annotations>
             <Annotations Target="SAP__self.I_DraftAdministrativeDataType/DraftEntityType">
                 <Annotation Term="SAP__common.IsUpperCase"/>
@@ -3280,12 +3378,6 @@
             <Annotations Target="SAP__self.IssueSticker(SAP__self.StickerMasterType)/HideExpireFlag">
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
-            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/stkreqid">
-                <Annotation Term="SAP__UI.Hidden"/>
-                <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
-                <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
-            </Annotations>
             <Annotations Target="SAP__self.reschedulePopup(SAP__self.StickerMasterType)/stkreqid">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
@@ -3293,6 +3385,12 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
             </Annotations>
             <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/stkreqid">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
+                <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/stkreqid">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
                 <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
@@ -3438,6 +3536,12 @@
             </Annotations>
             <Annotations Target="SAP__self.AppointmentSlotType/FormatTime">
                 <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerStatusType/Ddlanguage">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Lang."/>
+                <Annotation Term="SAP__common.Heading" String="Ln"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Language Key"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerTypesType/Ddlanguage">
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -3665,6 +3769,10 @@
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerStatusType/StatusText">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
             </Annotations>
             <Annotations Target="SAP__self.I_DraftAdministrativeDataType/CreationDateTime">
                 <Annotation Term="SAP__common.Label" String="Draft Created On"/>
