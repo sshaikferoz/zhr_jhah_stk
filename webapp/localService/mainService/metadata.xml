@@ -3378,6 +3378,12 @@
             <Annotations Target="SAP__self.IssueSticker(SAP__self.StickerMasterType)/HideExpireFlag">
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
+            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/stkreqid">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
+                <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
+            </Annotations>
             <Annotations Target="SAP__self.reschedulePopup(SAP__self.StickerMasterType)/stkreqid">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
@@ -3385,12 +3391,6 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
             </Annotations>
             <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/stkreqid">
-                <Annotation Term="SAP__UI.Hidden"/>
-                <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
-                <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/stkreqid">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
                 <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
