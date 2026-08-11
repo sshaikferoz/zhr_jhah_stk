@@ -14,7 +14,7 @@ sap.ui.define([
     var formatTime12h = SlotTimeFormat.formatTime12h;
 
     var MS_PER_HOUR = 60 * 60 * 1000;
-    var MS_PER_DAY = 24 * MS_PER_HOUR;
+    var MS_PER_DAY = 24 * MS_PER_HOUR ;
 
     // Rescheduling and cancelling both close this many hours before the
     // appointment starts, and a sticker can only be renewed inside this many
