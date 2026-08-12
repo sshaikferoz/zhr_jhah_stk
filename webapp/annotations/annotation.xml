@@ -96,10 +96,8 @@
                             <Path>_it/StkType</Path>
                             <String>RMV</String>
                         </Eq>
-                        <!-- Hidden if StkType is RMV -->
                         <Bool>true</Bool>                        
                         <Bool>false</Bool>
-                        <!-- Visible if StkType is RMV or other values -->
                     </If>
                 </Annotation>
             </Annotations>
