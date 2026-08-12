@@ -162,6 +162,7 @@ sap.ui.define([
             }
         },
 
+        
         /**
          * Fetch every appointment slot and expose it through the "apptslots" JSON
          * model used by the custom Appointment Slot section. Groups slots by date,
