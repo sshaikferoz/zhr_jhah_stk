@@ -164,3 +164,23 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
     width: 100%;
     min-width: 0;
 }
+
+
+/*=========================================================*/
+/* 5. ATTACHMENT BUTTONS - ICON TO TEXT                     */
+/* ========================================================= */
+
+/* Upload File */
+/* Upload File button */
+[id$="-fu_button"] .sapMBtnIcon {
+    display: none !important;
+}
+
+[id$="-fu_button"] .sapMBtnInner {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+}
+
+[id$="-fu_button"] .sapMBtnInner::after {
+    content: "Upload File";
+}
