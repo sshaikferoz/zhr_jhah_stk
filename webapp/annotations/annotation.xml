@@ -59,6 +59,22 @@
                 <Annotation Term="UI.DeleteHidden" Bool="true"/>
             </Annotations>
 
+
+             <Annotations Target="SAP__self.IssueSticker(SAP__self.StickerMasterType)/ValidityPeriod">
+                <Annotation Term="UI.Hidden">
+                    <If>
+                        <Eq>
+                            <Path>_it/StkType</Path>
+                            <String>RMV</String>
+                        </Eq>
+                        <Bool>true</Bool>
+                        <!-- Hidden if StkType is RMV -->
+                        <Bool>false</Bool>
+                        <!-- Visible if StkType is RMV or other values -->
+                    </If>
+                </Annotation>
+            </Annotations>
+
             <!--
                 Issue Sticker dialog: Expire Date is only asked for when the
                 validity period is "Others" (OT) — every other period derives the
