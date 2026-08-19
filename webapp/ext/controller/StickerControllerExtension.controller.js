@@ -42,6 +42,9 @@ sap.ui.define([
     // annotated as hidden, and the appointment fields are not columns — so the
     // guard loads them for the affected rows before it validates.
     var APPOINTMENT_PROPERTIES = ["AppointmentDate", "AppointmentFromTime"];
+    // Reschedule additionally reads the security-reschedule flag, which lifts
+    // the 24h cutoff for the employee (see _validateReschedule).
+    var RESCHEDULE_PROPERTIES = APPOINTMENT_PROPERTIES.concat(["isSecurityRescheduled"]);
     // ExpireDate drives the renewal-window rule; ContractEnddate is shown
     // read-only in the Renew Sticker dialog, so both are preloaded here.
     var RENEW_PROPERTIES = ["ExpireDate", "ContractEnddate"];
@@ -65,6 +68,12 @@ sap.ui.define([
         if (!sDate) { return null; }
         var oDate = new Date(sDate + "T" + (sTime || "00:00:00"));
         return isNaN(oDate.getTime()) ? null : oDate;
+    }
+
+    // ABAP truth flags reach the client as an Edm.Boolean (true), but tolerate
+    // the raw 'X'/'x' char form too in case the value arrives unconverted.
+    function isTrueFlag(vValue) {
+        return vValue === true || vValue === "X" || vValue === "x";
     }
 
     function startOfToday() {
@@ -458,8 +467,8 @@ sap.ui.define([
          */
         _applyActionGuards: function () {
             this._guardActionButton("reschedulePopup", {
-                properties: APPOINTMENT_PROPERTIES,
-                validate: this._validateAppointmentChange
+                properties: RESCHEDULE_PROPERTIES,
+                validate: this._validateReschedule
             });
             this._guardActionButton("RenewSticker", {
                 properties: RENEW_PROPERTIES,
@@ -618,6 +627,19 @@ sap.ui.define([
             });
 
             return Promise.all(aRequests);
+        },
+
+        /**
+         * Reschedule rule. When security has already rescheduled this
+         * appointment (isSecurityRescheduled = 'X', surfaced as the boolean
+         * true) the employee may reschedule regardless of how close the
+         * appointment is; otherwise the shared 24h cutoff below applies.
+         */
+        _validateReschedule: function (oContext) {
+            if (isTrueFlag(oContext.getProperty("isSecurityRescheduled"))) {
+                return null;
+            }
+            return this._validateAppointmentChange(oContext);
         },
 
         /**
