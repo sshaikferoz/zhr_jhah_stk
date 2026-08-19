@@ -60,6 +60,7 @@
                 <Property Name="Filename" Type="Edm.String" Nullable="false" MaxLength="255"/>
                 <Property Name="MimeType" Type="Edm.String" Nullable="false" MaxLength="128"/>
                 <Property Name="AttachmentContent" Type="Edm.Stream"/>
+                <Property Name="AttachmentType" Type="Edm.String" Nullable="false" MaxLength="128"/>
                 <Property Name="CreatedBy" Type="Edm.String" Nullable="false" MaxLength="12"/>
                 <Property Name="CreatedAt" Type="Edm.DateTimeOffset" Precision="7"/>
                 <Property Name="LastChangedBy" Type="Edm.String" Nullable="false" MaxLength="12"/>
@@ -227,6 +228,7 @@
                 <Property Name="Status" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="StatsCriticality" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="Justification" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="HideJust" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="PlateTyp" Type="Edm.String" Nullable="false" MaxLength="2"/>
                 <Property Name="PlateTypDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="Manufacturer" Type="Edm.String" Nullable="false" MaxLength="3"/>
@@ -259,6 +261,9 @@
                 <Property Name="FromTime" Type="Edm.TimeOfDay" Nullable="false"/>
                 <Property Name="ToTime" Type="Edm.TimeOfDay" Nullable="false"/>
                 <Property Name="HideApp" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="RejectJust" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="ContractEnddate" Type="Edm.Date"/>
+                <Property Name="isSecurityRescheduled" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="DraftUUID" Type="Edm.Guid" Nullable="false"/>
                 <Property Name="DraftEntityCreationDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
@@ -388,6 +393,7 @@
                 <Property Name="AppointmentToTime" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="Color" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="JhahId" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Justification" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="Location" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="Manufacturer" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="PlateNum" Type="Edm.Byte" Nullable="false"/>
@@ -454,6 +460,7 @@
                 <Property Name="stkreqid" Type="Edm.String" Nullable="false" MaxLength="12"/>
                 <Property Name="Filename" Type="Edm.String" Nullable="false" MaxLength="255"/>
                 <Property Name="Mimetype" Type="Edm.String" Nullable="false" MaxLength="128"/>
+                <Property Name="AttachmentType" Type="Edm.String" Nullable="false" MaxLength="128"/>
                 <Property Name="AttachmentContent" Type="Edm.Binary" Nullable="false"/>
             </ComplexType>
             <ComplexType Name="EntityControl">
@@ -593,6 +600,7 @@
             </Action>
             <Action Name="Reject" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
+                <Parameter Name="Justification" Type="Edm.String" Nullable="false" MaxLength="255"/>
                 <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ZHR_STK_RETURN_PRM" Nullable="true"/>
             </Action>
             <Action Name="ImmediateValidationsOnEnter" IsBound="true">
@@ -663,6 +671,10 @@
                     </Collection>
                 </Annotation>
                 <Annotation Term="SAP__common.Label" String="Attachment"/>
+            </Annotations>
+            <Annotations Target="SAP__self.evidenceType/AttachmentType">
+                <Annotation Term="SAP__common.Label" String="Attachment Type"/>
+                <Annotation Term="SAP__core.Computed"/>
             </Annotations>
             <Annotations Target="SAP__self.evidenceType/CreatedBy">
                 <Annotation Term="SAP__core.Computed"/>
@@ -872,6 +884,9 @@
                 <Annotation Term="SAP__UI.Identification">
                     <Collection>
                         <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="AttachmentType"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="Filename"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
@@ -882,6 +897,10 @@
                 </Annotation>
                 <Annotation Term="SAP__UI.LineItem">
                     <Collection>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="AttachmentType"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="Filename"/>
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
@@ -1773,6 +1792,13 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/Justification">
+                <Annotation Term="SAP__common.Label" String="Additional Sticker Jusitification"/>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/Justification"/>
+                <Annotation Term="SAP__UI.MultiLineText"/>
+                <Annotation Term="SAP__common.Heading" String="Message"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Message"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/PlateTyp">
                 <Annotation Term="SAP__common.Label" String="Plate Type"/>
                 <Annotation Term="SAP__common.Text" Path="PlateTypDesc">
@@ -2173,6 +2199,15 @@
             </Annotations>
             <Annotations Target="SAP__self.CancelRequest(SAP__self.StickerMasterType)">
                 <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/CancelRequest"/>
+                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Action_CancelRequest">
+                    <Record Type="SAP__common.SideEffectsType">
+                        <PropertyValue Property="TargetEntities">
+                            <Collection>
+                                <NavigationPropertyPath/>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
             </Annotations>
             <Annotations Target="SAP__self.reschedulePopup(SAP__self.StickerMasterType)/appointmentdate">
                 <Annotation Term="SAP__common.Label" String="Appointment Date"/>
@@ -2273,6 +2308,7 @@
             </Annotations>
             <Annotations Target="SAP__self.IssueSticker(SAP__self.StickerMasterType)/Remark">
                 <Annotation Term="SAP__common.Label" String="Remark"/>
+                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
                 <Annotation Term="SAP__UI.MultiLineText"/>
             </Annotations>
             <Annotations Target="SAP__self.IssueSticker(SAP__self.StickerMasterType)">
@@ -2332,6 +2368,10 @@
                         </PropertyValue>
                     </Record>
                 </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.Reject(SAP__self.StickerMasterType)/Justification">
+                <Annotation Term="SAP__common.Label" String="Reject Justification"/>
+                <Annotation Term="SAP__UI.MultiLineText"/>
             </Annotations>
             <Annotations Target="SAP__self.Reject(SAP__self.StickerMasterType)">
                 <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/Reject"/>
@@ -2580,7 +2620,7 @@
                             </PropertyValue>
                         </Record>
                         <Record Type="SAP__UI.CollectionFacet">
-                            <PropertyValue Property="Label" String="Attachment Section(Evidence)"/>
+                            <PropertyValue Property="Label" String="Supporting Attachments"/>
                             <PropertyValue Property="ID" String="EvidenceSection"/>
                             <PropertyValue Property="Facets">
                                 <Collection>
@@ -2682,6 +2722,10 @@
                                 <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Value" Path="Remarks"/>
                                     <Annotation Term="SAP__UI.Hidden" Path="HideExpireDate"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="Justification"/>
+                                    <Annotation Term="SAP__UI.Hidden" Path="HideJust"/>
                                 </Record>
                             </Collection>
                         </PropertyValue>
@@ -3378,6 +3422,12 @@
             <Annotations Target="SAP__self.IssueSticker(SAP__self.StickerMasterType)/HideExpireFlag">
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
+            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/stkreqid">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
+                <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
+            </Annotations>
             <Annotations Target="SAP__self.reschedulePopup(SAP__self.StickerMasterType)/stkreqid">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
@@ -3385,12 +3435,6 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
             </Annotations>
             <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/stkreqid">
-                <Annotation Term="SAP__UI.Hidden"/>
-                <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
-                <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/stkreqid">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
                 <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
@@ -3456,6 +3500,10 @@
             <Annotations Target="SAP__self.StickerMasterType/StatsCriticality">
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/HideJust">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/PlateTypDesc">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
@@ -3505,6 +3553,14 @@
                 <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/HideApp">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Truth Value"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/RejectJust">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/isSecurityRescheduled">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Truth Value"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
@@ -3627,9 +3683,6 @@
                 <Annotation Term="SAP__common.Heading" String="Short Text of Position"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text of Position"/>
             </Annotations>
-            <Annotations Target="SAP__self.StickerMasterType/Justification">
-                <Annotation Term="SAP__common.Label" String="Message"/>
-            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/__CreateByAssociationControl/_Evidence">
                 <Annotation Term="SAP__common.Label" String="Dynamic CbA-Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Create by Association Control"/>
@@ -3671,6 +3724,11 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/__FieldControl/JhahId">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/Justification">
                 <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
@@ -3842,6 +3900,11 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterControl/JhahId">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/Justification">
                 <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
