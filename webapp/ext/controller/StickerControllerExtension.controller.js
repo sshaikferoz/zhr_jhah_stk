@@ -45,12 +45,14 @@ sap.ui.define([
     // Reschedule additionally reads the security-reschedule flag, which lifts
     // the 24h cutoff for the employee (see _validateReschedule).
     var RESCHEDULE_PROPERTIES = APPOINTMENT_PROPERTIES.concat(["isSecurityRescheduled"]);
-    // ExpireDate drives the renewal-window rule; ContractEnddate is shown
-    // read-only in the Renew Sticker dialog, so both are preloaded here.
-    var RENEW_PROPERTIES = ["ExpireDate", "ContractEnddate"];
+    var RENEW_PROPERTIES = ["ExpireDate"];
+    // ContractEnddate is shown read-only in the Process Sticker Request
+    // (IssueSticker) dialog, so it is preloaded before that dialog opens.
+    var ISSUE_PROPERTIES = ["ContractEnddate"];
 
-    // Marks the read-only Contract End Date field injected into the Renew
-    // Sticker action dialog, so a re-opened dialog is not given a second copy.
+    // Marks the read-only Contract End Date field injected into the Process
+    // Sticker Request action dialog, so a re-opened dialog is not given a
+    // second copy.
     var CONTRACT_END_FIELD_FLAG = "zhrContractEndField";
 
     var oDateFormat = DateFormat.getDateInstance({ style: "medium" });
@@ -472,10 +474,15 @@ sap.ui.define([
             });
             this._guardActionButton("RenewSticker", {
                 properties: RENEW_PROPERTIES,
-                validate: this._validateRenew,
-                // FE opens its action dialog once the button is replayed; add the
-                // read-only Contract End Date field to it right afterwards.
-                afterReplay: this._injectRenewContractEndDate
+                validate: this._validateRenew
+            });
+            // Process Sticker Request (IssueSticker) carries no client-side rule;
+            // it is wrapped only so the read-only Contract End Date field can be
+            // added to its dialog once FE opens it.
+            this._guardActionButton("IssueSticker", {
+                properties: ISSUE_PROPERTIES,
+                validate: function () { return null; },
+                afterReplay: this._injectIssueContractEndDate
             });
             // Cancel Request runs straight away — FE opens no dialog of its own
             // for a parameterless action — and cannot be undone, so it is also
@@ -720,16 +727,17 @@ sap.ui.define([
         },
 
         /**
-         * Add a read-only "Contract End Date" row to the Renew Sticker action
-         * dialog, placed just above the Appointment Date field. FE builds that
-         * dialog itself and offers no slot for a non-parameter field, so it is
-         * injected into the generated form once the dialog has opened. The value
-         * is taken from the renewed request's ContractEnddate (preloaded by the
-         * guard) and shown as static text — it is context, not an input.
+         * Add a read-only "Contract End Date" row to the Process Sticker Request
+         * (IssueSticker) action dialog, placed above the Validity Period field.
+         * FE builds that dialog itself and offers no slot for a non-parameter
+         * field, so it is injected into the generated form once the dialog has
+         * opened. The value is taken from the request's ContractEnddate
+         * (preloaded by the guard) and shown as static text — it is context,
+         * not an input.
          *
-         * @param {sap.ui.model.odata.v4.Context} oContext The request being renewed.
+         * @param {sap.ui.model.odata.v4.Context} oContext The request being processed.
          */
-        _injectRenewContractEndDate: function (oContext) {
+        _injectIssueContractEndDate: function (oContext) {
             var that = this;
             var sRaw = oContext.getProperty("ContractEnddate");
             var sValue = sRaw ? formatDate(toLocalDate(sRaw)) : "";
@@ -739,7 +747,7 @@ sap.ui.define([
             var iTries = 0;
             var iMaxTries = 40; // ~4s at 100ms intervals
             var poll = function () {
-                var oField = that._findRenewAppointmentDateField();
+                var oField = that._findActionDialogField("validityperiod");
                 if (oField) {
                     that._addContractEndDateField(oField, sValue);
                     return;
@@ -752,19 +760,21 @@ sap.ui.define([
         },
 
         /**
-         * The Appointment Date control inside the currently open Renew Sticker
+         * The control for the given action parameter inside the currently open
          * action dialog, or null while no such dialog is open yet. FE names the
-         * generated field after the "appointmentdate" action parameter, matched
-         * here on either the control id or a value binding path.
+         * generated field after the action parameter, matched here on either the
+         * control id or a value binding path.
+         *
+         * @param {string} sParamName Lower-cased action parameter name to find.
          */
-        _findRenewAppointmentDateField: function () {
+        _findActionDialogField: function (sParamName) {
             var aDialogs = Element.registry.filter(function (oControl) {
                 return oControl.isA("sap.m.Dialog") && oControl.isOpen && oControl.isOpen();
             });
 
             for (var i = 0; i < aDialogs.length; i++) {
                 var aMatches = aDialogs[i].findAggregatedObjects(true, function (oControl) {
-                    return this._isAppointmentDateControl(oControl);
+                    return this._isParamControl(oControl, sParamName);
                 }.bind(this));
                 if (aMatches.length) {
                     return aMatches[0];
@@ -773,8 +783,8 @@ sap.ui.define([
             return null;
         },
 
-        _isAppointmentDateControl: function (oControl) {
-            if ((oControl.getId() || "").toLowerCase().indexOf("appointmentdate") !== -1) {
+        _isParamControl: function (oControl, sParamName) {
+            if ((oControl.getId() || "").toLowerCase().indexOf(sParamName) !== -1) {
                 return true;
             }
             if (!oControl.getBindingInfo) { return false; }
@@ -785,22 +795,22 @@ sap.ui.define([
                 var aParts = oInfo && (oInfo.parts || [oInfo]);
                 return !!aParts && aParts.some(function (oPart) {
                     return oPart && oPart.path &&
-                        oPart.path.toLowerCase().indexOf("appointmentdate") !== -1;
+                        oPart.path.toLowerCase().indexOf(sParamName) !== -1;
                 });
             });
         },
 
         /**
          * Insert the read-only Contract End Date row directly before the form
-         * row that holds the Appointment Date field. Idempotent: a dialog that
+         * row that holds the given anchor field. Idempotent: a dialog that
          * already carries the injected row (e.g. reused by FE) is left untouched.
          *
-         * @param {sap.ui.core.Control} oAppointmentField The Appointment Date field.
+         * @param {sap.ui.core.Control} oAnchorField The field to insert above.
          * @param {string} sValue Formatted contract end date, or "" when unset.
          */
-        _addContractEndDateField: function (oAppointmentField, sValue) {
+        _addContractEndDateField: function (oAnchorField, sValue) {
             // Walk up to the form row (FormElement) that wraps the field.
-            var oFormElement = oAppointmentField;
+            var oFormElement = oAnchorField;
             while (oFormElement && !oFormElement.isA("sap.ui.layout.form.FormElement")) {
                 oFormElement = oFormElement.getParent();
             }
