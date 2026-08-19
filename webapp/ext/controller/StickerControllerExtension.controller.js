@@ -1,14 +1,18 @@
 sap.ui.define([
     "sap/ui/core/mvc/ControllerExtension",
     "sap/ui/core/Fragment",
+    "sap/ui/core/Element",
     "sap/ui/core/format/DateFormat",
     "sap/ui/base/Event",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
+    "sap/m/Label",
+    "sap/m/Text",
+    "sap/ui/layout/form/FormElement",
     "com/jhah/zhrjhahsecstk/ext/util/SlotTimeFormat"
-], function (ControllerExtension, Fragment, DateFormat, Event, Filter, FilterOperator, JSONModel, MessageBox, SlotTimeFormat) {
+], function (ControllerExtension, Fragment, Element, DateFormat, Event, Filter, FilterOperator, JSONModel, MessageBox, Label, Text, FormElement, SlotTimeFormat) {
     "use strict";
 
     var formatTime12h = SlotTimeFormat.formatTime12h;
@@ -38,7 +42,13 @@ sap.ui.define([
     // annotated as hidden, and the appointment fields are not columns — so the
     // guard loads them for the affected rows before it validates.
     var APPOINTMENT_PROPERTIES = ["AppointmentDate", "AppointmentFromTime"];
-    var RENEW_PROPERTIES = ["ExpireDate"];
+    // ExpireDate drives the renewal-window rule; ContractEnddate is shown
+    // read-only in the Renew Sticker dialog, so both are preloaded here.
+    var RENEW_PROPERTIES = ["ExpireDate", "ContractEnddate"];
+
+    // Marks the read-only Contract End Date field injected into the Renew
+    // Sticker action dialog, so a re-opened dialog is not given a second copy.
+    var CONTRACT_END_FIELD_FLAG = "zhrContractEndField";
 
     var oDateFormat = DateFormat.getDateInstance({ style: "medium" });
     // Edm.Date literal for $filter. Formatted rather than derived from
@@ -453,7 +463,10 @@ sap.ui.define([
             });
             this._guardActionButton("RenewSticker", {
                 properties: RENEW_PROPERTIES,
-                validate: this._validateRenew
+                validate: this._validateRenew,
+                // FE opens its action dialog once the button is replayed; add the
+                // read-only Contract End Date field to it right afterwards.
+                afterReplay: this._injectRenewContractEndDate
             });
             // Cancel Request runs straight away — FE opens no dialog of its own
             // for a parameterless action — and cannot be undone, so it is also
@@ -478,6 +491,10 @@ sap.ui.define([
          * @param {function} [mGuard.confirm] Called with those contexts once the
          *        validation passed; returns the text of a Yes/No confirmation to
          *        put in front of the action, or null to run it straight away.
+         * @param {function} [mGuard.afterReplay] Called with the first affected
+         *        context immediately after the wrapped FE handler runs (i.e. once
+         *        FE has been asked to open its action dialog). Used to enrich that
+         *        dialog after FE has built it.
          */
         _guardActionButton: function (sActionName, mGuard) {
             var that = this;
@@ -516,6 +533,9 @@ sap.ui.define([
                         aHandlers.forEach(function (oHandler) {
                             oHandler.fFunction.call(oHandler.oListener || oButton, oReplayEvent, oHandler.oData);
                         });
+                        if (mGuard.afterReplay) {
+                            mGuard.afterReplay.call(that, aContexts[0]);
+                        }
                     };
 
                     that._requestGuardProperties(aContexts, mGuard.properties).then(function () {
@@ -665,6 +685,120 @@ sap.ui.define([
                     formatDate(addDays(oExpire, -RENEW_WINDOW_DAYS)) + ".";
             }
             return null;
+        },
+
+        /**
+         * Resolve a text from the app's i18n bundle, falling back to sFallback
+         * if the "i18n" model (or the key) is not available.
+         */
+        _getText: function (sKey, sFallback) {
+            var oModel = this.base.getView().getModel("i18n");
+            var oBundle = oModel && oModel.getResourceBundle && oModel.getResourceBundle();
+            return (oBundle && oBundle.getText(sKey)) || sFallback;
+        },
+
+        /**
+         * Add a read-only "Contract End Date" row to the Renew Sticker action
+         * dialog, placed just above the Appointment Date field. FE builds that
+         * dialog itself and offers no slot for a non-parameter field, so it is
+         * injected into the generated form once the dialog has opened. The value
+         * is taken from the renewed request's ContractEnddate (preloaded by the
+         * guard) and shown as static text — it is context, not an input.
+         *
+         * @param {sap.ui.model.odata.v4.Context} oContext The request being renewed.
+         */
+        _injectRenewContractEndDate: function (oContext) {
+            var that = this;
+            var sRaw = oContext.getProperty("ContractEnddate");
+            var sValue = sRaw ? formatDate(toLocalDate(sRaw)) : "";
+
+            // FE opens the dialog asynchronously (value lists, side effects), so
+            // poll briefly for it rather than assume it is up on the next tick.
+            var iTries = 0;
+            var iMaxTries = 40; // ~4s at 100ms intervals
+            var poll = function () {
+                var oField = that._findRenewAppointmentDateField();
+                if (oField) {
+                    that._addContractEndDateField(oField, sValue);
+                    return;
+                }
+                if (++iTries < iMaxTries) {
+                    setTimeout(poll, 100);
+                }
+            };
+            poll();
+        },
+
+        /**
+         * The Appointment Date control inside the currently open Renew Sticker
+         * action dialog, or null while no such dialog is open yet. FE names the
+         * generated field after the "appointmentdate" action parameter, matched
+         * here on either the control id or a value binding path.
+         */
+        _findRenewAppointmentDateField: function () {
+            var aDialogs = Element.registry.filter(function (oControl) {
+                return oControl.isA("sap.m.Dialog") && oControl.isOpen && oControl.isOpen();
+            });
+
+            for (var i = 0; i < aDialogs.length; i++) {
+                var aMatches = aDialogs[i].findAggregatedObjects(true, function (oControl) {
+                    return this._isAppointmentDateControl(oControl);
+                }.bind(this));
+                if (aMatches.length) {
+                    return aMatches[0];
+                }
+            }
+            return null;
+        },
+
+        _isAppointmentDateControl: function (oControl) {
+            if ((oControl.getId() || "").toLowerCase().indexOf("appointmentdate") !== -1) {
+                return true;
+            }
+            if (!oControl.getBindingInfo) { return false; }
+
+            var aProps = ["value", "selectedKey", "additionalValue", "dateValue"];
+            return aProps.some(function (sProp) {
+                var oInfo = oControl.getBindingInfo(sProp);
+                var aParts = oInfo && (oInfo.parts || [oInfo]);
+                return !!aParts && aParts.some(function (oPart) {
+                    return oPart && oPart.path &&
+                        oPart.path.toLowerCase().indexOf("appointmentdate") !== -1;
+                });
+            });
+        },
+
+        /**
+         * Insert the read-only Contract End Date row directly before the form
+         * row that holds the Appointment Date field. Idempotent: a dialog that
+         * already carries the injected row (e.g. reused by FE) is left untouched.
+         *
+         * @param {sap.ui.core.Control} oAppointmentField The Appointment Date field.
+         * @param {string} sValue Formatted contract end date, or "" when unset.
+         */
+        _addContractEndDateField: function (oAppointmentField, sValue) {
+            // Walk up to the form row (FormElement) that wraps the field.
+            var oFormElement = oAppointmentField;
+            while (oFormElement && !oFormElement.isA("sap.ui.layout.form.FormElement")) {
+                oFormElement = oFormElement.getParent();
+            }
+            if (!oFormElement) { return; }
+
+            var oContainer = oFormElement.getParent(); // FormContainer
+            if (!oContainer || !oContainer.insertFormElement) { return; }
+
+            var bAlready = oContainer.getFormElements().some(function (oExisting) {
+                return oExisting.data(CONTRACT_END_FIELD_FLAG);
+            });
+            if (bAlready) { return; }
+
+            var oNewElement = new FormElement({
+                label: new Label({ text: this._getText("contractEndDate", "Contract End Date") }),
+                fields: [ new Text({ text: sValue }) ]
+            });
+            oNewElement.data(CONTRACT_END_FIELD_FLAG, true);
+
+            oContainer.insertFormElement(oNewElement, oContainer.indexOfFormElement(oFormElement));
         },
 
         /**
