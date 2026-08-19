@@ -50,16 +50,6 @@
                                     <PropertyValue Property="Label" String="Slot ID"/>
                                     <PropertyValue Property="Value" Path="SlotId"/>
                                 </Record>
-                                <!--
-                                    Not shown: added purely so Fiori Elements
-                                    includes isSecurityRescheduled in the object
-                                    page $select. The reschedule guard reads it to
-                                    lift the 24h cutoff when security has already
-                                    rescheduled the appointment; without this a
-                                    standard FE read omits it (it is UI.Hidden on
-                                    the entity type). Mirrors the hidden
-                                    AppointmentDate field above.
-                                -->
                                 <Record Type="UI.DataField">
                                     <PropertyValue Property="Label" String="Is Security Rescheduled"/>
                                     <PropertyValue Property="Value" Path="isSecurityRescheduled"/>
