@@ -16,6 +16,8 @@
 /*   Disable Maintain Appointment Location                        */
 /* ========================================================= */
 
+
+
 /* Hide maintenance actions for Sticker Admins */
 body.hideMaintenanceActions [id*="StandardAction::Create"],
 body.hideMaintenanceActions [id*="StandardAction::Edit"],
@@ -184,3 +186,10 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
 [id$="-fu_button"] .sapMBtnInner::after {
     content: "Upload File";
 }
+
+.zhrAttachmentsMandatory::after {
+    content: " *";
+    color: #bb0000;
+    font-weight: bold;
+}
+
