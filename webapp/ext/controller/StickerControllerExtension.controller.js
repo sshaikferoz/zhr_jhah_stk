@@ -854,33 +854,77 @@ sap.ui.define([
                 });
 
                 oButton.attachPress(function (oEvent) {
-                    var aContexts = that._resolveActionContexts(oButton, oEvent) || [];
-                    var oReplayEvent = new Event(oEvent.getId(), oEvent.getSource(), Object.assign({}, oEvent.getParameters()));
+
+                    var aContexts =
+                        that._resolveActionContexts(oButton, oEvent) || [];
+
+                    var oReplayEvent = new Event(
+                        oEvent.getId(),
+                        oEvent.getSource(),
+                        Object.assign({}, oEvent.getParameters())
+                    );
 
                     var fnReplay = function () {
+
                         aHandlers.forEach(function (oHandler) {
-                            oHandler.fFunction.call(oHandler.oListener || oButton, oReplayEvent, oHandler.oData);
+                            oHandler.fFunction.call(
+                                oHandler.oListener || oButton,
+                                oReplayEvent,
+                                oHandler.oData
+                            );
                         });
+
                         if (mGuard.afterReplay) {
-                            mGuard.afterReplay.call(that, aContexts);
+                            mGuard.afterReplay.call(
+                                that,
+                                aContexts
+                            );
                         }
                     };
 
-                    that._requestGuardProperties(aContexts, mGuard.properties).then(function () {
-                        var sError = null;
+                    that._requestGuardProperties(
+                        aContexts,
+                        mGuard.properties
+                    ).then(function () {
+
+                        var vValidationResult;
+
                         if (aContexts.length === 0) {
-                            sError = mGuard.validate.call(that, []);
+                            vValidationResult =
+                                mGuard.validate.call(that, []);
                         } else {
                             vValidationResult =
                                 mGuard.validate.call(that, aContexts);
                         }
+
+                        // IMPORTANT:
+                        // Wait for Promise returned by async validation
+                        return Promise.resolve(vValidationResult);
+
+                    }).then(function (sError) {
+
+                        console.log(
+                            "[JHAH-EXT] Validation result:",
+                            sError
+                        );
 
                         if (sError) {
                             MessageBox.error(sError);
                             return;
                         }
 
+                        // Only execute original Renew action
                         fnReplay();
+                    }).catch(function (oError) {
+
+                        console.error(
+                            "[JHAH-EXT] Renew validation failed:",
+                            oError
+                        );
+
+                        MessageBox.error(
+                            "Unable to validate the renewal request."
+                        );
                     });
                 });
 
@@ -888,7 +932,7 @@ sap.ui.define([
             });
         },
 
-       
+
         _resolveActionContexts: function (oButton, oEvent) {
             var oButtonContext = oButton.getBindingContext();
             if (oButtonContext) { return [oButtonContext]; }
@@ -934,6 +978,85 @@ sap.ui.define([
                 });
             });
             return Promise.all(aRequests);
+        },
+
+        _validateRenewStickerNumber: function () {
+
+            return this._checkRenewStickerCount().then(function (iCount) {
+
+                console.log(
+                    "[JHAH-EXT] Count returned to validation:",
+                    iCount
+                );
+
+                if (iCount === 0) {
+                    return "There is no active sticker to renew.";
+                }
+
+                return null;
+            });
+        },
+        _validateCancelStickerNumber: function (aContexts) {
+            return this._checkRenewStickerCount().then(function (iCount) {
+
+                console.log(
+                    "[JHAH-EXT] Count returned to validation:",
+                    iCount
+                );
+
+                if (iCount === 0) {
+                    return "There is no active sticker to remove.";
+                }
+
+                return null;
+            });
+        },
+
+        _checkRenewStickerCount: function () {
+            var sUrl =
+                "/sap/opu/odata4/sap/zui_hr_stk/srvd_f4/sap/zi_hr_stk_renew_vh/0001" +
+                ";ps='srvd-zsrv_hr_stk-0001'" +
+                ";va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.renew.stickernumber.StickerMasterType.X'" +
+                "/ZI_HR_STK_RENEW_VH" +
+                "?$select=Pernr,PlateNum,StickerNumber,StkReqId" +
+                "&$orderby=StickerNumber" +
+                "&$count=true" +
+                "&$skip=0" +
+                "&$top=100";
+
+            return new Promise(function (resolve, reject) {
+
+                jQuery.ajax({
+                    url: sUrl,
+                    method: "GET",
+                    dataType: "json",
+                    headers: {
+                        "Accept": "application/json"
+                    },
+
+                    success: function (oData) {
+
+                        var iCount = Number(oData["@odata.count"] || 0);
+
+                        console.log(
+                            "[JHAH-EXT] Renew Sticker Count:",
+                            iCount
+                        );
+
+                        resolve(iCount);
+                    },
+
+                    error: function (oError) {
+
+                        console.error(
+                            "[JHAH-EXT] Renew Sticker Count Error:",
+                            oError
+                        );
+
+                        reject(oError);
+                    }
+                });
+            });
         },
 
         _validateReschedule: function (oContext) {
