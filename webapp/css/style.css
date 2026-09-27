@@ -1,51 +1,132 @@
+[id$="::LineItem-settings"] {
+    display: none !important;
+}
+
+/* =========================================================
+   12. JUSTIFICATION TEXTAREA OVERRIDES
+========================================================= */
+.sapUiFormCLCellsS12:has([id*="RequestGrpFacet"][id*="Justification"][id*="Field-content"]),
+.sapUiFormCLCellsL12:has([id*="RequestGrpFacet"][id*="Justification"][id*="Field-content"]),
+.sapUiFormCLCellsS12:has([id*="RequestGrpFacet"][id*="Remarks"][id*="Field-content"]),
+.sapUiFormCLCellsL12:has([id*="RequestGrpFacet"][id*="Remarks"][id*="Field-content"]),
+.sapUiFormCLCellsS12:has([id*="RequestGrpFacet"][id*="Reason"][id*="Field-content"]),
+.sapUiFormCLCellsL12:has([id*="RequestGrpFacet"][id*="Reason"][id*="Field-content"]) {
+    width: 700px !important;
+    max-width: 700px !important;
+    min-width: 700px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+[id*="RequestGrpFacet"][id*="Justification"][id*="Field-content"],
+[id*="RequestGrpFacet"][id*="Justification"][id*="Field-edit"],
+[id*="RequestGrpFacet"][id*="Remarks"][id*="Field-content"],
+[id*="RequestGrpFacet"][id*="Remarks"][id*="Field-edit"],
+[id*="RequestGrpFacet"][id*="Reason"][id*="Field-content"],
+[id*="RequestGrpFacet"][id*="Reason"][id*="Field-edit"] {
+    width: 1000px !important;
+    max-width: 1000px !important;
+    box-sizing: border-box !important;
+}
+
+[id*="RequestGrpFacet"][id*="Justification"][id*="Field-edit-content"],
+[id*="RequestGrpFacet"][id*="Remarks"][id*="Field-edit-content"] ,
+[id*="RequestGrpFacet"][id*="Reason"][id*="Field-edit-content"]  {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+}
+
+[id*="RequestGrpFacet"][id*="Justification"][id*="Field-edit-inner"],
+ [id*="RequestGrpFacet"][id*="Remarks"][id*="Field-edit-inner"],
+ [id*="RequestGrpFacet"][id*="Reason"][id*="Field-edit-inner"]{
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+}
+
+
+
 /* ========================================================= */
-/* 0. MAINTENANCE ACTION VISIBILITY                          */
-/*                                                          */
-/* Sticker Admin (StickerAdmin = "X")                       */
-/*   Disable Create                                               */
-/*   Disable Edit                                                 */
-/*   Disable Delete                                               */
-/*   Disable Request                                         */
-/*   Enable Maintain Appointment Location                        */
-/*                                                          */
-/* Non-Admin                                                */
-/*   Enable Create                                               */
-/*   Enable Edit                                                 */
-/*   Enable Delete                                               */
-/*   Enable Copy Request                                         */
-/*   Disable Maintain Appointment Location                        */
+/* 0. ROLE-BASED VISIBILITY (LIST REPORT TABS & ACTIONS)     */
+/* Maps dynamic CSS Classes injected by Controller Extension */
 /* ========================================================= */
 
-/* Hide maintenance actions for Sticker Admins */
-body.hideMaintenanceActions [id*="StandardAction::Create"],
-body.hideMaintenanceActions [id*="StandardAction::Edit"],
-body.hideMaintenanceActions [id*="StandardAction::Delete"],
-body.hideMaintenanceActions [id*="RemoveSticker"],
-body.hideMaintenanceActions [id*="Renew"],
-body.hideMaintenanceActions [id*="CopySticker"]
- {
+/* Hide Admin Tab for Employees */
+.employeeMode [id*="AdminTabKey" i] {
+    display: none !important;
+}
+
+/* Hide Maintain Locations for Employees */
+.employeeMode [id*="MaintAppointmentLocation" i] {
+    display: none !important;
+}
+
+/* Hide Admin Tab ("Employee Requests") for regular Employees */
+.hideAdminOnlyActions [id*="AdminTabKey" i] {
+    display: none !important;
+}
+/* ========================================================= */
+/* 0b. CONTEXT-BASED VISIBILITY (OBJECT PAGE ACTIONS)        */
+/* myRequestMode: Logged-in user is viewing their OWN record */
+/* otherRequestMode: Admin is viewing SOMEONE ELSE'S record  */
+/* ========================================================= */
+
+/* 
+  When looking at MY OWN request, you act as an Employee.
+  Hide Admin actions: 
+  Issue Sticker, Reject, Approve, No Show, Maintain Appointment
+*/
+.myRequestMode [id*="IssueSticker" i],
+.myRequestMode [id*="Reject" i],
+.myRequestMode [id*="Approve" i],
+.myRequestMode [id*="NoShow" i],
+.myRequestMode [id*="MaintAppointmentLocation" i] {
+    display: none !important;
+}
+
+/* 
+  When looking at SOMEONE ELSE's request, you act as an Admin.
+  Hide Employee maintenance actions: 
+  Edit, Delete, Renew, Remove, Cancel Request, Copy
+*/
+/* .otherRequestMode [id*="StandardAction::Edit" i],
+.otherRequestMode [id*="StandardAction::Delete" i], */
+.otherRequestMode [id*="Renew" i],
+.otherRequestMode [id*="Remove" i],
+.otherRequestMode [id*="CancelRequest" i],
+.otherRequestMode [id*="CopySticker" i] {
+    display: none !important;
+}
+
+/* 
+  Handling Loading State:
+  Hide everything dynamically toggled until the context resolves 
+  so users don't see flashing buttons.
+*/
+/* .loadingOwnershipMode [id*="StandardAction::Edit" i],
+.loadingOwnershipMode [id*="StandardAction::Delete" i], */
+.loadingOwnershipMode [id*="Renew" i],
+.loadingOwnershipMode [id*="Remove" i],
+.loadingOwnershipMode [id*="CancelRequest" i],
+.loadingOwnershipMode [id*="CopySticker" i],
+.loadingOwnershipMode [id*="IssueSticker" i],
+.loadingOwnershipMode [id*="Reject" i],
+.loadingOwnershipMode [id*="Approve" i],
+.loadingOwnershipMode [id*="NoShow" i] {
     display: none !important;
 }
 
 /* ========================================================= */
-/* 0b. ADMIN-ONLY ACTIONS                                   */
-/* Maintain Appointment Location is visible ONLY for        */
-/* Sticker Admins.                                          */
+/* HIDE ADMIN TAB FOR EMPLOYEES                              */
 /* ========================================================= */
-
-body.hideAdminOnlyActions [id*="MaintAppointmentLocation"],
-body.hideAdminOnlyActions [id*="IssueSticker"],
-body.hideAdminOnlyActions [id*="NoShow"],
-body.hideAdminOnlyActions [id*="Approve"],
-body.hideAdminOnlyActions [id*="Reject"]  
-{
+.hideAdminTab [id*="AdminTabKey" i] {
     display: none !important;
 }
 
 /* ========================================================= */
 /* 1. HEADER STRIP (BLENDED LAYOUT)                          */
 /* ========================================================= */
-
 .zhrjhahsecstk-app .nativeViolatorStrip {
     flex-basis: 100%;
     width: 100%;
@@ -72,7 +153,6 @@ body.hideAdminOnlyActions [id*="Reject"]
 /* ========================================================= */
 /* 2. HEADER STRIP ALIGNMENT                                 */
 /* ========================================================= */
-
 .zhrjhahsecstk-app .violatorRow {
     align-items: center !important;
     margin-bottom: 6px !important;
@@ -96,9 +176,8 @@ body.hideAdminOnlyActions [id*="Reject"]
 /* 3. FIELD GROUP VALUE ALIGNMENT                            */
 /* Applies only to JHAH custom themes                        */
 /* ========================================================= */
-
 /* Remove custom indentation from form values */
-html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] > dd {
+html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"]>dd {
     margin: 0 !important;
     margin-inline-start: 0 !important;
     padding: 0 !important;
@@ -117,7 +196,7 @@ html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] [id$="Field-content"] {
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMText,
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMTextMaxWidth,
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMdcField,
-html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMdcField > * {
+html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMdcField>* {
     text-align: start !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -127,7 +206,6 @@ html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMdcField > * {
 /* JHAH CUSTOM THEMES                                        */
 /* Align form content without moving subsection headers      */
 /* ========================================================= */
-
 html[class*="sapUiTheme-JHAH"] .sapUiFormCL {
     padding-left: 0 !important;
     margin-left: 0 !important;
@@ -144,7 +222,6 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
 /* ========================================================= */
 /* 4. APPOINTMENT TIME SLOT GRID                             */
 /* ========================================================= */
-
 .zhrjhahsecstk-app .zhrSlotGrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr));
@@ -169,8 +246,6 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
 /*=========================================================*/
 /* 5. ATTACHMENT BUTTONS - ICON TO TEXT                     */
 /* ========================================================= */
-
-/* Upload File */
 /* Upload File button */
 [id$="-fu_button"] .sapMBtnIcon {
     display: none !important;
@@ -184,6 +259,7 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
 [id$="-fu_button"] .sapMBtnInner::after {
     content: "Upload File";
 }
+
 .zhrAttachmentsMandatory::after {
     content: " *";
     color: #bb0000;

@@ -142,6 +142,19 @@
             "settings": {
               "contextPath": "/StickerMaster",
               "variantManagement": "Page",
+              "views": {
+                "paths": [
+                  {
+                    "key": "EmpTabKey",
+                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#EmpTab"
+                  },
+                  {
+                    "key": "AdminTabKey",
+                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#AdminTab"
+                  }
+                ],
+                "showCounts": true
+              },
               "navigation": {
                 "StickerMaster": {
                   "detail": {
@@ -151,6 +164,16 @@
               },
               "controlConfiguration": {
                 "@com.sap.vocabularies.UI.v1.LineItem": {
+                  "tableSettings": {
+                    "type": "ResponsiveTable"
+                  }
+                },
+                "@com.sap.vocabularies.UI.v1.LineItem#EmpList": {
+                  "tableSettings": {
+                    "type": "ResponsiveTable"
+                  }
+                },
+                "@com.sap.vocabularies.UI.v1.LineItem#AdminList": {
                   "tableSettings": {
                     "type": "ResponsiveTable"
                   }
