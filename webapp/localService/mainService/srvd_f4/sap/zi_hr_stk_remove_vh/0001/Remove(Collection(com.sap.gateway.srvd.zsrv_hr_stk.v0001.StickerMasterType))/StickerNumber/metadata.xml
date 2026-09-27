@@ -45,54 +45,66 @@
     <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_HIERARCHY',Version='0001',SAP__Origin='LOCAL')/$value">
         <edmx:Include Namespace="com.sap.vocabularies.Hierarchy.v1" Alias="SAP__hierarchy"/>
     </edmx:Reference>
-    <edmx:Reference Uri="../../../../srvd/sap/zhr_var_app_srv_defn/0001/$metadata">
-        <edmx:Include Namespace="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001" Alias="SAP__ParentService"/>
+    <edmx:Reference Uri="../../../../srvd/sap/zsrv_hr_stk/0001/$metadata">
+        <edmx:Include Namespace="com.sap.gateway.srvd.zsrv_hr_stk.v0001" Alias="SAP__ParentService"/>
     </edmx:Reference>
     <edmx:DataServices>
-        <Schema Namespace="com.sap.gateway.srvd_f4.zhr_var_location.v0001" Alias="SAP__self">
+        <Schema Namespace="com.sap.gateway.srvd_f4.zi_hr_stk_remove_vh.v0001" Alias="SAP__self">
             <Annotation Term="SAP__core.SchemaVersion" String="1.0.0"/>
-            <EntityType Name="ZHR_VAR_LOCATIONType">
+            <EntityType Name="ZI_HR_STK_REMOVE_VHType">
                 <Key>
-                    <PropertyRef Name="UUID"/>
-                    <PropertyRef Name="LocationValue"/>
+                    <PropertyRef Name="Pernr"/>
+                    <PropertyRef Name="StickerNumber"/>
                 </Key>
-                <Property Name="UUID" Type="Edm.Guid" Nullable="false"/>
-                <Property Name="LocationValue" Type="Edm.String" Nullable="false" MaxLength="4"/>
-                <Property Name="LocationDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Pernr" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="StickerNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="StkReqId" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="PlateNum" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="ExpireDate" Type="Edm.Date"/>
+                <Property Name="Status" Type="Edm.String" Nullable="false" MaxLength="3"/>
             </EntityType>
             <EntityContainer Name="Container">
-                <EntitySet Name="ZHR_VAR_LOCATION" EntityType="com.sap.gateway.srvd_f4.zhr_var_location.v0001.ZHR_VAR_LOCATIONType"/>
+                <EntitySet Name="ZI_HR_STK_REMOVE_VH" EntityType="com.sap.gateway.srvd_f4.zi_hr_stk_remove_vh.v0001.ZI_HR_STK_REMOVE_VHType"/>
             </EntityContainer>
-            <Annotations Target="SAP__self.ZHR_VAR_LOCATIONType/LocationValue">
-                <Annotation Term="SAP__common.Text" Path="LocationDesc"/>
-                <Annotation Term="SAP__common.IsUpperCase"/>
-                <Annotation Term="SAP__common.Label" String="Location Details"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Location and RAC Area Details"/>
+            <Annotations Target="SAP__self.ZI_HR_STK_REMOVE_VHType/Pernr">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Personnel Number"/>
+                <Annotation Term="SAP__common.Heading" String="Pers.No."/>
             </Annotations>
-            <Annotations Target="SAP__ParentService.VarListType/Location">
+            <Annotations Target="SAP__self.ZI_HR_STK_REMOVE_VHType/Status">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Request Status"/>
+            </Annotations>
+            <Annotations Target="SAP__ParentService.Remove(Collection(SAP__ParentService.StickerMasterType))/StickerNumber">
                 <Annotation Term="SAP__common.ValueListMapping">
                     <Record>
-                        <PropertyValue Property="Label" String="Location Details of the Request"/>
-                        <PropertyValue Property="CollectionPath" String="ZHR_VAR_LOCATION"/>
+                        <PropertyValue Property="Label" String="Display the the remove popup"/>
+                        <PropertyValue Property="CollectionPath" String="ZI_HR_STK_REMOVE_VH"/>
                         <PropertyValue Property="Parameters">
                             <Collection>
                                 <Record Type="SAP__common.ValueListParameterInOut">
-                                    <PropertyValue Property="LocalDataProperty" PropertyPath="Location"/>
-                                    <PropertyValue Property="ValueListProperty" String="LocationValue"/>
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="StickerNumber"/>
+                                    <PropertyValue Property="ValueListProperty" String="StickerNumber"/>
                                 </Record>
                                 <Record Type="SAP__common.ValueListParameterOut">
-                                    <PropertyValue Property="LocalDataProperty" PropertyPath="LocationDesc"/>
-                                    <PropertyValue Property="ValueListProperty" String="LocationDesc"/>
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="StkReqId"/>
+                                    <PropertyValue Property="ValueListProperty" String="StkReqId"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="PlateNum"/>
+                                    <PropertyValue Property="ValueListProperty" String="PlateNum"/>
                                 </Record>
                             </Collection>
                         </PropertyValue>
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="SAP__self.ZHR_VAR_LOCATIONType">
-                <Annotation Term="SAP__common.Label" String="Location Details of the Request"/>
+            <Annotations Target="SAP__self.ZI_HR_STK_REMOVE_VHType">
+                <Annotation Term="SAP__common.Label" String="Display the the remove popup"/>
             </Annotations>
-            <Annotations Target="SAP__self.Container/ZHR_VAR_LOCATION">
+            <Annotations Target="SAP__self.Container/ZI_HR_STK_REMOVE_VH">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
                         <PropertyValue Property="Searchable" Bool="false"/>
@@ -180,14 +192,18 @@
                 <Annotation Term="SAP__capabilities.KeyAsSegmentSupported"/>
                 <Annotation Term="SAP__capabilities.AsynchronousRequestsSupported"/>
             </Annotations>
-            <Annotations Target="SAP__self.ZHR_VAR_LOCATIONType/UUID">
+            <Annotations Target="SAP__self.ZI_HR_STK_REMOVE_VHType/StkReqId">
                 <Annotation Term="SAP__UI.Hidden"/>
-                <Annotation Term="SAP__common.Label" String="UUID"/>
-                <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)"/>
             </Annotations>
-            <Annotations Target="SAP__self.ZHR_VAR_LOCATIONType/LocationDesc">
-                <Annotation Term="SAP__common.Label" String="Short text"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Explanatory Short Text"/>
+            <Annotations Target="SAP__self.ZI_HR_STK_REMOVE_VHType/PlateNum">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_HR_STK_REMOVE_VHType/ExpireDate">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Expire Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_HR_STK_REMOVE_VHType/StickerNumber">
+                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
             </Annotations>
         </Schema>
     </edmx:DataServices>

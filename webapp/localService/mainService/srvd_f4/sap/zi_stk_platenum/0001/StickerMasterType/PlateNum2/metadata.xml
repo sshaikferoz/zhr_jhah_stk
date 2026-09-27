@@ -65,6 +65,7 @@
                 <Property Name="Valpos" Type="Edm.String" Nullable="false" MaxLength="4"/>
                 <Property Name="As4vers" Type="Edm.String" Nullable="false" MaxLength="4"/>
                 <Property Name="PlateNumDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="PlateNo" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="PlateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
             </EntityType>
             <EntityContainer Name="Container">
@@ -96,7 +97,7 @@
                 <Annotation Term="SAP__common.Heading" String="Vers"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Version of the entry (not used)"/>
             </Annotations>
-            <Annotations Target="SAP__self.ZI_STK_PLATENUMType/PlateNum">
+            <Annotations Target="SAP__self.ZI_STK_PLATENUMType/PlateNo">
                 <Annotation Term="SAP__common.Text" Path="PlateNumDesc"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -221,6 +222,9 @@
                 <Annotation Term="SAP__common.Label" String="Lang."/>
                 <Annotation Term="SAP__common.Heading" String="Ln"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Language Key"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_STK_PLATENUMType/PlateNum">
+                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.ZI_STK_PLATENUMType/PlateNumDesc">
                 <Annotation Term="SAP__common.Label" String="Short Description"/>

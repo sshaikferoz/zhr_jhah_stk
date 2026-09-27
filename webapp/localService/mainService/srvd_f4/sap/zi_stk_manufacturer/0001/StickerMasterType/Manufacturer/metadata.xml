@@ -67,6 +67,7 @@
                 <Property Name="ManufacturerDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="DomvalLd" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="DomvalHd" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="ManufacturerVal" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="ManufacturerValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
             </EntityType>
             <EntityContainer Name="Container">
@@ -111,7 +112,7 @@
                 <Annotation Term="SAP__common.Heading" String="Uppr Limit"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Language-specific values for domains, upper limit"/>
             </Annotations>
-            <Annotations Target="SAP__self.ZI_STK_MANUFACTURERType/ManufacturerValue">
+            <Annotations Target="SAP__self.ZI_STK_MANUFACTURERType/ManufacturerVal">
                 <Annotation Term="SAP__common.Text" Path="ManufacturerDesc"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -236,6 +237,9 @@
                 <Annotation Term="SAP__common.Label" String="Lang."/>
                 <Annotation Term="SAP__common.Heading" String="Ln"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Language Key"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_STK_MANUFACTURERType/ManufacturerValue">
+                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.ZI_STK_MANUFACTURERType/ManufacturerDesc">
                 <Annotation Term="SAP__common.Label" String="Short Description"/>

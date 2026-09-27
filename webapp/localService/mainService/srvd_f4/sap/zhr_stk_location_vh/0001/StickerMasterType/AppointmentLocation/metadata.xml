@@ -64,7 +64,9 @@
                 <EntitySet Name="ZHR_STK_LOCATION_VH" EntityType="com.sap.gateway.srvd_f4.zhr_stk_location_vh.v0001.ZHR_STK_LOCATION_VHType"/>
             </EntityContainer>
             <Annotations Target="SAP__self.ZHR_STK_LOCATION_VHType/LocationValue">
-                <Annotation Term="SAP__common.Text" Path="LocationDesc"/>
+                <Annotation Term="SAP__common.Text" Path="LocationDesc">
+                    <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
+                </Annotation>
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__common.Label" String="Sticker Location"/>
                 <Annotation Term="SAP__common.Heading" String="Maintenance of Sticker Location"/>
