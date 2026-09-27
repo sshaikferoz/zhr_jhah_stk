@@ -44,21 +44,21 @@ sap.ui.define([
     // ========================================================================
     var VALIDATION_MESSAGES = {
         invalidAppointmentDate: "Please select an available appointment date.",
-        activeStickerLimit: function(iCount, iMax) {
+        activeStickerLimit: function (iCount, iMax) {
             return "You already have " + iCount + " active stickers. A maximum of " + iMax + " is allowed, so a new request can only be created once one of them expires.";
         },
-        appointmentCutoff: function(iHours) {
+        appointmentCutoff: function (iHours) {
             return "Please note that appointments can only be rescheduled or canceled up to " + iHours + " hours before the approved appointment date and time.";
         },
-        confirmCancelMultiple: function(iCount) {
+        confirmCancelMultiple: function (iCount) {
             return "Are you sure you want to cancel the " + iCount + " selected requests? This cannot be undone.";
         },
         confirmCancelSingle: "Are you sure you want to cancel this request? This cannot be undone.",
         renewNoExpiry: "This request cannot be renewed because it has no expiry date.",
-        renewAlreadyExpired: function(sDate) {
+        renewAlreadyExpired: function (sDate) {
             return "This sticker expired on " + sDate + " and can no longer be renewed.";
         },
-        renewNotYetEligible: function(sExpireDate, iDays, sEligibleDate) {
+        renewNotYetEligible: function (sExpireDate, iDays, sEligibleDate) {
             return "This sticker expires on " + sExpireDate + ". Renewal is only possible within " + iDays + " days before the expiry date, from " + sEligibleDate + ".";
         },
         noLineItem: "No Line Item selected.",
@@ -232,7 +232,7 @@ sap.ui.define([
         //         console.error(err);
         //     }
         // },
-_applyMaintenanceActionVisibility: function () {
+        _applyMaintenanceActionVisibility: function () {
             // Safe default: hide everything until authorization is known
             document.body.classList.add("hideMaintenanceActions");
             document.body.classList.add("hideAdminOnlyActions");
@@ -269,16 +269,16 @@ _applyMaintenanceActionVisibility: function () {
                     // ========================================================
                     // Fiori Elements Stable ID for the Multi-Tab bar is "fe::TabMultipleMode"
                     var oTabBar = oView.byId("fe::TabMultipleMode");
-                    
+
                     if (oTabBar && typeof oTabBar.getItems === "function") {
                         var aTabs = oTabBar.getItems();
-                        
-                        aTabs.forEach(function(oTab) {
+
+                        aTabs.forEach(function (oTab) {
                             var sText = "";
                             if (typeof oTab.getText === "function") {
                                 sText = oTab.getText() || "";
                             }
-                            
+
                             // If this is the Employee Requests tab, set visibility based on Admin role
                             if (sText.indexOf("Employee Requests") !== -1) {
                                 oTab.setVisible(bIsStickerAdmin);
@@ -350,18 +350,18 @@ _applyMaintenanceActionVisibility: function () {
         //             var aObjectPages = oView.findAggregatedObjects(true, function(o) { 
         //                 return o.isA("sap.uxap.ObjectPageLayout"); 
         //             });
-                    
+
         //             if (aObjectPages.length === 0) return; // Not on Object Page
-                    
+
         //             var oObjectPage = aObjectPages[0];
         //             var aButtons = oObjectPage.findAggregatedObjects(true, function(o) { return o.isA("sap.m.Button"); });
 
         //             aButtons.forEach(function(oBtn) {
         //                 var sId = String(oBtn.getId() || "").toUpperCase();
-                        
+
         //                 var bIsAdminAction = sId.indexOf("MAINTAPPOINTMENTLOCATION") !== -1 || sId.indexOf("ISSUESTICKER") !== -1 || sId.indexOf("NOSHOW") !== -1 || sId.indexOf("APPROVE") !== -1 || sId.indexOf("REJECT") !== -1;
         //                 var bIsEmpAction = sId.indexOf("STANDARDACTION::DELETE") !== -1 || sId.indexOf("COPYSTICKER") !== -1 || sId.indexOf("STANDARDACTION::EDIT") !== -1 || sId.indexOf("CANCELREQUEST") !== -1 || sId.indexOf("CREATESELFSTKREQ") !== -1 || (sId.indexOf("RENEW") !== -1 && sId.indexOf("RENEWON") === -1) || sId.indexOf("REMOVE") !== -1;
-                        
+
         //                 if (bIsAdminAction && bHideAdminButtons && typeof oBtn.setVisible === "function") {
         //                     oBtn.setVisible(false);
         //                 }
@@ -415,7 +415,7 @@ _applyMaintenanceActionVisibility: function () {
                 // 3. Apply the correct CSS class to the View based on the context
                 if (!bIsAdmin) {
                     // Regular Employee viewing request -> Hide Admin buttons
-                    oView.addStyleClass("myRequestMode"); 
+                    oView.addStyleClass("myRequestMode");
                 } else {
                     if (bIsMyRequestBool) {
                         // Admin viewing THEIR OWN request -> Hide Admin buttons
@@ -479,7 +479,7 @@ _applyMaintenanceActionVisibility: function () {
 
                                         oFilterBar._oP13nFilter.setP13nData(oP13nData);
                                         bDone = true;
-                                    } catch (e) {}
+                                    } catch (e) { }
                                 }
                             }
                         }
@@ -497,7 +497,7 @@ _applyMaintenanceActionVisibility: function () {
                             });
                         }
                     }
-                } catch (oError) {}
+                } catch (oError) { }
 
                 if (bDone || iAttempts >= iMaxAttempts) {
                     clearInterval(oExtension._pEditingStatusReset);
@@ -552,7 +552,7 @@ _applyMaintenanceActionVisibility: function () {
                         if (!aBtnEls[i].closest(FOOTER_SELECTOR)) { continue; }
                         relabelIfCreate(oBtn, FOOTER_TARGET_TEXT);
                     }
-                } catch (e) {}
+                } catch (e) { }
             };
 
             fnChangeCreateToSubmit();
@@ -597,7 +597,7 @@ _applyMaintenanceActionVisibility: function () {
                 }
             });
         },
-        
+
         _markAttachmentsMandatory: function () {
             var oView = this.base.getView();
             var oTitle = oView.byId("fe::table::_Evidence::LineItem-title");
@@ -636,7 +636,7 @@ _applyMaintenanceActionVisibility: function () {
                     var oSlot = oCtx.getObject();
                     var sDate = oSlot.AppointmentDate;
                     if (!sDate) { return; }
-                    
+
                     var sSeenKey = sDate + "#" + oSlot.SlotId + "#" + oSlot.FromTime;
                     if (mSeen[sSeenKey]) { return; }
                     mSeen[sSeenKey] = true;
@@ -644,7 +644,7 @@ _applyMaintenanceActionVisibility: function () {
                         mByDate[sDate] = [];
                         aDates.push(sDate);
                     }
-                    
+
                     var bFull = oSlot.Capacity > 0 && oSlot.Booked >= oSlot.Capacity;
                     var sRange = formatTime12h(oSlot.FromTime) + " - " + formatTime12h(oSlot.ToTime);
                     mByDate[sDate].push({
@@ -658,7 +658,7 @@ _applyMaintenanceActionVisibility: function () {
                     });
                 });
                 aDates.sort();
-                
+
                 Object.keys(mByDate).forEach(function (sKey) {
                     mByDate[sKey].sort(function (a, b) {
                         return a.FromTime < b.FromTime ? -1 : (a.FromTime > b.FromTime ? 1 : 0);
@@ -697,7 +697,7 @@ _applyMaintenanceActionVisibility: function () {
                 return;
             }
 
-            var sDate = oContext.getProperty("AppointmentDate"); 
+            var sDate = oContext.getProperty("AppointmentDate");
             var mByDate = oSlotModel.getProperty("/slotsByDate") || {};
             var aSlots = (sDate && mByDate[sDate]) || [];
 
@@ -854,32 +854,77 @@ _applyMaintenanceActionVisibility: function () {
                 });
 
                 oButton.attachPress(function (oEvent) {
-                    var aContexts = that._resolveActionContexts(oButton, oEvent) || [];
-                    var oReplayEvent = new Event(oEvent.getId(), oEvent.getSource(), Object.assign({}, oEvent.getParameters()));
+
+                    var aContexts =
+                        that._resolveActionContexts(oButton, oEvent) || [];
+
+                    var oReplayEvent = new Event(
+                        oEvent.getId(),
+                        oEvent.getSource(),
+                        Object.assign({}, oEvent.getParameters())
+                    );
 
                     var fnReplay = function () {
+
                         aHandlers.forEach(function (oHandler) {
-                            oHandler.fFunction.call(oHandler.oListener || oButton, oReplayEvent, oHandler.oData);
+                            oHandler.fFunction.call(
+                                oHandler.oListener || oButton,
+                                oReplayEvent,
+                                oHandler.oData
+                            );
                         });
+
                         if (mGuard.afterReplay) {
-                            mGuard.afterReplay.call(that, aContexts);
+                            mGuard.afterReplay.call(
+                                that,
+                                aContexts
+                            );
                         }
                     };
 
-                    that._requestGuardProperties(aContexts, mGuard.properties).then(function () {
-                        var sError = null;
+                    that._requestGuardProperties(
+                        aContexts,
+                        mGuard.properties
+                    ).then(function () {
+
+                        var vValidationResult;
+
                         if (aContexts.length === 0) {
-                            sError = mGuard.validate.call(that, []);
+                            vValidationResult =
+                                mGuard.validate.call(that, []);
                         } else {
-                            sError = mGuard.validate.call(that, aContexts);
+                            vValidationResult =
+                                mGuard.validate.call(that, aContexts);
                         }
+
+                        // IMPORTANT:
+                        // Wait for Promise returned by async validation
+                        return Promise.resolve(vValidationResult);
+
+                    }).then(function (sError) {
+
+                        console.log(
+                            "[JHAH-EXT] Validation result:",
+                            sError
+                        );
 
                         if (sError) {
                             MessageBox.error(sError);
                             return;
                         }
 
+                        // Only execute original Renew action
                         fnReplay();
+                    }).catch(function (oError) {
+
+                        console.error(
+                            "[JHAH-EXT] Renew validation failed:",
+                            oError
+                        );
+
+                        MessageBox.error(
+                            "Unable to validate the renewal request."
+                        );
                     });
                 });
 
@@ -887,24 +932,82 @@ _applyMaintenanceActionVisibility: function () {
             });
         },
 
-        _validateRenewStickerNumber: function (aContexts) {
-            if (!aContexts || !aContexts.length) { return VALIDATION_MESSAGES.noLineItem; }
-            var bHasStickerNumber = aContexts.some(function (oContext, iIndex) {
-                var sStickerNumber = oContext.getProperty("StickerNumber");
-                return (sStickerNumber && String(sStickerNumber).trim() !== "");
-            });
-            if (!bHasStickerNumber) { return VALIDATION_MESSAGES.noStickerForRenew; }
-            return null;
-        },
+        _checkRenewStickerCount: function () {
+            var sUrl =
+                "/sap/opu/odata4/sap/zui_hr_stk/srvd_f4/sap/zi_hr_stk_renew_vh/0001" +
+                ";ps='srvd-zsrv_hr_stk-0001'" +
+                ";va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.renew.stickernumber.StickerMasterType.X'" +
+                "/ZI_HR_STK_RENEW_VH" +
+                "?$select=Pernr,PlateNum,StickerNumber,StkReqId" +
+                "&$orderby=StickerNumber" +
+                "&$count=true" +
+                "&$skip=0" +
+                "&$top=100";
 
-        _validateCancelStickerNumber: function (aContexts) {
-            if (!aContexts || !aContexts.length) { return VALIDATION_MESSAGES.noLineItem; }
-            var bHasStickerNumber = aContexts.some(function (oContext, iIndex) {
-                var sStickerNumber = oContext.getProperty("StickerNumber");
-                return (sStickerNumber && String(sStickerNumber).trim() !== "");
+            return new Promise(function (resolve, reject) {
+
+                jQuery.ajax({
+                    url: sUrl,
+                    method: "GET",
+                    dataType: "json",
+                    headers: {
+                        "Accept": "application/json"
+                    },
+
+                    success: function (oData) {
+
+                        var iCount = Number(oData["@odata.count"] || 0);
+
+                        console.log(
+                            "[JHAH-EXT] Renew Sticker Count:",
+                            iCount
+                        );
+
+                        resolve(iCount);
+                    },
+
+                    error: function (oError) {
+
+                        console.error(
+                            "[JHAH-EXT] Renew Sticker Count Error:",
+                            oError
+                        );
+
+                        reject(oError);
+                    }
+                });
             });
-            if (!bHasStickerNumber) { return VALIDATION_MESSAGES.noStickerForCancel; }
-            return null;
+        },
+        _validateRenewStickerNumber: function () {
+
+            return this._checkRenewStickerCount().then(function (iCount) {
+
+                console.log(
+                    "[JHAH-EXT] Count returned to validation:",
+                    iCount
+                );
+
+                if (iCount === 0) {
+                    return "There is no active sticker to renew.";
+                }
+
+                return null;
+            });
+        },
+        _validateCancelStickerNumber: function (aContexts) {
+            return this._checkRenewStickerCount().then(function (iCount) {
+
+                console.log(
+                    "[JHAH-EXT] Count returned to validation:",
+                    iCount
+                );
+
+                if (iCount === 0) {
+                    return "There is no active sticker to remove.";
+                }
+
+                return null;
+            });
         },
 
         _resolveActionContexts: function (oButton, oEvent) {
@@ -948,7 +1051,7 @@ _applyMaintenanceActionVisibility: function () {
             var aRequests = [];
             aContexts.forEach(function (oContext) {
                 aProperties.forEach(function (sProperty) {
-                    aRequests.push(oContext.requestProperty(sProperty).catch(function (err) {}));
+                    aRequests.push(oContext.requestProperty(sProperty).catch(function (err) { }));
                 });
             });
             return Promise.all(aRequests);
@@ -1014,7 +1117,7 @@ _applyMaintenanceActionVisibility: function () {
             var sValue = sRaw ? formatDate(toLocalDate(sRaw)) : "";
 
             var iTries = 0;
-            var iMaxTries = 40; 
+            var iMaxTries = 40;
             var poll = function () {
                 var oField = that._findActionDialogField("validityperiod");
                 if (oField) {
@@ -1033,7 +1136,7 @@ _applyMaintenanceActionVisibility: function () {
         __disablePlateNumField: function (oContext) {
             var that = this;
             var iTries = 0;
-            var iMaxTries = 40; 
+            var iMaxTries = 40;
             var poll = function () {
                 var oField = that._findActionDialogField("platenum");
                 if (oField) {
@@ -1146,7 +1249,7 @@ _applyMaintenanceActionVisibility: function () {
             }
             if (!oFormElement) { return; }
 
-            var oContainer = oFormElement.getParent(); 
+            var oContainer = oFormElement.getParent();
             if (!oContainer || !oContainer.insertFormElement) { return; }
 
             var bAlready = oContainer.getFormElements().some(function (oExisting) {
@@ -1161,7 +1264,7 @@ _applyMaintenanceActionVisibility: function () {
             oNewElement.data(CONTRACT_END_FIELD_FLAG, true);
 
             oContainer.insertFormElement(oNewElement, oContainer.indexOfFormElement(oFormElement));
-        }   
+        }
 
     });
 });
