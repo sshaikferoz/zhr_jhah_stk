@@ -184,3 +184,8 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
 [id$="-fu_button"] .sapMBtnInner::after {
     content: "Upload File";
 }
+.zhrAttachmentsMandatory::after {
+    content: " *";
+    color: #bb0000;
+    font-weight: bold;
+}

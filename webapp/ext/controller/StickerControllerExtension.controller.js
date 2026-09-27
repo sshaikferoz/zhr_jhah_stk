@@ -18,7 +18,7 @@ sap.ui.define([
     var formatTime12h = SlotTimeFormat.formatTime12h;
 
     var MS_PER_HOUR = 60 * 60 * 1000;
-    var MS_PER_DAY = 24 * MS_PER_HOUR ;
+    var MS_PER_DAY = 24 * MS_PER_HOUR;
 
     // Rescheduling and cancelling both close this many hours before the
     // appointment starts, and a sticker can only be renewed inside this many
@@ -131,6 +131,10 @@ sap.ui.define([
                     var oView = this.base.getView();
                     var oAppModel = oView.getModel();
 
+                    this._markAppointmentFieldsMandatory();
+                    this._markAttachmentsMandatory();
+                    this._applyUIEnhancements();
+
                     // The annotation-driven toolbar buttons exist by the time the
                     // page is bound, so this is where they get their guards.
                     try {
@@ -182,6 +186,132 @@ sap.ui.define([
                 }
             }
         },
+
+        _applyUIEnhancements: function () {
+
+            var oExtension = this;
+            var oView = this.base.getView();
+            var $view = oView.$();
+
+            if (!$view || $view.length === 0) {
+                setTimeout(function () {
+                    oExtension._applyUIEnhancements();
+                }, 200);
+                return;
+            }
+
+            var domView = $view[0];
+
+            var EVIDENCE_CREATE_BUTTON_ID =
+                "com.jhah.zhrjhahsecstk::StickerMasterObjectPage--" +
+                "fe::table::_Evidence::LineItem::StandardAction::Create";
+            var EVIDENCE_TARGET_TEXT = "Add Attachment";
+            var FOOTER_TARGET_TEXT = "Submit";
+            var FOOTER_SELECTOR =
+                ".sapMFooter-CTX, .sapFDynamicPageFooter, .sapMPageFooter, footer";
+
+            // Single source of truth for "is this a Create button, and should
+            // it become sTargetText" — used by both call sites below, so the
+            // idempotency check can never drift from the text actually being set.
+            function relabelIfCreate(oButton, sTargetText, sLogLabel) {
+                if (!oButton || typeof oButton.getText !== "function") { return; }
+                if (oButton.getText() === sTargetText) { return; }
+                if (String(oButton.getText() || "").trim().toUpperCase() !== "CREATE") { return; }
+                oButton.setText(sTargetText);
+                console.log(sLogLabel + " changed to '" + sTargetText + "':", oButton.getId());
+            }
+
+            var fnChangeCreateToSubmit = function () {
+                try {
+                    // Bail early if the view's been torn down — avoids a wasted
+                    // full scan after navigation, while the observer is still
+                    // draining its queued mutation records.
+                    if (!domView.isConnected) { return; }
+
+                    // 1. Evidence table Create button
+                    relabelIfCreate(
+                        sap.ui.getCore().byId(EVIDENCE_CREATE_BUTTON_ID),
+                        EVIDENCE_TARGET_TEXT,
+                        "Evidence Create button"
+                    );
+
+                    // 2. Footer Create button — native DOM APIs instead of jQuery
+                    // .find()/.each()/.closest(): this runs on every MutationObserver
+                    // tick, so avoiding jQuery's per-call wrapping overhead matters.
+                    var aBtnEls = domView.querySelectorAll(".sapMBtn");
+                    for (var i = 0; i < aBtnEls.length; i++) {
+                        var oBtn = sap.ui.core.Element.closestTo(aBtnEls[i]);
+                        if (!oBtn || typeof oBtn.getText !== "function") { continue; }
+                        if (String(oBtn.getText() || "").trim().toUpperCase() !== "CREATE") { continue; }
+                        if (!aBtnEls[i].closest(FOOTER_SELECTOR)) { continue; }
+                        relabelIfCreate(oBtn, FOOTER_TARGET_TEXT, "Footer Create button");
+                    }
+                } catch (e) {
+                    console.error("Error while relabeling Create buttons:", e);
+                }
+            };
+
+            // Run once immediately.
+            fnChangeCreateToSubmit();
+
+            // Two staggered fallbacks cover the narrow window before the
+            // MutationObserver below is attached on first call.
+            setTimeout(fnChangeCreateToSubmit, 300);
+            setTimeout(fnChangeCreateToSubmit, 1000);
+
+            // Debounced observer: Fiori Elements can recreate controls after
+            // Create->Edit, Edit->Display, draft changes, table refresh, or
+            // navigation. Coalesce bursts of mutations (e.g. a table rendering
+            // dozens of rows) into a single re-scan instead of one per batch.
+            if (!$view.data("createToSubmitObserverAttached")) {
+                var iDebounceHandle = null;
+
+                var oObserver = new MutationObserver(function () {
+                    if (iDebounceHandle) { clearTimeout(iDebounceHandle); }
+                    iDebounceHandle = setTimeout(fnChangeCreateToSubmit, 50);
+                });
+
+                oObserver.observe(domView, { childList: true, subtree: true });
+
+                $view.data("createToSubmitObserverAttached", true);
+                $view.data("createToSubmitObserver", oObserver);
+            }
+        },
+
+        _markAppointmentFieldsMandatory: function () {
+            var oView = this.base.getView();
+
+            var aFieldIds = [
+                "fe::FormContainer::VehicleSpecFacet::FormElement::DataField::PlateTyp-label",
+                "fe::FormContainer::VehicleSpecFacet::FormElement::DataField::PlateNum-label",
+                "fe::FormContainer::VehicleSpecFacet::FormElement::DataField::Manufacturer-label",
+                "fe::FormContainer::VehicleSpecFacet::FormElement::DataField::Color-label",
+                "fe::FormContainer::VehicleSpecFacet::FormElement::DataField::PlateNum1-label",
+                "fe::FormContainer::VehicleSpecFacet::FormElement::DataField::PlateNum2-label",
+                "fe::FormContainer::VehicleSpecFacet::FormElement::DataField::PlateNum3-label",
+                "fe::FormContainer::AppointSpecFacet::CustomFormElement::AppointmentDatePicker-label",
+                "fe::FormContainer::AppointSpecFacet::CustomFormElement::TimeSlotSelect-label",
+                "fe::FormContainer::AppointSpecFacet::FormElement::DataField::AppointmentLocation-label"
+            ];
+
+            aFieldIds.forEach(function (sFieldId) {
+                var oLabel = oView.byId(sFieldId);
+
+                if (oLabel) {
+                    oLabel.setRequired(true);
+                }
+            });
+        },
+        _markAttachmentsMandatory: function () {
+            var oView = this.base.getView();
+
+            var oTitle = oView.byId("fe::table::_Evidence::LineItem-title");
+
+            if (oTitle) {
+                oTitle.addStyleClass("zhrAttachmentsMandatory");
+            }
+        },
+
 
         /**
          * Fetch every appointment slot and expose it through the "apptslots" JSON
@@ -468,14 +598,23 @@ sap.ui.define([
          * not carry a press handler yet are retried on the next binding.
          */
         _applyActionGuards: function () {
+
             this._guardActionButton("reschedulePopup", {
-                properties: RESCHEDULE_PROPERTIES,
-                validate: this._validateReschedule
+                properties: APPOINTMENT_PROPERTIES,
+                validate: this._validateAppointmentChange
             });
             this._guardActionButton("RenewSticker", {
                 properties: RENEW_PROPERTIES,
                 validate: this._validateRenew
             });
+            // this._guardActionButton("reschedulePopup", {
+            //     properties: RESCHEDULE_PROPERTIES,
+            //     validate: this._validateReschedule
+            // });
+            // this._guardActionButton("RenewSticker", {
+            //     properties: RENEW_PROPERTIES,
+            //     validate: this._validateRenew
+            // });
             // Process Sticker Request (IssueSticker) carries no client-side rule;
             // it is wrapped only so the read-only Contract End Date field can be
             // added to its dialog once FE opens it.
@@ -571,6 +710,44 @@ sap.ui.define([
                         var sConfirm = mGuard.confirm ? mGuard.confirm.call(that, aContexts) : null;
                         if (!sConfirm) {
                             fnReplay();
+                            if (sActionName === "RenewSticker") {
+                                var iAttempts = 0;
+                                var iInterval = setInterval(function () {
+                                    var aDialogs = oView.findAggregatedObjects(true, function (oControl) {
+                                        return oControl.isA("sap.m.Dialog") && oControl.getId().indexOf("RenewSticker") !== -1;
+                                    });
+
+                                    if (aDialogs.length > 0) {
+                                        clearInterval(iInterval);
+                                        var oDialog = aDialogs[0];
+
+                                        // Make dialog thinner to perfectly wrap the input fields
+                                        oDialog.setContentWidth("300px");
+
+                                        sap.ui.require(["sap/m/MessageStrip"], function (MessageStrip) {
+                                            var aContent = oDialog.getContent() || [];
+                                            var bHasMsg = aContent.some(function (c) { return c.isA("sap.m.MessageStrip"); });
+
+                                            if (!bHasMsg) {
+                                                var oMsg = new MessageStrip({
+                                                    text: "Please review the request and validate the supporting attachments.",
+                                                    type: "Information",
+                                                    showIcon: true
+                                                });
+
+                                                // Margin so it doesn't touch the fields or buttons directly
+                                                oMsg.addStyleClass("sapUiSmallMarginTop");
+
+                                                // Append to bottom (right above the buttons)
+                                                oDialog.addContent(oMsg);
+                                            }
+                                        });
+                                    }
+
+                                    iAttempts++;
+                                    if (iAttempts > 40) { clearInterval(iInterval); }
+                                }, 50);
+                            }
                             return;
                         }
 
@@ -826,7 +1003,7 @@ sap.ui.define([
 
             var oNewElement = new FormElement({
                 label: new Label({ text: this._getText("contractEndDate", "Contract End Date") }),
-                fields: [ new Text({ text: sValue }) ]
+                fields: [new Text({ text: sValue })]
             });
             oNewElement.data(CONTRACT_END_FIELD_FLAG, true);
 

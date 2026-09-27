@@ -73,10 +73,17 @@
                 <Property Name="DOB" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="Nationality" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="NationalityDesc" Type="Edm.String" Nullable="false" MaxLength="50"/>
-                <Property Name="GovernmentID" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="NationalID" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="IQAMA" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="GovernmentID" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="BloodGroup" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="gender" Type="Edm.String" Nullable="false" MaxLength="80"/>
                 <Property Name="BadgeNumber" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="WorkPhone" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="HomePhone" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="BusinessMobile" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="CellPhone" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="Phone" Type="Edm.String" Nullable="false" MaxLength="30"/>
             </EntityType>
             <EntityContainer Name="Container">
                 <EntitySet Name="ZHR_I_EMPLOYEE_DETAILS" EntityType="com.sap.gateway.srvd_f4.zhr_i_employee_details.v0001.ZHR_I_EMPLOYEE_DETAILSType"/>
@@ -138,10 +145,20 @@
                 <Annotation Term="SAP__common.Label" String="Nationality"/>
                 <Annotation Term="SAP__common.Heading" String="Nat"/>
             </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/NationalID">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Identity Number"/>
+                <Annotation Term="SAP__common.Heading" String="ID Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/IQAMA">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Identity Number"/>
+                <Annotation Term="SAP__common.Heading" String="ID Number"/>
+            </Annotations>
             <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/GovernmentID">
                 <Annotation Term="SAP__common.IsUpperCase"/>
-                <Annotation Term="SAP__common.Label" String="ID number"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Personnel ID Number"/>
+                <Annotation Term="SAP__common.Label" String="Identity Number"/>
+                <Annotation Term="SAP__common.Heading" String="ID Number"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/BloodGroup">
                 <Annotation Term="SAP__common.IsUpperCase"/>
@@ -152,6 +169,31 @@
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__common.Label" String="Identity Number"/>
                 <Annotation Term="SAP__common.Heading" String="ID Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/WorkPhone">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="System ID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Communication Identification/Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/HomePhone">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="System ID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Communication Identification/Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/BusinessMobile">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="System ID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Communication Identification/Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/CellPhone">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="System ID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Communication Identification/Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/Phone">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="System ID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Communication Identification/Number"/>
             </Annotations>
             <Annotations Target="SAP__ParentService.StickerMasterType/JhahId">
                 <Annotation Term="SAP__common.ValueListMapping">
@@ -224,6 +266,12 @@
                                     <PropertyValue Property="ValueListProperty" String="NationalityDesc"/>
                                 </Record>
                                 <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="NationalID"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="IQAMA"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
                                     <PropertyValue Property="ValueListProperty" String="GovernmentID"/>
                                 </Record>
                                 <Record Type="SAP__common.ValueListParameterDisplayOnly">
@@ -234,6 +282,21 @@
                                 </Record>
                                 <Record Type="SAP__common.ValueListParameterDisplayOnly">
                                     <PropertyValue Property="ValueListProperty" String="BadgeNumber"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="WorkPhone"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="HomePhone"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="BusinessMobile"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="CellPhone"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="Phone"/>
                                 </Record>
                             </Collection>
                         </PropertyValue>

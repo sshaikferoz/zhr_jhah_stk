@@ -1,0 +1,102 @@
+[
+    {
+        "Uuid": "fc7ca65d-cb38-5133-8f26-3a34c8fa9883",
+        "LocationValue": "App1",
+        "LocationDesc": "LocationDesc1"
+    },
+    {
+        "Uuid": "eb467a58-4d59-5f50-9a56-9ac3ff84c920",
+        "LocationValue": "App2",
+        "LocationDesc": "LocationDesc2"
+    },
+    {
+        "Uuid": "7d8bb369-d4df-5258-9c97-0b8b1f3a6efe",
+        "LocationValue": "App3",
+        "LocationDesc": "LocationDesc3"
+    },
+    {
+        "Uuid": "fe199399-9e1c-5a75-8e90-69cbc31c2ddc",
+        "LocationValue": "App4",
+        "LocationDesc": "LocationDesc4"
+    },
+    {
+        "Uuid": "dd26d53d-e08d-5ec3-b890-f4521e42b18c",
+        "LocationValue": "App5",
+        "LocationDesc": "LocationDesc5"
+    },
+    {
+        "Uuid": "210bb490-5a7b-5058-8e4b-7215234e2104",
+        "LocationValue": "App6",
+        "LocationDesc": "LocationDesc6"
+    },
+    {
+        "Uuid": "083bf717-d6e6-5b4c-9055-ce4e18b7a89e",
+        "LocationValue": "App7",
+        "LocationDesc": "LocationDesc7"
+    },
+    {
+        "Uuid": "ea76eea4-bc05-52e3-a146-b018a63af3aa",
+        "LocationValue": "App8",
+        "LocationDesc": "LocationDesc8"
+    },
+    {
+        "Uuid": "2c9d078a-4e7d-5957-a59d-38ec5eaf9736",
+        "LocationValue": "App9",
+        "LocationDesc": "LocationDesc9"
+    },
+    {
+        "Uuid": "83b1c442-7df1-5646-bd10-b3aaa4463307",
+        "LocationValue": "Ap10",
+        "LocationDesc": "LocationDesc10"
+    },
+    {
+        "Uuid": "2b379b9c-6c3d-5665-b1b2-87859db2bcc4",
+        "LocationValue": "Jkdb",
+        "LocationDesc": "LocationDesc1"
+    },
+    {
+        "Uuid": "ba9494ad-49ef-5c18-b0f9-166fe8aff76c",
+        "LocationValue": "9Y2N",
+        "LocationDesc": "LocationDesc2"
+    },
+    {
+        "Uuid": "ab3de487-5403-55a3-a132-9c5706385bc2",
+        "LocationValue": "1MSP",
+        "LocationDesc": "LocationDesc3"
+    },
+    {
+        "Uuid": "e3d56352-13b6-50fa-8286-122a3cfd89ec",
+        "LocationValue": "EoYf",
+        "LocationDesc": "LocationDesc4"
+    },
+    {
+        "Uuid": "1c95f329-691d-5af5-9e38-5729b31be649",
+        "LocationValue": "f6w0",
+        "LocationDesc": "LocationDesc5"
+    },
+    {
+        "Uuid": "d7781043-b98d-5d70-9fa0-c22efeb6c947",
+        "LocationValue": "s9hQ",
+        "LocationDesc": "LocationDesc6"
+    },
+    {
+        "Uuid": "805a4cd0-af5d-55b2-bdb2-9ac91cceb6f2",
+        "LocationValue": "C0WI",
+        "LocationDesc": "LocationDesc7"
+    },
+    {
+        "Uuid": "bb2769ca-bfc7-557c-a2e8-36d6f4879db6",
+        "LocationValue": "8tXe",
+        "LocationDesc": "LocationDesc8"
+    },
+    {
+        "Uuid": "196e7e0b-98e6-57ae-8a9c-c1d363776659",
+        "LocationValue": "KAmb",
+        "LocationDesc": "LocationDesc9"
+    },
+    {
+        "Uuid": "da2a2e14-00bb-53c2-9963-ae97acb064b7",
+        "LocationValue": "vDFG",
+        "LocationDesc": "LocationDesc10"
+    }
+]
