@@ -8,13 +8,12 @@
     "sapui5"
   ],
   "main": "webapp/index.html",
-  "dependencies": {},
   "devDependencies": {
-    "@ui5/cli": "^4.0.33",
-    "@sap/ux-ui5-tooling": "1",
     "@sap-ux/eslint-plugin-fiori-tools": "^10.0.0",
-    "eslint": "^10",
     "@sap-ux/ui5-middleware-fe-mockserver": "2",
+    "@sap/ux-ui5-tooling": "1",
+    "@ui5/cli": "^4.0.68",
+    "eslint": "^10",
     "rimraf": "^5.0.5"
   },
   "scripts": {
@@ -32,5 +31,8 @@
     "deploy-test": "npm run build && fiori deploy --config ui5-deploy.yaml --testMode true"
   },
   "sapuxLayer": "CUSTOMER_BASE",
-  "sapux": true
+  "sapux": true,
+  "dependencies": {
+    "@openui5/sap.m": "^1.152.0"
+  }
 }

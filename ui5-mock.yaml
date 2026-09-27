@@ -44,11 +44,11 @@ server:
             metadataPath: ./webapp/localService/mainService/metadata.xml
             mockdataPath: ./webapp/localService/mainService/data
             generateMockData: true
-            resolveExternalServiceReferences: true
           - urlPath: /sap/opu/odata4/sap/zhr_var_app_srv_bind/srvd/sap/zhr_var_app_srv_defn/0001
             metadataPath: ./webapp/localService/varService/metadata.xml
             mockdataPath: ./webapp/localService/varService/data
             generateMockData: true
+            resolveExternalServiceReferences: true
         annotations: []
 builder:
   resources:

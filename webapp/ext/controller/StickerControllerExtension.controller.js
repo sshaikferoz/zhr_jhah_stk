@@ -20,60 +20,62 @@ sap.ui.define([
     var MS_PER_HOUR = 60 * 60 * 1000;
     var MS_PER_DAY = 24 * MS_PER_HOUR;
 
-    // Rescheduling and cancelling both close this many hours before the
-    // appointment starts, and a sticker can only be renewed inside this many
-    // days before it expires.
     var APPOINTMENT_CUTOFF_HOURS = 24;
     var RENEW_WINDOW_DAYS = 30;
-
-    // A requester may hold at most this many stickers that are issued and not
-    // yet expired; a further request is rejected before the draft is created.
-    // "Issued" has no dedicated flag on StickerMaster — the status is expressed
-    // through StatsCriticality, where 3 is the positive (issued) value.
     var MAX_ACTIVE_STICKERS = 2;
     var ISSUED_CRITICALITY = 3;
 
-    // Marks a toolbar button whose press handler has already been wrapped, so
-    // re-binding the page doesn't guard the same button twice.
     var GUARD_FLAG = "zhrActionGuarded";
 
-    // Properties the guarded rules read. Neither the object page nor the list
-    // report table necessarily has them in its $select — ExpireDate is
-    // annotated as hidden, and the appointment fields are not columns — so the
-    // guard loads them for the affected rows before it validates.
     var APPOINTMENT_PROPERTIES = ["AppointmentDate", "AppointmentFromTime"];
-    // Reschedule additionally reads the security-reschedule flag, which lifts
-    // the 24h cutoff for the employee (see _validateReschedule).
     var RESCHEDULE_PROPERTIES = APPOINTMENT_PROPERTIES.concat(["isSecurityRescheduled"]);
     var RENEW_PROPERTIES = ["ExpireDate"];
-    // ContractEnddate is shown read-only in the Process Sticker Request
-    // (IssueSticker) dialog, so it is preloaded before that dialog opens.
-    var ISSUE_PROPERTIES = ["ContractEnddate"];
+    var ISSUE_PROPERTIES = ["ContractEnddate", "StkType"];
 
-    // Marks the read-only Contract End Date field injected into the Process
-    // Sticker Request action dialog, so a re-opened dialog is not given a
-    // second copy.
+    var HIDE_VALIDITY_STK_TYPE = "RMV";
     var CONTRACT_END_FIELD_FLAG = "zhrContractEndField";
+    var PLATENUM_READONLY_FLAG = "zhrPlateNumReadOnly";
 
     var oDateFormat = DateFormat.getDateInstance({ style: "medium" });
-    // Edm.Date literal for $filter. Formatted rather than derived from
-    // toISOString(), which would shift the day for negative UTC offsets.
     var oEdmDateFormat = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd", calendarType: "Gregorian" });
+
+    // ========================================================================
+    // CONSOLIDATED VALIDATION & ERROR MESSAGES
+    // ========================================================================
+    var VALIDATION_MESSAGES = {
+        invalidAppointmentDate: "Please select an available appointment date.",
+        activeStickerLimit: function(iCount, iMax) {
+            return "You already have " + iCount + " active stickers. A maximum of " + iMax + " is allowed, so a new request can only be created once one of them expires.";
+        },
+        appointmentCutoff: function(iHours) {
+            return "Please note that appointments can only be rescheduled or canceled up to " + iHours + " hours before the approved appointment date and time.";
+        },
+        confirmCancelMultiple: function(iCount) {
+            return "Are you sure you want to cancel the " + iCount + " selected requests? This cannot be undone.";
+        },
+        confirmCancelSingle: "Are you sure you want to cancel this request? This cannot be undone.",
+        renewNoExpiry: "This request cannot be renewed because it has no expiry date.",
+        renewAlreadyExpired: function(sDate) {
+            return "This sticker expired on " + sDate + " and can no longer be renewed.";
+        },
+        renewNotYetEligible: function(sExpireDate, iDays, sEligibleDate) {
+            return "This sticker expires on " + sExpireDate + ". Renewal is only possible within " + iDays + " days before the expiry date, from " + sEligibleDate + ".";
+        },
+        noLineItem: "No Line Item selected.",
+        noStickerForRenew: "There is no active sticker to renew.",
+        noStickerForCancel: "There is no active sticker to cancel."
+    };
 
     function formatDate(oDate) {
         return oDate ? oDateFormat.format(oDate) : "";
     }
 
-    // Edm.Date reaches the client as "yyyy-MM-dd" and Edm.TimeOfDay as
-    // "HH:mm:ss"; both are wall-clock values, so they are read as local time.
     function toLocalDate(sDate, sTime) {
         if (!sDate) { return null; }
         var oDate = new Date(sDate + "T" + (sTime || "00:00:00"));
         return isNaN(oDate.getTime()) ? null : oDate;
     }
 
-    // ABAP truth flags reach the client as an Edm.Boolean (true), but tolerate
-    // the raw 'X'/'x' char form too in case the value arrives unconverted.
     function isTrueFlag(vValue) {
         return vValue === true || vValue === "X" || vValue === "x";
     }
@@ -90,10 +92,6 @@ sap.ui.define([
         return oResult;
     }
 
-    // FromTime/ToTime (and HideApp) are computed on the backend from the chosen
-    // slot. Writing via Context#setProperty bypasses the FE field wiring, so the
-    // metadata side effects never fire — request them explicitly so the computed
-    // fields refresh. Queued in the same $auto batch as the patches.
     function requestAppointmentSideEffects(oContext) {
         oContext.requestSideEffects([
             "FromTime", "ToTime", "HideApp", "AppointmentFromTime", "AppointmentToTime"
@@ -109,18 +107,27 @@ sap.ui.define([
                 var oView = this.base.getView();
 
                 try {
-                    // Safe model initialization
                     var oViolatorModel = new JSONModel({ isVisible: false });
                     oView.setModel(oViolatorModel, "violator");
 
-                    // Style hook used by css/style.css to scope the strip
                     oView.addStyleClass("zhrjhahsecstk-app");
                     document.body.classList.add("zhrjhahsecstk-app");
 
-                    // Hide the Create/Copy/Edit/Delete actions by default; they
-                    // are revealed only once the auth check confirms the user
-                    // is NOT a Sticker admin (admins get a read-only view).
+                    // 1. Applies List Report & Global Role via original CSS method
                     this._applyMaintenanceActionVisibility();
+
+                    this._markAppointmentFieldsMandatory();
+                    this._markAttachmentsMandatory();
+                    this._applyUIEnhancements();
+                    this._hideEditingStatusFilter();
+
+                    var oFioriI18nModel = oView && oView.getModel("sap.fe.i18n");
+                    if (oFioriI18nModel && !oFioriI18nModel.__jhahCustomTextsApplied) {
+                        oFioriI18nModel.enhance({ bundleName: "com.jhah.zhrjhahsecstk.i18n.i18n" });
+                        oFioriI18nModel.__jhahCustomTextsApplied = true;
+                        this._log("Fiori Elements texts enhanced.", { bundleName: "com.jhah.zhrjhahsecstk.i18n.i18n" });
+                    }
+
                 } catch (err) {
                     console.error("Error in StickerControllerExtension onInit:", err);
                 }
@@ -131,12 +138,6 @@ sap.ui.define([
                     var oView = this.base.getView();
                     var oAppModel = oView.getModel();
 
-                    this._markAppointmentFieldsMandatory();
-                    this._markAttachmentsMandatory();
-                    this._applyUIEnhancements();
-
-                    // The annotation-driven toolbar buttons exist by the time the
-                    // page is bound, so this is where they get their guards.
                     try {
                         this._applyActionGuards();
                     } catch (err) {
@@ -154,18 +155,15 @@ sap.ui.define([
                     // Only act on the Sticker Master object page context
                     if (oBindingContext && oBindingContext.getPath().indexOf("/StickerMaster") !== -1) {
 
-                        // Build the appointment-slot picker data used by the
-                        // AppointmentDatePicker / TimeSlotSelect custom fields.
+                        // 2. Safely process Object Page specific button hiding
+                        this._applyRequestVisibility(oBindingContext);
+
                         this._loadAppointmentSlots(oView, oAppModel, oBindingContext);
 
                         oBindingContext.requestProperty("JhahId").then(function (sJhahId) {
-
                             if (sJhahId && sJhahId.trim() !== "") {
                                 var sPath = "/EmployeeDetails('" + sJhahId + "')";
-
-                                var oContext = oAppModel.bindContext(sPath, null, {
-                                    "$$groupId": "$direct"
-                                });
+                                var oContext = oAppModel.bindContext(sPath, null, { "$$groupId": "$direct" });
 
                                 oContext.requestObject().then(function (oData) {
                                     if (oData && oViolatorModel) {
@@ -187,8 +185,328 @@ sap.ui.define([
             }
         },
 
-        _applyUIEnhancements: function () {
+        _log: function (sMessage, oData) {
+            var sLog = "[JHAH-EXT] " + sMessage;
+            if (oData !== undefined) console.log(sLog, oData);
+            else console.log(sLog);
+        },
 
+        // ========================================================================
+        // 1. ORIGINAL LIST REPORT & ROLE LOGIC (Untouched, CSS Based)
+        // ========================================================================
+        // _applyMaintenanceActionVisibility: function () {
+        //     // Safe default: hide everything until authorization is known
+        //     document.body.classList.add("hideMaintenanceActions");
+        //     document.body.classList.add("hideAdminOnlyActions");
+
+        //     var that = this;
+        //     this._bIsStickerAdmin = false;
+
+        //     var oView = this.base.getView();
+        //     var oComponent = this.base.getAppComponent && this.base.getAppComponent();
+        //     var oVarModel = (oComponent && oComponent.getModel("varAuth")) || (oView && oView.getModel("varAuth"));
+
+        //     if (!oVarModel) return;
+
+        //     try {
+        //         var oBinding = oVarModel.bindList("/EmployeeHeader", null, null, null, { $$groupId: "$direct" });
+        //         oBinding.requestContexts(0, 1).then(function (aContexts) {
+        //             var bIsStickerAdmin = false;
+        //             if (aContexts.length) {
+        //                 bIsStickerAdmin = aContexts[0].getObject() && aContexts[0].getObject().StickerAdmin === "X";
+        //             }
+
+        //             that._bIsStickerAdmin = bIsStickerAdmin;
+
+        //             if (bIsStickerAdmin) {
+        //                 document.body.classList.add("hideMaintenanceActions");
+        //                 document.body.classList.remove("hideAdminOnlyActions");
+        //             } else {
+        //                 document.body.classList.remove("hideMaintenanceActions");
+        //                 document.body.classList.add("hideAdminOnlyActions");
+        //             }
+        //         }).catch(function (err) {
+        //             console.error("Failed to determine StickerAdmin role", err);
+        //         });
+        //     } catch (err) {
+        //         console.error(err);
+        //     }
+        // },
+_applyMaintenanceActionVisibility: function () {
+            // Safe default: hide everything until authorization is known
+            document.body.classList.add("hideMaintenanceActions");
+            document.body.classList.add("hideAdminOnlyActions");
+
+            var that = this;
+            this._bIsStickerAdmin = false;
+
+            var oView = this.base.getView();
+            var oComponent = this.base.getAppComponent && this.base.getAppComponent();
+            var oVarModel = (oComponent && oComponent.getModel("varAuth")) || (oView && oView.getModel("varAuth"));
+
+            if (!oVarModel) return;
+
+            try {
+                var oBinding = oVarModel.bindList("/EmployeeHeader", null, null, null, { $$groupId: "$direct" });
+                oBinding.requestContexts(0, 1).then(function (aContexts) {
+                    var bIsStickerAdmin = false;
+                    if (aContexts.length) {
+                        bIsStickerAdmin = aContexts[0].getObject() && aContexts[0].getObject().StickerAdmin === "X";
+                    }
+
+                    that._bIsStickerAdmin = bIsStickerAdmin;
+
+                    if (bIsStickerAdmin) {
+                        document.body.classList.add("hideMaintenanceActions");
+                        document.body.classList.remove("hideAdminOnlyActions");
+                    } else {
+                        document.body.classList.remove("hideMaintenanceActions");
+                        document.body.classList.add("hideAdminOnlyActions");
+                    }
+
+                    // ========================================================
+                    // PROPER UI5 METHOD TO HIDE THE TAB
+                    // ========================================================
+                    // Fiori Elements Stable ID for the Multi-Tab bar is "fe::TabMultipleMode"
+                    var oTabBar = oView.byId("fe::TabMultipleMode");
+                    
+                    if (oTabBar && typeof oTabBar.getItems === "function") {
+                        var aTabs = oTabBar.getItems();
+                        
+                        aTabs.forEach(function(oTab) {
+                            var sText = "";
+                            if (typeof oTab.getText === "function") {
+                                sText = oTab.getText() || "";
+                            }
+                            
+                            // If this is the Employee Requests tab, set visibility based on Admin role
+                            if (sText.indexOf("Employee Requests") !== -1) {
+                                oTab.setVisible(bIsStickerAdmin);
+                            }
+                        });
+                    }
+                    // ========================================================
+
+                }).catch(function (err) {
+                    console.error("Failed to determine StickerAdmin role", err);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        },
+        // ========================================================================
+        // 2. ISOLATED OBJECT PAGE LOGIC (No CSS, UI5 Specific)
+        // ========================================================================
+        // _applyRequestVisibility: async function (oContext) {
+        //     if (!oContext) return;
+        //     var oView = this.base.getView();
+        //     var that = this;
+
+        //     // --- WEBIDE TESTING BYPASS --- 
+        //     // Change these to test without backend calls
+        //     var sBypassRole = ""; // Options: "ADMIN", "EMPLOYEE", ""
+        //     var sBypassOwnership = ""; // Options: "MINE", "OTHER", ""
+        //     // -----------------------------
+
+        //     try {
+        //         // Determine Admin Role
+        //         var bIsAdmin = false;
+        //         if (sBypassRole === "ADMIN") bIsAdmin = true;
+        //         else if (sBypassRole === "EMPLOYEE") bIsAdmin = false;
+        //         else {
+        //             var oVarModel = oView.getModel("varAuth") || (this.base.getAppComponent && this.base.getAppComponent().getModel("varAuth"));
+        //             if (oVarModel) {
+        //                 var aRoles = await oVarModel.bindList("/EmployeeHeader", null, null, null, { $$groupId: "$direct" }).requestContexts(0, 1);
+        //                 if (aRoles.length) bIsAdmin = (aRoles[0].getObject().StickerAdmin === "X");
+        //             }
+        //         }
+        //         that._bIsStickerAdmin = bIsAdmin; // Sync with global variable
+
+        //         // Determine Request Ownership
+        //         var bIsMyRequestBool = false;
+        //         if (sBypassOwnership === "MINE") bIsMyRequestBool = true;
+        //         else if (sBypassOwnership === "OTHER") bIsMyRequestBool = false;
+        //         else {
+        //             var bIsMyRequest = await oContext.requestProperty("IsMyRequest");
+        //             bIsMyRequestBool = (bIsMyRequest === true || bIsMyRequest === "X" || bIsMyRequest === "true");
+        //         }
+
+        //         var bHideAdminButtons = false;
+        //         var bHideEmployeeButtons = false;
+
+        //         if (!bIsAdmin) {
+        //             bHideAdminButtons = true; // Employee viewing request
+        //         } else {
+        //             if (bIsMyRequestBool) {
+        //                 bHideAdminButtons = true; // Admin viewing OWN request
+        //             } else {
+        //                 bHideEmployeeButtons = true; // Admin viewing OTHER request
+        //             }
+        //         }
+
+        //         var fnEnforceObjectPageButtons = function() {
+        //             // CRITICAL: We find the ObjectPageLayout specifically. 
+        //             // This physically prevents us from hiding buttons on the List Report.
+        //             var aObjectPages = oView.findAggregatedObjects(true, function(o) { 
+        //                 return o.isA("sap.uxap.ObjectPageLayout"); 
+        //             });
+                    
+        //             if (aObjectPages.length === 0) return; // Not on Object Page
+                    
+        //             var oObjectPage = aObjectPages[0];
+        //             var aButtons = oObjectPage.findAggregatedObjects(true, function(o) { return o.isA("sap.m.Button"); });
+
+        //             aButtons.forEach(function(oBtn) {
+        //                 var sId = String(oBtn.getId() || "").toUpperCase();
+                        
+        //                 var bIsAdminAction = sId.indexOf("MAINTAPPOINTMENTLOCATION") !== -1 || sId.indexOf("ISSUESTICKER") !== -1 || sId.indexOf("NOSHOW") !== -1 || sId.indexOf("APPROVE") !== -1 || sId.indexOf("REJECT") !== -1;
+        //                 var bIsEmpAction = sId.indexOf("STANDARDACTION::DELETE") !== -1 || sId.indexOf("COPYSTICKER") !== -1 || sId.indexOf("STANDARDACTION::EDIT") !== -1 || sId.indexOf("CANCELREQUEST") !== -1 || sId.indexOf("CREATESELFSTKREQ") !== -1 || (sId.indexOf("RENEW") !== -1 && sId.indexOf("RENEWON") === -1) || sId.indexOf("REMOVE") !== -1;
+                        
+        //                 if (bIsAdminAction && bHideAdminButtons && typeof oBtn.setVisible === "function") {
+        //                     oBtn.setVisible(false);
+        //                 }
+        //                 if (bIsEmpAction && bHideEmployeeButtons && typeof oBtn.setVisible === "function") {
+        //                     oBtn.setVisible(false);
+        //                 }
+        //             });
+        //         };
+
+        //         // Apply immediately, and retry briefly to catch lazy-rendered buttons
+        //         fnEnforceObjectPageButtons();
+        //         setTimeout(fnEnforceObjectPageButtons, 300);
+        //         setTimeout(fnEnforceObjectPageButtons, 800);
+
+        //     } catch (e) {
+        //         console.error("Error evaluating Request Ownership for Object Page:", e);
+        //     }
+        // },
+
+        // ========================================================================
+        // 2. ISOLATED OBJECT PAGE LOGIC (CSS Class Based)
+        // ========================================================================
+        _applyRequestVisibility: async function (oContext) {
+            if (!oContext) return;
+            var oView = this.base.getView();
+            var that = this;
+
+            // 1. Add Loading State so buttons don't flash while checking the backend
+            // Clear previous states to reset the view for the new record
+            oView.addStyleClass("loadingOwnershipMode");
+            oView.removeStyleClass("myRequestMode");
+            oView.removeStyleClass("otherRequestMode");
+
+            try {
+                // Determine Admin Role
+                var bIsAdmin = false;
+                var oVarModel = oView.getModel("varAuth") || (this.base.getAppComponent && this.base.getAppComponent().getModel("varAuth"));
+                if (oVarModel) {
+                    var aRoles = await oVarModel.bindList("/EmployeeHeader", null, null, null, { $$groupId: "$direct" }).requestContexts(0, 1);
+                    if (aRoles.length) bIsAdmin = (aRoles[0].getObject().StickerAdmin === "X");
+                }
+                that._bIsStickerAdmin = bIsAdmin; // Sync with global variable
+
+                // Determine Request Ownership
+                var bIsMyRequest = await oContext.requestProperty("IsMyRequest");
+                var bIsMyRequestBool = (bIsMyRequest === true || bIsMyRequest === "X" || bIsMyRequest === "true");
+
+                // 2. We have the data, remove loading state
+                oView.removeStyleClass("loadingOwnershipMode");
+
+                // 3. Apply the correct CSS class to the View based on the context
+                if (!bIsAdmin) {
+                    // Regular Employee viewing request -> Hide Admin buttons
+                    oView.addStyleClass("myRequestMode"); 
+                } else {
+                    if (bIsMyRequestBool) {
+                        // Admin viewing THEIR OWN request -> Hide Admin buttons
+                        oView.addStyleClass("myRequestMode");
+                    } else {
+                        // Admin viewing SOMEONE ELSE'S request -> Hide Employee buttons
+                        oView.addStyleClass("otherRequestMode");
+                    }
+                }
+
+            } catch (e) {
+                console.error("Error evaluating Request Ownership for Object Page:", e);
+                oView.removeStyleClass("loadingOwnershipMode");
+            }
+        },
+
+        // ========================================================================
+        // REMAINDER OF STANDARD UI LOGIC
+        // ========================================================================
+
+        _hideEditingStatusFilter: function () {
+            var oExtension = this;
+
+            if (this._pEditingStatusReset) {
+                clearInterval(this._pEditingStatusReset);
+            }
+
+            var iAttempts = 0;
+            var iMaxAttempts = 100;
+
+            this._pEditingStatusReset = setInterval(function () {
+                iAttempts++;
+                var bDone = false;
+
+                try {
+                    var aBars = sap.ui.core.Element.registry.filter(function (oControl) {
+                        return (oControl && oControl.isA && (oControl.isA("sap.ui.mdc.FilterBar") || oControl.isA("sap.ui.comp.smartfilterbar.SmartFilterBar")));
+                    });
+
+                    for (var i = 0; i < aBars.length; i++) {
+                        var oFilterBar = aBars[i];
+
+                        if (oFilterBar._oP13nFilter && typeof oFilterBar._oP13nFilter.getP13nData === "function") {
+                            var oP13nData = oFilterBar._oP13nFilter.getP13nData();
+
+                            if (oP13nData && Array.isArray(oP13nData.items)) {
+                                var oEditState = oP13nData.items.find(function (oItem) {
+                                    return (oItem.key === "$editState" || oItem.name === "$editState");
+                                });
+
+                                if (oEditState) {
+                                    oEditState.visible = false;
+                                    try {
+                                        if (typeof oFilterBar.setFilterConditions === "function") {
+                                            var mConditions = oFilterBar.getFilterConditions() || {};
+                                            if (mConditions["$editState"]) {
+                                                delete mConditions["$editState"];
+                                                oFilterBar.setFilterConditions(mConditions);
+                                            }
+                                        }
+
+                                        oFilterBar._oP13nFilter.setP13nData(oP13nData);
+                                        bDone = true;
+                                    } catch (e) {}
+                                }
+                            }
+                        }
+
+                        if (typeof oFilterBar.getFilterItems === "function") {
+                            var aItems = oFilterBar.getFilterItems() || [];
+                            aItems.forEach(function (oItem) {
+                                var sId = String(oItem.getId() || "");
+                                if (sId.indexOf("editState") !== -1 || sId.indexOf("EditingStatus") !== -1 || sId.indexOf("DraftEditingStatus") !== -1) {
+                                    try {
+                                        oItem.setVisible(false);
+                                        bDone = true;
+                                    } catch (e) { }
+                                }
+                            });
+                        }
+                    }
+                } catch (oError) {}
+
+                if (bDone || iAttempts >= iMaxAttempts) {
+                    clearInterval(oExtension._pEditingStatusReset);
+                    oExtension._pEditingStatusReset = null;
+                }
+            }, 200);
+        },
+
+        _applyUIEnhancements: function () {
             var oExtension = this;
             var oView = this.base.getView();
             var $view = oView.$();
@@ -210,59 +528,37 @@ sap.ui.define([
             var FOOTER_SELECTOR =
                 ".sapMFooter-CTX, .sapFDynamicPageFooter, .sapMPageFooter, footer";
 
-            // Single source of truth for "is this a Create button, and should
-            // it become sTargetText" — used by both call sites below, so the
-            // idempotency check can never drift from the text actually being set.
-            function relabelIfCreate(oButton, sTargetText, sLogLabel) {
+            function relabelIfCreate(oButton, sTargetText) {
                 if (!oButton || typeof oButton.getText !== "function") { return; }
                 if (oButton.getText() === sTargetText) { return; }
                 if (String(oButton.getText() || "").trim().toUpperCase() !== "CREATE") { return; }
                 oButton.setText(sTargetText);
-                console.log(sLogLabel + " changed to '" + sTargetText + "':", oButton.getId());
             }
 
             var fnChangeCreateToSubmit = function () {
                 try {
-                    // Bail early if the view's been torn down — avoids a wasted
-                    // full scan after navigation, while the observer is still
-                    // draining its queued mutation records.
                     if (!domView.isConnected) { return; }
 
-                    // 1. Evidence table Create button
                     relabelIfCreate(
                         sap.ui.getCore().byId(EVIDENCE_CREATE_BUTTON_ID),
-                        EVIDENCE_TARGET_TEXT,
-                        "Evidence Create button"
+                        EVIDENCE_TARGET_TEXT
                     );
 
-                    // 2. Footer Create button — native DOM APIs instead of jQuery
-                    // .find()/.each()/.closest(): this runs on every MutationObserver
-                    // tick, so avoiding jQuery's per-call wrapping overhead matters.
                     var aBtnEls = domView.querySelectorAll(".sapMBtn");
                     for (var i = 0; i < aBtnEls.length; i++) {
                         var oBtn = sap.ui.core.Element.closestTo(aBtnEls[i]);
                         if (!oBtn || typeof oBtn.getText !== "function") { continue; }
                         if (String(oBtn.getText() || "").trim().toUpperCase() !== "CREATE") { continue; }
                         if (!aBtnEls[i].closest(FOOTER_SELECTOR)) { continue; }
-                        relabelIfCreate(oBtn, FOOTER_TARGET_TEXT, "Footer Create button");
+                        relabelIfCreate(oBtn, FOOTER_TARGET_TEXT);
                     }
-                } catch (e) {
-                    console.error("Error while relabeling Create buttons:", e);
-                }
+                } catch (e) {}
             };
 
-            // Run once immediately.
             fnChangeCreateToSubmit();
-
-            // Two staggered fallbacks cover the narrow window before the
-            // MutationObserver below is attached on first call.
             setTimeout(fnChangeCreateToSubmit, 300);
             setTimeout(fnChangeCreateToSubmit, 1000);
 
-            // Debounced observer: Fiori Elements can recreate controls after
-            // Create->Edit, Edit->Display, draft changes, table refresh, or
-            // navigation. Coalesce bursts of mutations (e.g. a table rendering
-            // dozens of rows) into a single re-scan instead of one per batch.
             if (!$view.data("createToSubmitObserverAttached")) {
                 var iDebounceHandle = null;
 
@@ -272,7 +568,6 @@ sap.ui.define([
                 });
 
                 oObserver.observe(domView, { childList: true, subtree: true });
-
                 $view.data("createToSubmitObserverAttached", true);
                 $view.data("createToSubmitObserver", oObserver);
             }
@@ -280,7 +575,6 @@ sap.ui.define([
 
         _markAppointmentFieldsMandatory: function () {
             var oView = this.base.getView();
-
             var aFieldIds = [
                 "fe::FormContainer::VehicleSpecFacet::FormElement::DataField::PlateTyp-label",
                 "fe::FormContainer::VehicleSpecFacet::FormElement::DataField::PlateNum-label",
@@ -291,34 +585,27 @@ sap.ui.define([
                 "fe::FormContainer::VehicleSpecFacet::FormElement::DataField::PlateNum3-label",
                 "fe::FormContainer::AppointSpecFacet::CustomFormElement::AppointmentDatePicker-label",
                 "fe::FormContainer::AppointSpecFacet::CustomFormElement::TimeSlotSelect-label",
-                "fe::FormContainer::AppointSpecFacet::FormElement::DataField::AppointmentLocation-label"
+                "fe::FormContainer::AppointSpecFacet::FormElement::DataField::AppointmentLocation-label",
+                "fe::FormContainer::RequestGrpFacet::FormElement::DataField::Location-label",
+                "fe::FormContainer::RequestGrpFacet::FormElement::DataField::StkType-label"
             ];
 
             aFieldIds.forEach(function (sFieldId) {
                 var oLabel = oView.byId(sFieldId);
-
                 if (oLabel) {
                     oLabel.setRequired(true);
                 }
             });
         },
+        
         _markAttachmentsMandatory: function () {
             var oView = this.base.getView();
-
             var oTitle = oView.byId("fe::table::_Evidence::LineItem-title");
-
             if (oTitle) {
                 oTitle.addStyleClass("zhrAttachmentsMandatory");
             }
         },
 
-
-        /**
-         * Fetch every appointment slot and expose it through the "apptslots" JSON
-         * model used by the custom Appointment Slot section. Groups slots by date,
-         * derives the DatePicker min/max range, and seeds the time-chip grid with
-         * the slots for the currently selected date.
-         */
         _loadAppointmentSlots: function (oView, oAppModel, oBindingContext) {
             var oSlotModel = oView.getModel("apptslots");
             if (!oSlotModel) {
@@ -342,8 +629,6 @@ sap.ui.define([
                 var sCurrentSlotId = aResult[3];
                 var sCurrentToTime = aResult[4];
 
-
-
                 var mByDate = {};
                 var aDates = [];
                 var mSeen = {};
@@ -351,9 +636,7 @@ sap.ui.define([
                     var oSlot = oCtx.getObject();
                     var sDate = oSlot.AppointmentDate;
                     if (!sDate) { return; }
-                    // The entity key also spans Apps/StickerRequest, so the
-                    // backend can return the same physical interval as several
-                    // rows; keep only the first row per slot.
+                    
                     var sSeenKey = sDate + "#" + oSlot.SlotId + "#" + oSlot.FromTime;
                     if (mSeen[sSeenKey]) { return; }
                     mSeen[sSeenKey] = true;
@@ -361,28 +644,21 @@ sap.ui.define([
                         mByDate[sDate] = [];
                         aDates.push(sDate);
                     }
-                    // A slot with exhausted capacity stays visible but its chip
-                    // is disabled. Capacity 0 means "not maintained", not full.
+                    
                     var bFull = oSlot.Capacity > 0 && oSlot.Booked >= oSlot.Capacity;
                     var sRange = formatTime12h(oSlot.FromTime) + " - " + formatTime12h(oSlot.ToTime);
                     mByDate[sDate].push({
-                        // SlotId is only unique per DATE in the backend (e.g.
-                        // "SLOT:20260718" for every interval of that day), so a
-                        // synthetic key including FromTime disambiguates the items.
                         key: oSlot.SlotId + "#" + oSlot.FromTime,
                         SlotId: oSlot.SlotId,
                         FromTime: oSlot.FromTime,
                         ToTime: oSlot.ToTime,
                         full: bFull,
-                        // The chips and the value-help input both show the
-                        // from-to range; label adds the booked hint for tooltips.
                         rangeLabel: sRange,
                         label: sRange + (bFull ? " (fully booked)" : "")
                     });
                 });
                 aDates.sort();
-                // Chronological chips regardless of backend row order
-                // ("HH:MM:SS" sorts lexicographically).
+                
                 Object.keys(mByDate).forEach(function (sKey) {
                     mByDate[sKey].sort(function (a, b) {
                         return a.FromTime < b.FromTime ? -1 : (a.FromTime > b.FromTime ? 1 : 0);
@@ -400,7 +676,6 @@ sap.ui.define([
                     "/selectedKey",
                     sCurrentSlotId + "#" + sCurrentTime
                 );
-                // Value shown in the value-help input; empty until a slot is chosen.
                 oSlotModel.setProperty(
                     "/selectedLabel",
                     sCurrentSlotId
@@ -413,12 +688,6 @@ sap.ui.define([
             });
         },
 
-        /**
-         * Fired when the user picks an appointment date (invoked from
-         * AppointmentDatePicker.fragment.xml via the .extension handler syntax).
-         * Refreshes the time-chip grid to the slots for that date and clears
-         * any previous slot pick, or flags an error if the date has no slots.
-         */
         onAppointmentDateChange: function (oEvent) {
             var oDatePicker = oEvent.getSource();
             var bValid = oEvent.getParameter("valid");
@@ -428,16 +697,11 @@ sap.ui.define([
                 return;
             }
 
-            // AppointmentDate has already been written to the context by two-way binding.
-            var sDate = oContext.getProperty("AppointmentDate"); // "yyyy-MM-dd"
+            var sDate = oContext.getProperty("AppointmentDate"); 
             var mByDate = oSlotModel.getProperty("/slotsByDate") || {};
             var aSlots = (sDate && mByDate[sDate]) || [];
 
             oSlotModel.setProperty("/currentSlots", aSlots);
-
-            // Reset the previously chosen slot whenever the date changes; the
-            // chip highlight follows /selectedKey and the input text follows
-            // /selectedLabel, so clearing them resets the whole picker.
             oSlotModel.setProperty("/selectedKey", "");
             oSlotModel.setProperty("/selectedLabel", "");
             oContext.setProperty("SlotId", "");
@@ -447,18 +711,13 @@ sap.ui.define([
 
             if (!bValid || (sDate && aSlots.length === 0)) {
                 oDatePicker.setValueState("Error");
-                oDatePicker.setValueStateText("Please select an available appointment date.");
+                oDatePicker.setValueStateText(VALIDATION_MESSAGES.invalidAppointmentDate);
             } else {
                 oDatePicker.setValueState("None");
                 oDatePicker.setValueStateText("");
             }
         },
 
-        /**
-         * Fired when the user clicks the time-slot value-help input (invoked
-         * from TimeSlotSelect.fragment.xml via the .extension handler syntax).
-         * Lazily loads the TimeSlotPopover fragment and opens it by the input.
-         */
         onAppointmentSlotValueHelp: function (oEvent) {
             var oInput = oEvent.getSource();
             var oView = this.base.getView();
@@ -469,8 +728,6 @@ sap.ui.define([
                     name: "com.jhah.zhrjhahsecstk.ext.fragment.TimeSlotPopover",
                     controller: this
                 }).then(function (oPopover) {
-                    // Dependent of the view so the apptslots model and the
-                    // StickerMaster binding context propagate into the popover.
                     oView.addDependent(oPopover);
                     return oPopover;
                 });
@@ -488,12 +745,6 @@ sap.ui.define([
             }
         },
 
-        /**
-         * Fired when the user presses a time-slot chip in the popover grid
-         * (TimeSlotPopover.fragment.xml). Highlights the chip via /selectedKey,
-         * writes the slot's times and id back to the Sticker Master entity and
-         * closes the popover.
-         */
         onAppointmentSlotPress: function (oEvent) {
             var oButton = oEvent.getSource();
             var oView = this.base.getView();
@@ -503,10 +754,6 @@ sap.ui.define([
                 return;
             }
 
-            // Read the slot straight off the pressed chip's binding context.
-            // A key lookup would be ambiguous: the backend reuses one SlotId for
-            // every interval of a day (e.g. "SLOT:20260718"), so matching on
-            // SlotId alone always resolves to that date's first slot.
             var oItemContext = oButton.getBindingContext("apptslots");
             var oSlot = oItemContext && oItemContext.getObject();
             if (!oSlot) {
@@ -523,18 +770,6 @@ sap.ui.define([
             this.onAppointmentSlotPopoverCancel();
         },
 
-        /**
-         * Count the requester's stickers that are issued (StatsCriticality = 3)
-         * and not yet expired, i.e. the same set as
-         *
-         *   /StickerMaster/$count?$filter=ExpireDate gt <today>
-         *                                 and StatsCriticality eq 3
-         *
-         * The service scopes StickerMaster to the logged-in user, so no
-         * requester filter is added here.
-         *
-         * @returns {Promise<number>} the number of active stickers
-         */
         _requestActiveStickerCount: function () {
             var oModel = this.base.getView().getModel();
             if (!oModel) {
@@ -544,61 +779,27 @@ sap.ui.define([
             var aFilters = [
                 new Filter("StatsCriticality", FilterOperator.EQ, ISSUED_CRITICALITY),
                 new Filter("ExpireDate", FilterOperator.GT, oEdmDateFormat.format(startOfToday())),
-                // StickerMaster is draft-enabled, so it also holds the draft
-                // siblings of issued stickers — without this an issued sticker
-                // that is currently being edited would be counted twice.
                 new Filter("IsActiveEntity", FilterOperator.EQ, true)
             ];
 
-            var oBinding = oModel.bindList("/StickerMaster", null, null, aFilters, {
-            });
-
-            // Sends $count=true&$top=0 — the count only, no entity payload.
+            var oBinding = oModel.bindList("/StickerMaster", null, null, aFilters, {});
             return oBinding.getHeaderContext().requestProperty("$count");
         },
 
-        /**
-         * Block the creation of a new request once the requester already holds
-         * the maximum number of active stickers. Called from editFlow's
-         * onBeforeCreate hook, which stops the Create when the returned promise
-         * rejects — so the error is shown instead of the draft being created.
-         *
-         * If the count cannot be read the create is let through; the backend
-         * still enforces the limit and a failed lookup should not lock the user
-         * out of the app.
-         */
         _checkActiveStickerLimit: function () {
             return this._requestActiveStickerCount().then(function (iCount) {
                 if (iCount < MAX_ACTIVE_STICKERS) {
                     return;
                 }
 
-                MessageBox.error(
-                    "You already have " + iCount + " active stickers. A maximum of " +
-                    MAX_ACTIVE_STICKERS + " is allowed, so a new request can only be " +
-                    "created once one of them expires."
-                );
-
-                // FE only inspects whether the promise rejects; the reason is
-                // never surfaced, the MessageBox above is what the user sees.
+                MessageBox.error(VALIDATION_MESSAGES.activeStickerLimit(iCount, MAX_ACTIVE_STICKERS));
                 return Promise.reject(new Error("Active sticker limit reached."));
             }, function (err) {
                 console.error("Failed to read the active sticker count:", err);
             });
         },
 
-        /**
-         * Wrap the press handler of the annotation-driven "Reschedule", "Renew
-         * Sticker" and "Cancel Request" buttons so a business rule is checked
-         * BEFORE Fiori Elements opens the action dialog or fires the action. On
-         * a violation the FE handlers are never reached, so the user sees the
-         * error instead of the popup.
-         *
-         * Idempotent: buttons already wrapped are skipped, and buttons that do
-         * not carry a press handler yet are retried on the next binding.
-         */
         _applyActionGuards: function () {
-
             this._guardActionButton("reschedulePopup", {
                 properties: APPOINTMENT_PROPERTIES,
                 validate: this._validateAppointmentChange
@@ -607,25 +808,26 @@ sap.ui.define([
                 properties: RENEW_PROPERTIES,
                 validate: this._validateRenew
             });
-            // this._guardActionButton("reschedulePopup", {
-            //     properties: RESCHEDULE_PROPERTIES,
-            //     validate: this._validateReschedule
-            // });
-            // this._guardActionButton("RenewSticker", {
-            //     properties: RENEW_PROPERTIES,
-            //     validate: this._validateRenew
-            // });
-            // Process Sticker Request (IssueSticker) carries no client-side rule;
-            // it is wrapped only so the read-only Contract End Date field can be
-            // added to its dialog once FE opens it.
+            this._guardActionButton("Remove", {
+                properties: ["StickerNumber"],
+                validate: this._validateCancelStickerNumber,
+                afterReplay: this.__disablePlateNumField
+            });
+            this._guardActionButton("Renew", {
+                properties: ["StickerNumber"],
+                validate: this._validateRenewStickerNumber,
+                afterReplay: this.__disablePlateNumField
+            });
             this._guardActionButton("IssueSticker", {
                 properties: ISSUE_PROPERTIES,
                 validate: function () { return null; },
-                afterReplay: this._injectIssueContractEndDate
+                afterReplay: function (oContext) {
+                    var that = this;
+                    this._injectIssueContractEndDate(oContext, function () {
+                        that._applyIssueValidityPeriodVisibility(oContext);
+                    });
+                }
             });
-            // Cancel Request runs straight away — FE opens no dialog of its own
-            // for a parameterless action — and cannot be undone, so it is also
-            // confirmed once it passes the same cutoff Reschedule uses.
             this._guardActionButton("CancelRequest", {
                 properties: APPOINTMENT_PROPERTIES,
                 validate: this._validateAppointmentChange,
@@ -633,40 +835,17 @@ sap.ui.define([
             });
         },
 
-        /**
-         * @param {string} sActionName Fragment of the FE-generated button id —
-         *        action buttons carry the unbound action name (see css/style.css,
-         *        which gates the same buttons by id).
-         * @param {object} mGuard
-         * @param {string[]} mGuard.properties Properties the rule reads; loaded
-         *        for every affected row before the rule runs.
-         * @param {function} mGuard.validate Called with each context the action
-         *        would run on; returns an error text to block the action, or
-         *        null to allow it.
-         * @param {function} [mGuard.confirm] Called with those contexts once the
-         *        validation passed; returns the text of a Yes/No confirmation to
-         *        put in front of the action, or null to run it straight away.
-         * @param {function} [mGuard.afterReplay] Called with the first affected
-         *        context immediately after the wrapped FE handler runs (i.e. once
-         *        FE has been asked to open its action dialog). Used to enrich that
-         *        dialog after FE has built it.
-         */
         _guardActionButton: function (sActionName, mGuard) {
             var that = this;
             var oView = this.base.getView();
 
             var aButtons = oView.findAggregatedObjects(true, function (oControl) {
-                return oControl.isA("sap.m.Button") &&
-                    oControl.getId().indexOf(sActionName) !== -1;
+                return oControl.isA("sap.m.Button") && oControl.getId().indexOf(sActionName) !== -1;
             });
 
             aButtons.forEach(function (oButton) {
                 if (oButton.data(GUARD_FLAG)) { return; }
 
-                // FE attaches its own press handler when it builds the button;
-                // detach it, put ours in front, and replay it only when the
-                // validation passes. UI5 has no way to stop later handlers of
-                // the same event, so wrapping is the only ordering that works.
                 var aHandlers = ((oButton.mEventRegistry && oButton.mEventRegistry.press) || []).slice();
                 if (!aHandlers.length) { return; }
 
@@ -675,93 +854,32 @@ sap.ui.define([
                 });
 
                 oButton.attachPress(function (oEvent) {
-                    var aContexts = that._resolveActionContexts(oButton);
+                    var aContexts = that._resolveActionContexts(oButton, oEvent) || [];
+                    var oReplayEvent = new Event(oEvent.getId(), oEvent.getSource(), Object.assign({}, oEvent.getParameters()));
 
-                    // The press event belongs to UI5 and may be recycled once
-                    // this handler returns, while the checks below hand control
-                    // back to the event loop first — so the replay gets its own
-                    // copy carrying the same id, source and parameters.
-                    var oReplayEvent = new Event(
-                        oEvent.getId(), oEvent.getSource(), Object.assign({}, oEvent.getParameters())
-                    );
                     var fnReplay = function () {
                         aHandlers.forEach(function (oHandler) {
                             oHandler.fFunction.call(oHandler.oListener || oButton, oReplayEvent, oHandler.oData);
                         });
                         if (mGuard.afterReplay) {
-                            mGuard.afterReplay.call(that, aContexts[0]);
+                            mGuard.afterReplay.call(that, aContexts);
                         }
                     };
 
                     that._requestGuardProperties(aContexts, mGuard.properties).then(function () {
                         var sError = null;
-                        // Every affected row has to pass; the first offender is
-                        // the one reported.
-                        aContexts.some(function (oContext) {
-                            sError = mGuard.validate.call(that, oContext);
-                            return !!sError;
-                        });
+                        if (aContexts.length === 0) {
+                            sError = mGuard.validate.call(that, []);
+                        } else {
+                            sError = mGuard.validate.call(that, aContexts);
+                        }
 
                         if (sError) {
                             MessageBox.error(sError);
                             return;
                         }
 
-                        var sConfirm = mGuard.confirm ? mGuard.confirm.call(that, aContexts) : null;
-                        if (!sConfirm) {
-                            fnReplay();
-                            if (sActionName === "RenewSticker") {
-                                var iAttempts = 0;
-                                var iInterval = setInterval(function () {
-                                    var aDialogs = oView.findAggregatedObjects(true, function (oControl) {
-                                        return oControl.isA("sap.m.Dialog") && oControl.getId().indexOf("RenewSticker") !== -1;
-                                    });
-
-                                    if (aDialogs.length > 0) {
-                                        clearInterval(iInterval);
-                                        var oDialog = aDialogs[0];
-
-                                        // Make dialog thinner to perfectly wrap the input fields
-                                        oDialog.setContentWidth("300px");
-
-                                        sap.ui.require(["sap/m/MessageStrip"], function (MessageStrip) {
-                                            var aContent = oDialog.getContent() || [];
-                                            var bHasMsg = aContent.some(function (c) { return c.isA("sap.m.MessageStrip"); });
-
-                                            if (!bHasMsg) {
-                                                var oMsg = new MessageStrip({
-                                                    text: "Please review the request and validate the supporting attachments.",
-                                                    type: "Information",
-                                                    showIcon: true
-                                                });
-
-                                                // Margin so it doesn't touch the fields or buttons directly
-                                                oMsg.addStyleClass("sapUiSmallMarginTop");
-
-                                                // Append to bottom (right above the buttons)
-                                                oDialog.addContent(oMsg);
-                                            }
-                                        });
-                                    }
-
-                                    iAttempts++;
-                                    if (iAttempts > 40) { clearInterval(iInterval); }
-                                }, 50);
-                            }
-                            return;
-                        }
-
-                        // Yes/No rather than OK/Cancel: a "Cancel" button in a
-                        // dialog about cancelling a request reads both ways.
-                        MessageBox.confirm(sConfirm, {
-                            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                            emphasizedAction: MessageBox.Action.YES,
-                            onClose: function (sAction) {
-                                if (sAction === MessageBox.Action.YES) {
-                                    fnReplay();
-                                }
-                            }
-                        });
+                        fnReplay();
                     });
                 });
 
@@ -769,56 +887,73 @@ sap.ui.define([
             });
         },
 
-        /**
-         * The contexts a pressed action applies to: the page's own context for
-         * an object page header button, or the selected rows for a table
-         * toolbar button in the list report.
-         */
-        _resolveActionContexts: function (oButton) {
-            var oContext = oButton.getBindingContext();
-            if (oContext) { return [oContext]; }
-
-            var oParent = oButton.getParent();
-            while (oParent) {
-                if (oParent.isA("sap.ui.mdc.Table")) {
-                    return oParent.getSelectedContexts() || [];
-                }
-                oParent = oParent.getParent();
-            }
-
-            oContext = this.base.getView().getBindingContext();
-            return oContext ? [oContext] : [];
+        _validateRenewStickerNumber: function (aContexts) {
+            if (!aContexts || !aContexts.length) { return VALIDATION_MESSAGES.noLineItem; }
+            var bHasStickerNumber = aContexts.some(function (oContext, iIndex) {
+                var sStickerNumber = oContext.getProperty("StickerNumber");
+                return (sStickerNumber && String(sStickerNumber).trim() !== "");
+            });
+            if (!bHasStickerNumber) { return VALIDATION_MESSAGES.noStickerForRenew; }
+            return null;
         },
 
-        /**
-         * Load the properties a rule reads so it can then run synchronously off
-         * the context. Values already in the model resolve without a request.
-         * A property that cannot be read is logged and left undefined, which
-         * lands the rule on its "nothing to check" branch rather than blocking
-         * the user on a failed lookup.
-         */
+        _validateCancelStickerNumber: function (aContexts) {
+            if (!aContexts || !aContexts.length) { return VALIDATION_MESSAGES.noLineItem; }
+            var bHasStickerNumber = aContexts.some(function (oContext, iIndex) {
+                var sStickerNumber = oContext.getProperty("StickerNumber");
+                return (sStickerNumber && String(sStickerNumber).trim() !== "");
+            });
+            if (!bHasStickerNumber) { return VALIDATION_MESSAGES.noStickerForCancel; }
+            return null;
+        },
+
+        _resolveActionContexts: function (oButton, oEvent) {
+            var oButtonContext = oButton.getBindingContext();
+            if (oButtonContext) { return [oButtonContext]; }
+
+            var oSource = oEvent && oEvent.getSource();
+            if (oSource) {
+                var oSourceContext = oSource.getBindingContext();
+                if (oSourceContext) { return [oSourceContext]; }
+            }
+
+            var oCurrent = oButton;
+            while (oCurrent) {
+                var oParentContext = oCurrent.getBindingContext && oCurrent.getBindingContext();
+                if (oParentContext) { return [oParentContext]; }
+
+                if (oCurrent.isA && oCurrent.isA("sap.ui.mdc.Table")) {
+                    if (typeof oCurrent.getSelectedContexts === "function") {
+                        var aSelectedContexts = oCurrent.getSelectedContexts() || [];
+                        if (aSelectedContexts.length > 0) { return aSelectedContexts; }
+                    }
+
+                    var oInnerTable = oCurrent.getAggregation && oCurrent.getAggregation("_content");
+                    if (oInnerTable && typeof oInnerTable.getItems === "function") {
+                        var aRows = oInnerTable.getItems() || [];
+                        var aRowContexts = aRows.map(function (oRow) {
+                            return oRow.getBindingContext();
+                        }).filter(Boolean);
+
+                        if (aRowContexts.length > 0) { return aRowContexts; }
+                    }
+                    break;
+                }
+                oCurrent = oCurrent.getParent();
+            }
+            return [];
+        },
+
         _requestGuardProperties: function (aContexts, aProperties) {
             var aRequests = [];
-
             aContexts.forEach(function (oContext) {
                 aProperties.forEach(function (sProperty) {
-                    aRequests.push(
-                        oContext.requestProperty(sProperty).catch(function (err) {
-                            console.error("Failed to read " + sProperty + " for the action guard:", err);
-                        })
-                    );
+                    aRequests.push(oContext.requestProperty(sProperty).catch(function (err) {}));
                 });
             });
-
             return Promise.all(aRequests);
         },
 
-        /**
-         * Reschedule rule. When security has already rescheduled this
-         * appointment (isSecurityRescheduled = 'X', surfaced as the boolean
-         * true) the employee may reschedule regardless of how close the
-         * appointment is; otherwise the shared 24h cutoff below applies.
-         */
         _validateReschedule: function (oContext) {
             if (isTrueFlag(oContext.getProperty("isSecurityRescheduled"))) {
                 return null;
@@ -826,13 +961,6 @@ sap.ui.define([
             return this._validateAppointmentChange(oContext);
         },
 
-        /**
-         * An appointment may neither be rescheduled nor cancelled once it is
-         * less than 24 hours away. Sticker admins are exempt and may do both at
-         * any time; while the admin check is still pending the rule is
-         * enforced, matching the restrictive default used for the action
-         * visibility.
-         */
         _validateAppointmentChange: function (oContext) {
             if (this._bIsStickerAdmin) { return null; }
 
@@ -840,93 +968,76 @@ sap.ui.define([
                 oContext.getProperty("AppointmentDate"),
                 oContext.getProperty("AppointmentFromTime")
             );
-            // No appointment booked yet — nothing to protect.
             if (!oAppointment) { return null; }
 
             var iHoursLeft = (oAppointment.getTime() - Date.now()) / MS_PER_HOUR;
             if (iHoursLeft < APPOINTMENT_CUTOFF_HOURS) {
-                return "Please note that appointments can only be rescheduled or canceled up to " +
-                    APPOINTMENT_CUTOFF_HOURS +
-                    " hours before the approved appointment date and time.";
+                return VALIDATION_MESSAGES.appointmentCutoff(APPOINTMENT_CUTOFF_HOURS);
             }
             return null;
         },
 
-        /**
-         * Confirmation text for Cancel Request. The list report allows several
-         * rows to be selected at once, so the count is spelled out.
-         */
         _confirmCancel: function (aContexts) {
             if (aContexts.length > 1) {
-                return "Are you sure you want to cancel the " + aContexts.length +
-                    " selected requests? This cannot be undone.";
+                return VALIDATION_MESSAGES.confirmCancelMultiple(aContexts.length);
             }
-            return "Are you sure you want to cancel this request? This cannot be undone.";
+            return VALIDATION_MESSAGES.confirmCancelSingle;
         },
 
-        /**
-         * A sticker can only be renewed inside the last 30 days of its validity:
-         * not earlier than 30 days before ExpireDate, and not after it has
-         * expired. Renewing on the expiry date itself is still allowed.
-         */
         _validateRenew: function (oContext) {
             var oExpire = toLocalDate(oContext.getProperty("ExpireDate"));
             if (!oExpire) {
-                return "This request cannot be renewed because it has no expiry date.";
+                return VALIDATION_MESSAGES.renewNoExpiry;
             }
 
             var oToday = startOfToday();
-            // Day difference rather than a raw ms division, so a DST switch
-            // inside the window cannot shift the boundary by an hour.
             var iDaysLeft = Math.round((oExpire.getTime() - oToday.getTime()) / MS_PER_DAY);
 
             if (iDaysLeft < 0) {
-                return "This sticker expired on " + formatDate(oExpire) +
-                    " and can no longer be renewed.";
+                return VALIDATION_MESSAGES.renewAlreadyExpired(formatDate(oExpire));
             }
             if (iDaysLeft > RENEW_WINDOW_DAYS) {
-                return "This sticker expires on " + formatDate(oExpire) +
-                    ". Renewal is only possible within " + RENEW_WINDOW_DAYS +
-                    " days before the expiry date, from " +
-                    formatDate(addDays(oExpire, -RENEW_WINDOW_DAYS)) + ".";
+                return VALIDATION_MESSAGES.renewNotYetEligible(formatDate(oExpire), RENEW_WINDOW_DAYS, formatDate(addDays(oExpire, -RENEW_WINDOW_DAYS)));
             }
             return null;
         },
 
-        /**
-         * Resolve a text from the app's i18n bundle, falling back to sFallback
-         * if the "i18n" model (or the key) is not available.
-         */
         _getText: function (sKey, sFallback) {
             var oModel = this.base.getView().getModel("i18n");
             var oBundle = oModel && oModel.getResourceBundle && oModel.getResourceBundle();
             return (oBundle && oBundle.getText(sKey)) || sFallback;
         },
 
-        /**
-         * Add a read-only "Contract End Date" row to the Process Sticker Request
-         * (IssueSticker) action dialog, placed above the Validity Period field.
-         * FE builds that dialog itself and offers no slot for a non-parameter
-         * field, so it is injected into the generated form once the dialog has
-         * opened. The value is taken from the request's ContractEnddate
-         * (preloaded by the guard) and shown as static text — it is context,
-         * not an input.
-         *
-         * @param {sap.ui.model.odata.v4.Context} oContext The request being processed.
-         */
-        _injectIssueContractEndDate: function (oContext) {
+        _injectIssueContractEndDate: function (oContext, fnDone) {
             var that = this;
             var sRaw = oContext.getProperty("ContractEnddate");
             var sValue = sRaw ? formatDate(toLocalDate(sRaw)) : "";
 
-            // FE opens the dialog asynchronously (value lists, side effects), so
-            // poll briefly for it rather than assume it is up on the next tick.
             var iTries = 0;
-            var iMaxTries = 40; // ~4s at 100ms intervals
+            var iMaxTries = 40; 
             var poll = function () {
                 var oField = that._findActionDialogField("validityperiod");
                 if (oField) {
                     that._addContractEndDateField(oField, sValue);
+                    if (fnDone) { fnDone(); }
+                    return;
+                }
+                if (++iTries < iMaxTries) {
+                    setTimeout(poll, 100);
+                } else if (fnDone) {
+                    fnDone();
+                }
+            };
+            poll();
+        },
+        __disablePlateNumField: function (oContext) {
+            var that = this;
+            var iTries = 0;
+            var iMaxTries = 40; 
+            var poll = function () {
+                var oField = that._findActionDialogField("platenum");
+                if (oField) {
+                    that._setFieldReadOnly(oField);
                     return;
                 }
                 if (++iTries < iMaxTries) {
@@ -936,14 +1047,61 @@ sap.ui.define([
             poll();
         },
 
-        /**
-         * The control for the given action parameter inside the currently open
-         * action dialog, or null while no such dialog is open yet. FE names the
-         * generated field after the action parameter, matched here on either the
-         * control id or a value binding path.
-         *
-         * @param {string} sParamName Lower-cased action parameter name to find.
-         */
+        _setFieldReadOnly: function (oField) {
+            if (oField.data(PLATENUM_READONLY_FLAG)) { return; }
+            if (typeof oField.setEditMode === "function") {
+                oField.setEditMode("Display");
+            } else if (typeof oField.setEditable === "function") {
+                oField.setEditable(false);
+            } else if (typeof oField.setEnabled === "function") {
+                oField.setEnabled(false);
+            }
+            oField.data(PLATENUM_READONLY_FLAG, true);
+        },
+
+        _applyIssueValidityPeriodVisibility: function (oContext) {
+            var that = this;
+            var sStkType = oContext.getProperty("StkType");
+            var bHide = sStkType === HIDE_VALIDITY_STK_TYPE;
+
+            var iTries = 0;
+            var iMaxTries = 40;
+            var poll = function () {
+                var oField = that._findActionDialogField("validityperiod");
+                if (oField) {
+                    that._setFormElementVisible(oField, !bHide);
+                    return;
+                }
+                if (++iTries < iMaxTries) {
+                    setTimeout(poll, 100);
+                }
+            };
+            poll();
+        },
+
+        _setFormElementVisible: function (oAnchorField, bVisible) {
+            var oFormElement = oAnchorField;
+            while (oFormElement && !oFormElement.isA("sap.ui.layout.form.FormElement")) {
+                oFormElement = oFormElement.getParent();
+            }
+            if (!oFormElement) { return; }
+
+            oFormElement.setVisible(bVisible);
+            if (typeof oAnchorField.setVisible === "function") {
+                oAnchorField.setVisible(bVisible);
+            }
+
+            var fnApplyDom = function () {
+                var oDom = oFormElement.getDomRef();
+                if (oDom) { oDom.style.display = bVisible ? "" : "none"; }
+                var oFieldDom = oAnchorField.getDomRef && oAnchorField.getDomRef();
+                if (oFieldDom) { oFieldDom.style.display = bVisible ? "" : "none"; }
+            };
+
+            fnApplyDom();
+            setTimeout(fnApplyDom, 100);
+        },
+
         _findActionDialogField: function (sParamName) {
             var aDialogs = Element.registry.filter(function (oControl) {
                 return oControl.isA("sap.m.Dialog") && oControl.isOpen && oControl.isOpen();
@@ -953,14 +1111,19 @@ sap.ui.define([
                 var aMatches = aDialogs[i].findAggregatedObjects(true, function (oControl) {
                     return this._isParamControl(oControl, sParamName);
                 }.bind(this));
-                if (aMatches.length) {
-                    return aMatches[0];
-                }
+
+                var oFieldMatch = aMatches.filter(function (oControl) {
+                    return !oControl.isA("sap.ui.layout.form.FormElement") && !oControl.isA("sap.m.Label");
+                })[0];
+
+                if (oFieldMatch) { return oFieldMatch; }
+                if (aMatches.length) { return aMatches[0]; }
             }
             return null;
         },
-
         _isParamControl: function (oControl, sParamName) {
+            if (oControl.data && oControl.data(CONTRACT_END_FIELD_FLAG)) { return false; }
+
             if ((oControl.getId() || "").toLowerCase().indexOf(sParamName) !== -1) {
                 return true;
             }
@@ -971,29 +1134,19 @@ sap.ui.define([
                 var oInfo = oControl.getBindingInfo(sProp);
                 var aParts = oInfo && (oInfo.parts || [oInfo]);
                 return !!aParts && aParts.some(function (oPart) {
-                    return oPart && oPart.path &&
-                        oPart.path.toLowerCase().indexOf(sParamName) !== -1;
+                    return oPart && oPart.path && oPart.path.toLowerCase().indexOf(sParamName) !== -1;
                 });
             });
         },
 
-        /**
-         * Insert the read-only Contract End Date row directly before the form
-         * row that holds the given anchor field. Idempotent: a dialog that
-         * already carries the injected row (e.g. reused by FE) is left untouched.
-         *
-         * @param {sap.ui.core.Control} oAnchorField The field to insert above.
-         * @param {string} sValue Formatted contract end date, or "" when unset.
-         */
         _addContractEndDateField: function (oAnchorField, sValue) {
-            // Walk up to the form row (FormElement) that wraps the field.
             var oFormElement = oAnchorField;
             while (oFormElement && !oFormElement.isA("sap.ui.layout.form.FormElement")) {
                 oFormElement = oFormElement.getParent();
             }
             if (!oFormElement) { return; }
 
-            var oContainer = oFormElement.getParent(); // FormContainer
+            var oContainer = oFormElement.getParent(); 
             if (!oContainer || !oContainer.insertFormElement) { return; }
 
             var bAlready = oContainer.getFormElements().some(function (oExisting) {
@@ -1008,88 +1161,7 @@ sap.ui.define([
             oNewElement.data(CONTRACT_END_FIELD_FLAG, true);
 
             oContainer.insertFormElement(oNewElement, oContainer.indexOfFormElement(oFormElement));
-        },
+        }   
 
-        /**
-         * Toggle visibility of the role-gated actions based on the logged-in
-         * user's Sticker-admin flag. The flag lives on the VAR service's
-         * EmployeeHeader entity (StickerAdmin = "X" for admins), exposed here
-         * via the "varAuth" model. Two independent, opposite gates are applied:
-         *
-         *   1. Maintenance actions (Create, Edit, Delete): hidden FROM admins —
-         *      admins get a read-only view (body.hideMaintenanceActions +
-         *      css/style.css), shown to everyone else.
-         *   2. Admin-only actions ("Copy Request" / CopySticker and "Maintain
-         *      Appointment Locations" / SemanticObject MaintAppointmentLocation):
-         *      shown ONLY to admins (body.hideAdminOnlyActions + css/style.css),
-         *      hidden for everyone else.
-         *
-         * Both are set to their safe default (hidden) until the check resolves,
-         * so nothing flashes in; on a failed check they stay at that default.
-         */
-        _applyMaintenanceActionVisibility: function () {
-            // Safe default: hide everything until authorization is known
-            document.body.classList.add("hideMaintenanceActions");
-            document.body.classList.add("hideAdminOnlyActions");
-
-            var that = this;
-            // Same restrictive default for the admin exemption in
-            // _validateAppointmentChange: not an admin until proven otherwise.
-            this._bIsStickerAdmin = false;
-
-            var oView = this.base.getView();
-            var oComponent = this.base.getAppComponent?.();
-
-            var oVarModel =
-                (oComponent && oComponent.getModel("varAuth")) ||
-                (oView && oView.getModel("varAuth"));
-
-            if (!oVarModel) {
-                console.error("varAuth model not available.");
-                return;
-            }
-
-            try {
-                var oBinding = oVarModel.bindList(
-                    "/EmployeeHeader",
-                    null,
-                    null,
-                    null,
-                    { $$groupId: "$direct" }
-                );
-
-                oBinding.requestContexts(0, 1).then(function (aContexts) {
-
-                    var bIsStickerAdmin = false;
-
-                    if (aContexts.length) {
-                        bIsStickerAdmin =
-                            aContexts[0].getObject()?.StickerAdmin === "X";
-                    }
-
-                    that._bIsStickerAdmin = bIsStickerAdmin;
-
-                    if (bIsStickerAdmin) {
-                        // Admin:
-                        // Hide Create/Edit/Delete/Copy
-                        // Show Maintain Appointment Location
-                        document.body.classList.add("hideMaintenanceActions");
-                        document.body.classList.remove("hideAdminOnlyActions");
-                    } else {
-                        // Non Admin:
-                        // Show Create/Edit/Delete/Copy
-                        // Hide Maintain Appointment Location
-                        document.body.classList.remove("hideMaintenanceActions");
-                        document.body.classList.add("hideAdminOnlyActions");
-                    }
-
-                }).catch(function (err) {
-                    console.error(err);
-                });
-
-            } catch (err) {
-                console.error(err);
-            }
-        }
     });
 });

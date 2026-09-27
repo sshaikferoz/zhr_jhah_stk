@@ -72,6 +72,17 @@
             </HBox>
         </VBox>
 
+        <VBox class="violatorCol">
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="Department:" class="violatorLabel" />
+                <Text text="{violator>/Department}" class="violatorValue" />
+            </HBox>
+            <HBox class="violatorRow" alignItems="Center">
+                <Text text="CSuite:" class="violatorLabel" />
+                <Text text="{violator>/CSuiteName}" class="violatorValue" />
+            </HBox>
+        </VBox>
+
     </HBox>
 
 </core:FragmentDefinition>
