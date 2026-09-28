@@ -232,7 +232,7 @@ sap.ui.define([
         //         console.error(err);
         //     }
         // },
-        _applyMaintenanceActionVisibility: function () {
+_applyMaintenanceActionVisibility: function () {
             // Safe default: hide everything until authorization is known
             document.body.classList.add("hideMaintenanceActions");
             document.body.classList.add("hideAdminOnlyActions");
@@ -264,29 +264,23 @@ sap.ui.define([
                         document.body.classList.add("hideAdminOnlyActions");
                     }
 
-                    // ========================================================
-                    // PROPER UI5 METHOD TO HIDE THE TAB
-                    // ========================================================
-                    // Fiori Elements Stable ID for the Multi-Tab bar is "fe::TabMultipleMode"
                     var oTabBar = oView.byId("fe::TabMultipleMode");
-
+                    
                     if (oTabBar && typeof oTabBar.getItems === "function") {
                         var aTabs = oTabBar.getItems();
-
-                        aTabs.forEach(function (oTab) {
+                        
+                        aTabs.forEach(function(oTab) {
                             var sText = "";
                             if (typeof oTab.getText === "function") {
                                 sText = oTab.getText() || "";
                             }
-
+                            
                             // If this is the Employee Requests tab, set visibility based on Admin role
                             if (sText.indexOf("Employee Requests") !== -1) {
                                 oTab.setVisible(bIsStickerAdmin);
                             }
                         });
                     }
-                    // ========================================================
-
                 }).catch(function (err) {
                     console.error("Failed to determine StickerAdmin role", err);
                 });
@@ -350,18 +344,18 @@ sap.ui.define([
         //             var aObjectPages = oView.findAggregatedObjects(true, function(o) { 
         //                 return o.isA("sap.uxap.ObjectPageLayout"); 
         //             });
-
+                    
         //             if (aObjectPages.length === 0) return; // Not on Object Page
-
+                    
         //             var oObjectPage = aObjectPages[0];
         //             var aButtons = oObjectPage.findAggregatedObjects(true, function(o) { return o.isA("sap.m.Button"); });
 
         //             aButtons.forEach(function(oBtn) {
         //                 var sId = String(oBtn.getId() || "").toUpperCase();
-
+                        
         //                 var bIsAdminAction = sId.indexOf("MAINTAPPOINTMENTLOCATION") !== -1 || sId.indexOf("ISSUESTICKER") !== -1 || sId.indexOf("NOSHOW") !== -1 || sId.indexOf("APPROVE") !== -1 || sId.indexOf("REJECT") !== -1;
         //                 var bIsEmpAction = sId.indexOf("STANDARDACTION::DELETE") !== -1 || sId.indexOf("COPYSTICKER") !== -1 || sId.indexOf("STANDARDACTION::EDIT") !== -1 || sId.indexOf("CANCELREQUEST") !== -1 || sId.indexOf("CREATESELFSTKREQ") !== -1 || (sId.indexOf("RENEW") !== -1 && sId.indexOf("RENEWON") === -1) || sId.indexOf("REMOVE") !== -1;
-
+                        
         //                 if (bIsAdminAction && bHideAdminButtons && typeof oBtn.setVisible === "function") {
         //                     oBtn.setVisible(false);
         //                 }
@@ -389,39 +383,31 @@ sap.ui.define([
             var oView = this.base.getView();
             var that = this;
 
-            // 1. Add Loading State so buttons don't flash while checking the backend
-            // Clear previous states to reset the view for the new record
             oView.addStyleClass("loadingOwnershipMode");
             oView.removeStyleClass("myRequestMode");
             oView.removeStyleClass("otherRequestMode");
 
             try {
-                // Determine Admin Role
                 var bIsAdmin = false;
                 var oVarModel = oView.getModel("varAuth") || (this.base.getAppComponent && this.base.getAppComponent().getModel("varAuth"));
                 if (oVarModel) {
                     var aRoles = await oVarModel.bindList("/EmployeeHeader", null, null, null, { $$groupId: "$direct" }).requestContexts(0, 1);
                     if (aRoles.length) bIsAdmin = (aRoles[0].getObject().StickerAdmin === "X");
                 }
-                that._bIsStickerAdmin = bIsAdmin; // Sync with global variable
+                that._bIsStickerAdmin = bIsAdmin; 
 
-                // Determine Request Ownership
                 var bIsMyRequest = await oContext.requestProperty("IsMyRequest");
                 var bIsMyRequestBool = (bIsMyRequest === true || bIsMyRequest === "X" || bIsMyRequest === "true");
 
-                // 2. We have the data, remove loading state
                 oView.removeStyleClass("loadingOwnershipMode");
 
-                // 3. Apply the correct CSS class to the View based on the context
                 if (!bIsAdmin) {
                     // Regular Employee viewing request -> Hide Admin buttons
-                    oView.addStyleClass("myRequestMode");
+                    oView.addStyleClass("myRequestMode"); 
                 } else {
                     if (bIsMyRequestBool) {
-                        // Admin viewing THEIR OWN request -> Hide Admin buttons
                         oView.addStyleClass("myRequestMode");
                     } else {
-                        // Admin viewing SOMEONE ELSE'S request -> Hide Employee buttons
                         oView.addStyleClass("otherRequestMode");
                     }
                 }
@@ -431,10 +417,6 @@ sap.ui.define([
                 oView.removeStyleClass("loadingOwnershipMode");
             }
         },
-
-        // ========================================================================
-        // REMAINDER OF STANDARD UI LOGIC
-        // ========================================================================
 
         _hideEditingStatusFilter: function () {
             var oExtension = this;
@@ -614,7 +596,7 @@ sap.ui.define([
                 });
                 oView.setModel(oSlotModel, "apptslots");
             }
-
+        
             var oSlotBinding = oAppModel.bindList("/AppointmentSlot", null, null, null, { $$groupId: "$direct" });
             Promise.all([
                 oSlotBinding.requestContexts(0, 1000),
@@ -818,20 +800,48 @@ sap.ui.define([
                 validate: this._validateRenewStickerNumber,
                 afterReplay: this.__disablePlateNumField
             });
+            
+            // [JHAH FIX LOG: MASSIVELY UPGRADED ISSUE STICKER GUARD]
             this._guardActionButton("IssueSticker", {
                 properties: ISSUE_PROPERTIES,
                 validate: function () { return null; },
-                afterReplay: function (oContext) {
+                afterReplay: function (aContexts) {
                     var that = this;
-                    this._injectIssueContractEndDate(oContext, function () {
-                        that._applyIssueValidityPeriodVisibility(oContext);
+                    
+                    // Safely extract Context without crashing
+                    var oCtx = Array.isArray(aContexts) ? aContexts[0] : aContexts;
+                    var sStkType = "";
+                    if (oCtx && typeof oCtx.getProperty === "function") {
+                        sStkType = oCtx.getProperty("StkType");
+                    }
+                    
+                    console.log("[JHAH FIX LOG] IssueSticker clicked. Detected StkType:", sStkType);
+
+                    // If it's RMV, CAN, or CANCEL, we treat it as a Cancel Request
+                    var bIsCancelRequest = (sStkType === HIDE_VALIDITY_STK_TYPE || sStkType === "CAN" || sStkType === "CANCEL");
+                    
+                    console.log("[JHAH FIX LOG] Is this a Cancel Request?", bIsCancelRequest);
+
+                    // We now pass a boolean (true = hide, false = show)
+                    that._applyIssueValidityPeriodVisibility(bIsCancelRequest);
+                    
+                    // Inject Contract End Date, but tell it whether to SHOW or HIDE based on bIsCancelRequest
+                    that._injectIssueContractEndDate(oCtx, !bIsCancelRequest, function () {
+                        console.log("[JHAH FIX LOG] Completed UI modifications for Process Sticker Request.");
                     });
                 }
             });
+            
+            // [JHAH FIX LOG: ENSURE VALIDITY PERIOD HIDES ON CANCEL REQUEST (CACHE FIX)]
             this._guardActionButton("CancelRequest", {
                 properties: APPOINTMENT_PROPERTIES,
                 validate: this._validateAppointmentChange,
-                confirm: this._confirmCancel
+                confirm: this._confirmCancel,
+                afterReplay: function () {
+                    var that = this;
+                    console.log("[JHAH FIX LOG] CancelRequest clicked. Forcing Validity Period to hide.");
+                    that._applyIssueValidityPeriodVisibility(true);
+                }
             });
         },
 
@@ -853,19 +863,41 @@ sap.ui.define([
                     oButton.detachPress(oHandler.fFunction, oHandler.oListener);
                 });
 
+                // oButton.attachPress(function (oEvent) {
+                //     var aContexts = that._resolveActionContexts(oButton, oEvent) || [];
+                //     var oReplayEvent = new Event(oEvent.getId(), oEvent.getSource(), Object.assign({}, oEvent.getParameters()));
+
+                //     var fnReplay = function () {
+                //         aHandlers.forEach(function (oHandler) {
+                //             oHandler.fFunction.call(oHandler.oListener || oButton, oReplayEvent, oHandler.oData);
+                //         });
+                //         if (mGuard.afterReplay) {
+                //             mGuard.afterReplay.call(that, aContexts);
+                //         }
+                //     };
+
+                //     that._requestGuardProperties(aContexts, mGuard.properties).then(function () {
+                //         var sError = null;
+                //         if (aContexts.length === 0) {
+                //             sError = mGuard.validate.call(that, []);
+                //         } else {
+                //             sError = mGuard.validate.call(that, aContexts);
+                //         }
+
+                //         if (sError) {
+                //             MessageBox.error(sError);
+                //             return;
+                //         }
+
+                //         fnReplay();
+                //     });
+                // });
+
                 oButton.attachPress(function (oEvent) {
-
-                    var aContexts =
-                        that._resolveActionContexts(oButton, oEvent) || [];
-
-                    var oReplayEvent = new Event(
-                        oEvent.getId(),
-                        oEvent.getSource(),
-                        Object.assign({}, oEvent.getParameters())
-                    );
+                    var aContexts = that._resolveActionContexts(oButton, oEvent) || [];
+                    var oReplayEvent = new Event(oEvent.getId(), oEvent.getSource(), Object.assign({}, oEvent.getParameters()));
 
                     var fnReplay = function () {
-
                         aHandlers.forEach(function (oHandler) {
                             oHandler.fFunction.call(
                                 oHandler.oListener || oButton,
@@ -873,7 +905,6 @@ sap.ui.define([
                                 oHandler.oData
                             );
                         });
-
                         if (mGuard.afterReplay) {
                             mGuard.afterReplay.call(
                                 that,
@@ -882,13 +913,8 @@ sap.ui.define([
                         }
                     };
 
-                    that._requestGuardProperties(
-                        aContexts,
-                        mGuard.properties
-                    ).then(function () {
-
-                        var vValidationResult;
-
+                    that._requestGuardProperties(aContexts, mGuard.properties).then(function () {
+                        var sError = null;
                         if (aContexts.length === 0) {
                             vValidationResult =
                                 mGuard.validate.call(that, []);
@@ -897,34 +923,12 @@ sap.ui.define([
                                 mGuard.validate.call(that, aContexts);
                         }
 
-                        // IMPORTANT:
-                        // Wait for Promise returned by async validation
-                        return Promise.resolve(vValidationResult);
-
-                    }).then(function (sError) {
-
-                        console.log(
-                            "[JHAH-EXT] Validation result:",
-                            sError
-                        );
-
                         if (sError) {
                             MessageBox.error(sError);
                             return;
                         }
 
-                        // Only execute original Renew action
                         fnReplay();
-                    }).catch(function (oError) {
-
-                        console.error(
-                            "[JHAH-EXT] Renew validation failed:",
-                            oError
-                        );
-
-                        MessageBox.error(
-                            "Unable to validate the renewal request."
-                        );
                     });
                 });
 
@@ -932,6 +936,25 @@ sap.ui.define([
             });
         },
 
+        _validateRenewStickerNumber: function (aContexts) {
+            if (!aContexts || !aContexts.length) { return VALIDATION_MESSAGES.noLineItem; }
+            var bHasStickerNumber = aContexts.some(function (oContext, iIndex) {
+                var sStickerNumber = oContext.getProperty("StickerNumber");
+                return (sStickerNumber && String(sStickerNumber).trim() !== "");
+            });
+            if (!bHasStickerNumber) { return VALIDATION_MESSAGES.noStickerForRenew; }
+            return null;
+        },
+
+        _validateCancelStickerNumber: function (aContexts) {
+            if (!aContexts || !aContexts.length) { return VALIDATION_MESSAGES.noLineItem; }
+            var bHasStickerNumber = aContexts.some(function (oContext, iIndex) {
+                var sStickerNumber = oContext.getProperty("StickerNumber");
+                return (sStickerNumber && String(sStickerNumber).trim() !== "");
+            });
+            if (!bHasStickerNumber) { return VALIDATION_MESSAGES.noStickerForCancel; }
+            return null;
+        },
 
         _resolveActionContexts: function (oButton, oEvent) {
             var oButtonContext = oButton.getBindingContext();
@@ -1069,9 +1092,13 @@ sap.ui.define([
         _validateAppointmentChange: function (oContext) {
             if (this._bIsStickerAdmin) { return null; }
 
+            // [JHAH FIX LOG: SAFE CONTEXT EXTRACTION]
+            var oCtx = Array.isArray(oContext) ? oContext[0] : oContext;
+            if (!oCtx || typeof oCtx.getProperty !== "function") return null;
+
             var oAppointment = toLocalDate(
-                oContext.getProperty("AppointmentDate"),
-                oContext.getProperty("AppointmentFromTime")
+                oCtx.getProperty("AppointmentDate"),
+                oCtx.getProperty("AppointmentFromTime")
             );
             if (!oAppointment) { return null; }
 
@@ -1090,7 +1117,11 @@ sap.ui.define([
         },
 
         _validateRenew: function (oContext) {
-            var oExpire = toLocalDate(oContext.getProperty("ExpireDate"));
+            // [JHAH FIX LOG: SAFE CONTEXT EXTRACTION]
+            var oCtx = Array.isArray(oContext) ? oContext[0] : oContext;
+            if (!oCtx || typeof oCtx.getProperty !== "function") return null;
+            
+            var oExpire = toLocalDate(oCtx.getProperty("ExpireDate"));
             if (!oExpire) {
                 return VALIDATION_MESSAGES.renewNoExpiry;
             }
@@ -1113,28 +1144,42 @@ sap.ui.define([
             return (oBundle && oBundle.getText(sKey)) || sFallback;
         },
 
-        _injectIssueContractEndDate: function (oContext, fnDone) {
+        // [JHAH FIX LOG: ADDED bShow PARAMETER AND SAFE CONTEXT EXTRACTION]
+        _injectIssueContractEndDate: function (oCtx, bShow, fnDone) {
             var that = this;
-            var sRaw = oContext.getProperty("ContractEnddate");
-            var sValue = sRaw ? formatDate(toLocalDate(sRaw)) : "";
+            
+            console.log("[JHAH FIX LOG] _injectIssueContractEndDate triggered. Should Show?:", bShow);
+            
+            var sRaw = "";
+            if (oCtx && typeof oCtx.getProperty === "function") {
+                sRaw = oCtx.getProperty("ContractEnddate");
+            }
+            
+            // Default to N/A if missing/empty
+            var sValue = (sRaw && String(sRaw).trim() !== "") ? formatDate(toLocalDate(sRaw)) : "N/A";
+            
+            console.log("[JHAH FIX LOG] Extracted ContractEnddate:", sRaw, "-> Formatted as:", sValue);
 
             var iTries = 0;
             var iMaxTries = 40;
             var poll = function () {
                 var oField = that._findActionDialogField("validityperiod");
                 if (oField) {
-                    that._addContractEndDateField(oField, sValue);
+                    console.log("[JHAH FIX LOG] Found Dialog Anchor. Updating Contract End Date field.");
+                    that._addContractEndDateField(oField, sValue, bShow);
                     if (fnDone) { fnDone(); }
                     return;
                 }
                 if (++iTries < iMaxTries) {
                     setTimeout(poll, 100);
-                } else if (fnDone) {
-                    fnDone();
+                } else {
+                    console.warn("[JHAH FIX LOG] Could NOT find Dialog Anchor after polling!");
+                    if (fnDone) { fnDone(); }
                 }
             };
             poll();
         },
+        
         __disablePlateNumField: function (oContext) {
             var that = this;
             var iTries = 0;
@@ -1164,21 +1209,24 @@ sap.ui.define([
             oField.data(PLATENUM_READONLY_FLAG, true);
         },
 
-        _applyIssueValidityPeriodVisibility: function (oContext) {
+        // [JHAH FIX LOG: MODIFIED TO ACCEPT A BOOLEAN DIRECTLY]
+        _applyIssueValidityPeriodVisibility: function (bHide) {
             var that = this;
-            var sStkType = oContext.getProperty("StkType");
-            var bHide = sStkType === HIDE_VALIDITY_STK_TYPE;
+            console.log("[JHAH FIX LOG] _applyIssueValidityPeriodVisibility triggered. Hide Validity Period?:", bHide);
 
             var iTries = 0;
             var iMaxTries = 40;
             var poll = function () {
                 var oField = that._findActionDialogField("validityperiod");
                 if (oField) {
+                    console.log("[JHAH FIX LOG] Found Validity Period field. Setting visibility to:", !bHide);
                     that._setFormElementVisible(oField, !bHide);
                     return;
                 }
                 if (++iTries < iMaxTries) {
                     setTimeout(poll, 100);
+                } else {
+                    console.warn("[JHAH FIX LOG] Could NOT find Validity Period field to hide/show after polling!");
                 }
             };
             poll();
@@ -1244,7 +1292,8 @@ sap.ui.define([
             });
         },
 
-        _addContractEndDateField: function (oAnchorField, sValue) {
+        // [JHAH FIX LOG: ADDED VISIBILITY TOGGLE (bShow) AND CACHE UPDATE]
+        _addContractEndDateField: function (oAnchorField, sValue, bShow) {
             var oFormElement = oAnchorField;
             while (oFormElement && !oFormElement.isA("sap.ui.layout.form.FormElement")) {
                 oFormElement = oFormElement.getParent();
@@ -1254,16 +1303,41 @@ sap.ui.define([
             var oContainer = oFormElement.getParent();
             if (!oContainer || !oContainer.insertFormElement) { return; }
 
-            var bAlready = oContainer.getFormElements().some(function (oExisting) {
-                return oExisting.data(CONTRACT_END_FIELD_FLAG);
-            });
-            if (bAlready) { return; }
+            // 1. Check if the field was previously injected on a cached dialog
+            var oExistingElement = null;
+            var aElements = oContainer.getFormElements();
+            for (var i = 0; i < aElements.length; i++) {
+                if (aElements[i].data(CONTRACT_END_FIELD_FLAG)) {
+                    oExistingElement = aElements[i];
+                    break;
+                }
+            }
 
+            // 2. If it exists, update text and force visibility
+            if (oExistingElement) {
+                console.log("[JHAH FIX LOG] _addContractEndDateField: Found Existing Field. Updating value and setting visibility to:", bShow);
+                var oText = oExistingElement.getFields()[0];
+                if (oText && typeof oText.setText === "function") {
+                    oText.setText(sValue);
+                }
+                oExistingElement.setVisible(bShow);
+                return;
+            }
+
+            // 3. If it doesn't exist, and we don't want to show it, do nothing!
+            if (!bShow) {
+                console.log("[JHAH FIX LOG] _addContractEndDateField: Field does not exist and should be hidden. Skipping creation.");
+                return;
+            }
+
+            // 4. Create the new element and show it
+            console.log("[JHAH FIX LOG] _addContractEndDateField: Creating New Field.");
             var oNewElement = new FormElement({
                 label: new Label({ text: this._getText("contractEndDate", "Contract End Date") }),
                 fields: [new Text({ text: sValue })]
             });
             oNewElement.data(CONTRACT_END_FIELD_FLAG, true);
+            oNewElement.setVisible(bShow);
 
             oContainer.insertFormElement(oNewElement, oContainer.indexOfFormElement(oFormElement));
         }

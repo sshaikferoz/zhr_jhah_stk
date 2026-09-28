@@ -24,8 +24,14 @@
 [id*="RequestGrpFacet"][id*="Remarks"][id*="Field-edit"],
 [id*="RequestGrpFacet"][id*="Reason"][id*="Field-content"],
 [id*="RequestGrpFacet"][id*="Reason"][id*="Field-edit"] {
-    width: 1000px !important;
-    max-width: 1000px !important;
+    
+    /* [JHAH FIX LOG: FIXED TEXT OVERLAP] 
+       Changed from "1000px" to "100%" below. 
+       This stops the text fields from spilling out of their 700px parent 
+       containers and overlapping the next column, while keeping your exact layout. */
+    width: 100% !important;
+    max-width: 100% !important;
+    
     box-sizing: border-box !important;
 }
 
@@ -90,8 +96,14 @@
   Hide Employee maintenance actions: 
   Edit, Delete, Renew, Remove, Cancel Request, Copy
 */
-/* .otherRequestMode [id*="StandardAction::Edit" i],
-.otherRequestMode [id*="StandardAction::Delete" i], */
+
+/* [JHAH FIX LOG: FIXED ADMIN EDIT BUTTON VISIBILITY] 
+   Added [id$="::Edit" i] and [id*="EditAction" i] to catch Fiori V4's dynamically generated 
+   Edit button IDs which were escaping the original [id*="StandardAction::Edit" i] selector. */
+.otherRequestMode [id*="StandardAction::Edit" i],
+.otherRequestMode [id$="::Edit" i],
+.otherRequestMode [id*="EditAction" i],
+.otherRequestMode [id*="StandardAction::Delete" i],
 .otherRequestMode [id*="Renew" i],
 .otherRequestMode [id*="Remove" i],
 .otherRequestMode [id*="CancelRequest" i],
@@ -104,8 +116,13 @@
   Hide everything dynamically toggled until the context resolves 
   so users don't see flashing buttons.
 */
-/* .loadingOwnershipMode [id*="StandardAction::Edit" i],
-.loadingOwnershipMode [id*="StandardAction::Delete" i], */
+
+/* [JHAH FIX LOG: SYNCED LOADING STATE WITH EDIT FIX] 
+   Also added the extra Edit selectors here so the button doesn't flash during initial load. */
+.loadingOwnershipMode [id*="StandardAction::Edit" i],
+.loadingOwnershipMode [id$="::Edit" i],
+.loadingOwnershipMode [id*="EditAction" i],
+.loadingOwnershipMode [id*="StandardAction::Delete" i],
 .loadingOwnershipMode [id*="Renew" i],
 .loadingOwnershipMode [id*="Remove" i],
 .loadingOwnershipMode [id*="CancelRequest" i],
