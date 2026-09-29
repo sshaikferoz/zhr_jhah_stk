@@ -232,7 +232,7 @@ sap.ui.define([
         //         console.error(err);
         //     }
         // },
-_applyMaintenanceActionVisibility: function () {
+        _applyMaintenanceActionVisibility: function () {
             // Safe default: hide everything until authorization is known
             document.body.classList.add("hideMaintenanceActions");
             document.body.classList.add("hideAdminOnlyActions");
@@ -265,16 +265,16 @@ _applyMaintenanceActionVisibility: function () {
                     }
 
                     var oTabBar = oView.byId("fe::TabMultipleMode");
-                    
+
                     if (oTabBar && typeof oTabBar.getItems === "function") {
                         var aTabs = oTabBar.getItems();
-                        
-                        aTabs.forEach(function(oTab) {
+
+                        aTabs.forEach(function (oTab) {
                             var sText = "";
                             if (typeof oTab.getText === "function") {
                                 sText = oTab.getText() || "";
                             }
-                            
+
                             // If this is the Employee Requests tab, set visibility based on Admin role
                             if (sText.indexOf("Employee Requests") !== -1) {
                                 oTab.setVisible(bIsStickerAdmin);
@@ -344,18 +344,18 @@ _applyMaintenanceActionVisibility: function () {
         //             var aObjectPages = oView.findAggregatedObjects(true, function(o) { 
         //                 return o.isA("sap.uxap.ObjectPageLayout"); 
         //             });
-                    
+
         //             if (aObjectPages.length === 0) return; // Not on Object Page
-                    
+
         //             var oObjectPage = aObjectPages[0];
         //             var aButtons = oObjectPage.findAggregatedObjects(true, function(o) { return o.isA("sap.m.Button"); });
 
         //             aButtons.forEach(function(oBtn) {
         //                 var sId = String(oBtn.getId() || "").toUpperCase();
-                        
+
         //                 var bIsAdminAction = sId.indexOf("MAINTAPPOINTMENTLOCATION") !== -1 || sId.indexOf("ISSUESTICKER") !== -1 || sId.indexOf("NOSHOW") !== -1 || sId.indexOf("APPROVE") !== -1 || sId.indexOf("REJECT") !== -1;
         //                 var bIsEmpAction = sId.indexOf("STANDARDACTION::DELETE") !== -1 || sId.indexOf("COPYSTICKER") !== -1 || sId.indexOf("STANDARDACTION::EDIT") !== -1 || sId.indexOf("CANCELREQUEST") !== -1 || sId.indexOf("CREATESELFSTKREQ") !== -1 || (sId.indexOf("RENEW") !== -1 && sId.indexOf("RENEWON") === -1) || sId.indexOf("REMOVE") !== -1;
-                        
+
         //                 if (bIsAdminAction && bHideAdminButtons && typeof oBtn.setVisible === "function") {
         //                     oBtn.setVisible(false);
         //                 }
@@ -394,7 +394,7 @@ _applyMaintenanceActionVisibility: function () {
                     var aRoles = await oVarModel.bindList("/EmployeeHeader", null, null, null, { $$groupId: "$direct" }).requestContexts(0, 1);
                     if (aRoles.length) bIsAdmin = (aRoles[0].getObject().StickerAdmin === "X");
                 }
-                that._bIsStickerAdmin = bIsAdmin; 
+                that._bIsStickerAdmin = bIsAdmin;
 
                 var bIsMyRequest = await oContext.requestProperty("IsMyRequest");
                 var bIsMyRequestBool = (bIsMyRequest === true || bIsMyRequest === "X" || bIsMyRequest === "true");
@@ -403,7 +403,7 @@ _applyMaintenanceActionVisibility: function () {
 
                 if (!bIsAdmin) {
                     // Regular Employee viewing request -> Hide Admin buttons
-                    oView.addStyleClass("myRequestMode"); 
+                    oView.addStyleClass("myRequestMode");
                 } else {
                     if (bIsMyRequestBool) {
                         oView.addStyleClass("myRequestMode");
@@ -596,7 +596,7 @@ _applyMaintenanceActionVisibility: function () {
                 });
                 oView.setModel(oSlotModel, "apptslots");
             }
-        
+
             var oSlotBinding = oAppModel.bindList("/AppointmentSlot", null, null, null, { $$groupId: "$direct" });
             Promise.all([
                 oSlotBinding.requestContexts(0, 1000),
@@ -800,38 +800,38 @@ _applyMaintenanceActionVisibility: function () {
                 validate: this._validateRenewStickerNumber,
                 afterReplay: this.__disablePlateNumField
             });
-            
+
             // [JHAH FIX LOG: MASSIVELY UPGRADED ISSUE STICKER GUARD]
             this._guardActionButton("IssueSticker", {
                 properties: ISSUE_PROPERTIES,
                 validate: function () { return null; },
                 afterReplay: function (aContexts) {
                     var that = this;
-                    
+
                     // Safely extract Context without crashing
                     var oCtx = Array.isArray(aContexts) ? aContexts[0] : aContexts;
                     var sStkType = "";
                     if (oCtx && typeof oCtx.getProperty === "function") {
                         sStkType = oCtx.getProperty("StkType");
                     }
-                    
+
                     console.log("[JHAH FIX LOG] IssueSticker clicked. Detected StkType:", sStkType);
 
                     // If it's RMV, CAN, or CANCEL, we treat it as a Cancel Request
                     var bIsCancelRequest = (sStkType === HIDE_VALIDITY_STK_TYPE || sStkType === "CAN" || sStkType === "CANCEL");
-                    
+
                     console.log("[JHAH FIX LOG] Is this a Cancel Request?", bIsCancelRequest);
 
                     // We now pass a boolean (true = hide, false = show)
                     that._applyIssueValidityPeriodVisibility(bIsCancelRequest);
-                    
+
                     // Inject Contract End Date, but tell it whether to SHOW or HIDE based on bIsCancelRequest
                     that._injectIssueContractEndDate(oCtx, !bIsCancelRequest, function () {
                         console.log("[JHAH FIX LOG] Completed UI modifications for Process Sticker Request.");
                     });
                 }
             });
-            
+
             // [JHAH FIX LOG: ENSURE VALIDITY PERIOD HIDES ON CANCEL REQUEST (CACHE FIX)]
             this._guardActionButton("CancelRequest", {
                 properties: APPOINTMENT_PROPERTIES,
@@ -915,6 +915,7 @@ _applyMaintenanceActionVisibility: function () {
 
                     that._requestGuardProperties(aContexts, mGuard.properties).then(function () {
                         var sError = null;
+                        var vValidationResult;
                         if (aContexts.length === 0) {
                             vValidationResult =
                                 mGuard.validate.call(that, []);
@@ -1020,7 +1021,7 @@ _applyMaintenanceActionVisibility: function () {
             });
         },
         _validateCancelStickerNumber: function (aContexts) {
-            return this._checkRenewStickerCount().then(function (iCount) {
+            return this._checkRemoveStickerCount().then(function (iCount) {
 
                 console.log(
                     "[JHAH-EXT] Count returned to validation:",
@@ -1081,6 +1082,52 @@ _applyMaintenanceActionVisibility: function () {
                 });
             });
         },
+        _checkRemoveStickerCount: function () {
+            var sUrl =
+                "/sap/opu/odata4/sap/zui_hr_stk/srvd_f4/sap/zi_hr_stk_remove_vh/0001" +
+                ";ps='srvd-zsrv_hr_stk-0001'" +
+                ";va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.remove.stickernumber.StickerMasterType.X'" +
+                "/ZI_HR_STK_REMOVE_VH" +
+                "?$select=Pernr,PlateNum,StickerNumber,StkReqId" +
+                "&$orderby=StickerNumber" +
+                "&$count=true" +
+                "&$skip=0" +
+                "&$top=100";
+
+            return new Promise(function (resolve, reject) {
+
+                jQuery.ajax({
+                    url: sUrl,
+                    method: "GET",
+                    dataType: "json",
+                    headers: {
+                        "Accept": "application/json"
+                    },
+
+                    success: function (oData) {
+
+                        var iCount = Number(oData["@odata.count"] || 0);
+
+                        console.log(
+                            "[JHAH-EXT] Remove Sticker Count:",
+                            iCount
+                        );
+
+                        resolve(iCount);
+                    },
+
+                    error: function (oError) {
+
+                        console.error(
+                            "[JHAH-EXT] Remove Sticker Count Error:",
+                            oError
+                        );
+
+                        reject(oError);
+                    }
+                });
+            });
+        },
 
         _validateReschedule: function (oContext) {
             if (isTrueFlag(oContext.getProperty("isSecurityRescheduled"))) {
@@ -1120,7 +1167,7 @@ _applyMaintenanceActionVisibility: function () {
             // [JHAH FIX LOG: SAFE CONTEXT EXTRACTION]
             var oCtx = Array.isArray(oContext) ? oContext[0] : oContext;
             if (!oCtx || typeof oCtx.getProperty !== "function") return null;
-            
+
             var oExpire = toLocalDate(oCtx.getProperty("ExpireDate"));
             if (!oExpire) {
                 return VALIDATION_MESSAGES.renewNoExpiry;
@@ -1147,17 +1194,17 @@ _applyMaintenanceActionVisibility: function () {
         // [JHAH FIX LOG: ADDED bShow PARAMETER AND SAFE CONTEXT EXTRACTION]
         _injectIssueContractEndDate: function (oCtx, bShow, fnDone) {
             var that = this;
-            
+
             console.log("[JHAH FIX LOG] _injectIssueContractEndDate triggered. Should Show?:", bShow);
-            
+
             var sRaw = "";
             if (oCtx && typeof oCtx.getProperty === "function") {
                 sRaw = oCtx.getProperty("ContractEnddate");
             }
-            
+
             // Default to N/A if missing/empty
             var sValue = (sRaw && String(sRaw).trim() !== "") ? formatDate(toLocalDate(sRaw)) : "N/A";
-            
+
             console.log("[JHAH FIX LOG] Extracted ContractEnddate:", sRaw, "-> Formatted as:", sValue);
 
             var iTries = 0;
@@ -1179,7 +1226,7 @@ _applyMaintenanceActionVisibility: function () {
             };
             poll();
         },
-        
+
         __disablePlateNumField: function (oContext) {
             var that = this;
             var iTries = 0;
