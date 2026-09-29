@@ -791,12 +791,12 @@ sap.ui.define([
                 validate: this._validateRenew
             });
             this._guardActionButton("Remove", {
-                properties: ["StickerNumber"],
+                properties: [],
                 validate: this._validateCancelStickerNumber,
                 afterReplay: this.__disablePlateNumField
             });
             this._guardActionButton("Renew", {
-                properties: ["StickerNumber"],
+                properties: [],
                 validate: this._validateRenewStickerNumber,
                 afterReplay: this.__disablePlateNumField
             });
@@ -914,8 +914,9 @@ sap.ui.define([
                     };
 
                     that._requestGuardProperties(aContexts, mGuard.properties).then(function () {
-                        var sError = null;
+
                         var vValidationResult;
+
                         if (aContexts.length === 0) {
                             vValidationResult =
                                 mGuard.validate.call(that, []);
@@ -924,39 +925,21 @@ sap.ui.define([
                                 mGuard.validate.call(that, aContexts);
                         }
 
-                        if (sError) {
-                            MessageBox.error(sError);
-                            return;
-                        }
+                        return Promise.resolve(vValidationResult).then(function (sError) {
 
-                        fnReplay();
+                            if (sError) {
+                                MessageBox.error(sError);
+                                return;
+                            }
+
+                            fnReplay();
+                        });
                     });
                 });
 
                 oButton.data(GUARD_FLAG, true);
             });
         },
-
-        _validateRenewStickerNumber: function (aContexts) {
-            if (!aContexts || !aContexts.length) { return VALIDATION_MESSAGES.noLineItem; }
-            var bHasStickerNumber = aContexts.some(function (oContext, iIndex) {
-                var sStickerNumber = oContext.getProperty("StickerNumber");
-                return (sStickerNumber && String(sStickerNumber).trim() !== "");
-            });
-            if (!bHasStickerNumber) { return VALIDATION_MESSAGES.noStickerForRenew; }
-            return null;
-        },
-
-        _validateCancelStickerNumber: function (aContexts) {
-            if (!aContexts || !aContexts.length) { return VALIDATION_MESSAGES.noLineItem; }
-            var bHasStickerNumber = aContexts.some(function (oContext, iIndex) {
-                var sStickerNumber = oContext.getProperty("StickerNumber");
-                return (sStickerNumber && String(sStickerNumber).trim() !== "");
-            });
-            if (!bHasStickerNumber) { return VALIDATION_MESSAGES.noStickerForCancel; }
-            return null;
-        },
-
         _resolveActionContexts: function (oButton, oEvent) {
             var oButtonContext = oButton.getBindingContext();
             if (oButtonContext) { return [oButtonContext]; }
@@ -1013,7 +996,7 @@ sap.ui.define([
                     iCount
                 );
 
-                if (iCount === 0) {
+                if (Number(iCount) === 0){
                     return "There is no active sticker to renew.";
                 }
 
@@ -1028,11 +1011,9 @@ sap.ui.define([
                     iCount
                 );
 
-                if (iCount === 0) {
+                if (Number(iCount) === 0) {
                     return "There is no active sticker to remove.";
                 }
-
-                return null;
             });
         },
 
