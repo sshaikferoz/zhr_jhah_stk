@@ -72,6 +72,10 @@
                 <Property Name="PlateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="ArabicPlateNum" Type="Edm.String" Nullable="false" MaxLength="20"/>
                 <Property Name="HidePlates" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="StickerValid" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="StickerValidCriticality" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="ViolationExist" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="ViolationExistCriticality" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="DraftUUID" Type="Edm.Guid" Nullable="false"/>
                 <Property Name="ParentDraftUUID" Type="Edm.Guid"/>
@@ -80,7 +84,6 @@
                 <Property Name="HasActiveEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="IsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="__EntityControl" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.EntityControl"/>
-                <Property Name="__OperationControl" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VehicleDetailsOperationControl"/>
                 <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.SAP__Message)" Nullable="false"/>
                 <NavigationProperty Name="DraftAdministrativeData" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.I_DraftAdministrativeDataType"/>
                 <NavigationProperty Name="SiblingEntity" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VehicleDetailsType"/>
@@ -213,7 +216,6 @@
                 <Property Name="HasActiveEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="IsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="__EntityControl" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.EntityControl"/>
-                <Property Name="__OperationControl" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VisitorDetailsOperationControl"/>
                 <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.SAP__Message)" Nullable="false"/>
                 <NavigationProperty Name="DraftAdministrativeData" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.I_DraftAdministrativeDataType"/>
                 <NavigationProperty Name="SiblingEntity" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VisitorDetailsType"/>
@@ -535,12 +537,6 @@
                 <Property Name="_VehicleDetails" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="_VisitorDetails" Type="Edm.Boolean" Nullable="false"/>
             </ComplexType>
-            <ComplexType Name="VehicleDetailsOperationControl">
-                <Property Name="ImmediateVehiclesOnEnter" Type="Edm.Boolean" Nullable="false"/>
-            </ComplexType>
-            <ComplexType Name="VisitorDetailsOperationControl">
-                <Property Name="ImmediateVisitorsOnEnter" Type="Edm.Boolean" Nullable="false"/>
-            </ComplexType>
             <ComplexType Name="LocationMasterOperationControl">
                 <Property Name="DelReq" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="Edit" Type="Edm.Boolean" Nullable="false"/>
@@ -548,7 +544,6 @@
             <ComplexType Name="VarListOperationControl">
                 <Property Name="CopyRequest" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="Edit" Type="Edm.Boolean" Nullable="false"/>
-                <Property Name="ImmediateValidationsOnEnter" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="MaintainLocation" Type="Edm.Boolean" Nullable="false"/>
             </ComplexType>
             <ComplexType Name="ZHR_MOB_VISITOR">
@@ -625,9 +620,6 @@
                 <Parameter Name="ResultIsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
                 <ReturnType Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
             </Action>
-            <Action Name="ImmediateValidationsOnEnter" IsBound="true">
-                <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
-            </Action>
             <Action Name="onVisitorCreateExt" IsBound="true">
                 <Parameter Name="_it" Type="Collection(com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType)" Nullable="false"/>
                 <Parameter Name="req_num" Type="Edm.String" Nullable="false" MaxLength="13"/>
@@ -662,9 +654,6 @@
             <Action Name="Prepare" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.LocationMasterType" Nullable="false"/>
             </Action>
-            <Action Name="ImmediateVehiclesOnEnter" IsBound="true">
-                <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VehicleDetailsType" Nullable="false"/>
-            </Action>
             <Action Name="Edit" EntitySetPath="_it" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
                 <Parameter Name="PreserveChanges" Type="Edm.Boolean" Nullable="false"/>
@@ -685,9 +674,6 @@
             <Action Name="Activate" EntitySetPath="_it" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.LocationMasterType" Nullable="false"/>
                 <ReturnType Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.LocationMasterType" Nullable="false"/>
-            </Action>
-            <Action Name="ImmediateVisitorsOnEnter" IsBound="true">
-                <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VisitorDetailsType" Nullable="false"/>
             </Action>
             <Action Name="Discard" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.LocationMasterType" Nullable="false"/>
@@ -876,6 +862,14 @@
                 <Annotation Term="SAP__common.Label" String="Arabic Plate Number"/>
                 <Annotation Term="SAP__core.Immutable"/>
             </Annotations>
+            <Annotations Target="SAP__self.VehicleDetailsType/StickerValid">
+                <Annotation Term="SAP__common.Label" String="Sticker Valid"/>
+                <Annotation Term="SAP__core.Immutable"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VehicleDetailsType/ViolationExist">
+                <Annotation Term="SAP__common.Label" String="Violation Exist"/>
+                <Annotation Term="SAP__core.Immutable"/>
+            </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType/HasDraftEntity">
                 <Annotation Term="SAP__core.Computed"/>
                 <Annotation Term="SAP__UI.HiddenFilter"/>
@@ -928,11 +922,6 @@
                 <Annotation Term="SAP__UI.HiddenFilter"/>
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
-            <Annotations Target="SAP__self.VehicleDetailsType/__OperationControl">
-                <Annotation Term="SAP__core.Computed"/>
-                <Annotation Term="SAP__UI.HiddenFilter"/>
-                <Annotation Term="SAP__UI.Hidden"/>
-            </Annotations>
             <Annotations Target="SAP__self.Container/VehicleDetails">
                 <Annotation Term="SAP__capabilities.NavigationRestrictions">
                     <Record>
@@ -981,7 +970,6 @@
                         <PropertyValue Property="NonFilterableProperties">
                             <Collection>
                                 <PropertyPath>__EntityControl</PropertyPath>
-                                <PropertyPath>__OperationControl</PropertyPath>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -991,7 +979,6 @@
                         <PropertyValue Property="NonSortableProperties">
                             <Collection>
                                 <PropertyPath>__EntityControl</PropertyPath>
-                                <PropertyPath>__OperationControl</PropertyPath>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1020,26 +1007,8 @@
                     <Collection/>
                 </Annotation>
             </Annotations>
-            <Annotations Target="SAP__self.ImmediateVehiclesOnEnter(SAP__self.VehicleDetailsType)">
-                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/ImmediateVehiclesOnEnter"/>
-            </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType">
                 <Annotation Term="SAP__common.Label" String="Projection View for Vehicle Interface"/>
-                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Determine_Action_ImmediateVehiclesOnEnter">
-                    <Record Type="SAP__common.SideEffectsType">
-                        <PropertyValue Property="TriggerAction" String="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.ImmediateVehiclesOnEnter"/>
-                        <PropertyValue Property="SourceEntities">
-                            <Collection>
-                                <NavigationPropertyPath/>
-                            </Collection>
-                        </PropertyValue>
-                        <PropertyValue Property="TargetProperties">
-                            <Collection>
-                                <String>SAP__Messages</String>
-                            </Collection>
-                        </PropertyValue>
-                    </Record>
-                </Annotation>
                 <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_PlateNum">
                     <Record Type="SAP__common.SideEffectsType">
                         <PropertyValue Property="SourceProperties">
@@ -1173,6 +1142,16 @@
                                 <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Value" Path="Color"/>
                                 </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Criticality" Path="StickerValidCriticality"/>
+                                    <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithIcon"/>
+                                    <PropertyValue Property="Value" Path="StickerValid"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Criticality" Path="ViolationExistCriticality"/>
+                                    <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithIcon"/>
+                                    <PropertyValue Property="Value" Path="ViolationExist"/>
+                                </Record>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1221,6 +1200,12 @@
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="VehSeqNum"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="ViolationExist"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="StickerValid"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="ArabicPlateNum"/>
@@ -1312,6 +1297,16 @@
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="PlateNum3Desc"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Criticality" Path="StickerValidCriticality"/>
+                            <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithIcon"/>
+                            <PropertyValue Property="Value" Path="StickerValid"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Criticality" Path="ViolationExistCriticality"/>
+                            <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithIcon"/>
+                            <PropertyValue Property="Value" Path="ViolationExist"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="ManufacturerDesc"/>
@@ -1798,11 +1793,6 @@
                 <Annotation Term="SAP__UI.HiddenFilter"/>
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
-            <Annotations Target="SAP__self.VisitorDetailsType/__OperationControl">
-                <Annotation Term="SAP__core.Computed"/>
-                <Annotation Term="SAP__UI.HiddenFilter"/>
-                <Annotation Term="SAP__UI.Hidden"/>
-            </Annotations>
             <Annotations Target="SAP__self.Container/VisitorDetails">
                 <Annotation Term="SAP__capabilities.NavigationRestrictions">
                     <Record>
@@ -1839,7 +1829,6 @@
                             <Collection>
                                 <PropertyPath>daysinyear</PropertyPath>
                                 <PropertyPath>__EntityControl</PropertyPath>
-                                <PropertyPath>__OperationControl</PropertyPath>
                             </Collection>
                         </PropertyValue>
                         <PropertyValue Property="Filterable" Bool="true"/>
@@ -1863,7 +1852,6 @@
                             <Collection>
                                 <PropertyPath>daysinyear</PropertyPath>
                                 <PropertyPath>__EntityControl</PropertyPath>
-                                <PropertyPath>__OperationControl</PropertyPath>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1892,26 +1880,8 @@
                     <Collection/>
                 </Annotation>
             </Annotations>
-            <Annotations Target="SAP__self.ImmediateVisitorsOnEnter(SAP__self.VisitorDetailsType)">
-                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/ImmediateVisitorsOnEnter"/>
-            </Annotations>
             <Annotations Target="SAP__self.VisitorDetailsType">
                 <Annotation Term="SAP__common.Label" String="Consumption View for Visitors"/>
-                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Determine_Action_ImmediateVisitorsOnEnter">
-                    <Record Type="SAP__common.SideEffectsType">
-                        <PropertyValue Property="TriggerAction" String="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.ImmediateVisitorsOnEnter"/>
-                        <PropertyValue Property="SourceEntities">
-                            <Collection>
-                                <NavigationPropertyPath/>
-                            </Collection>
-                        </PropertyValue>
-                        <PropertyValue Property="TargetProperties">
-                            <Collection>
-                                <String>SAP__Messages</String>
-                            </Collection>
-                        </PropertyValue>
-                    </Record>
-                </Annotation>
                 <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_DaysCount">
                     <Record Type="SAP__common.SideEffectsType">
                         <PropertyValue Property="SourceProperties">
@@ -3039,9 +3009,6 @@
             <Annotations Target="SAP__self.CopyRequest(SAP__self.VarListType)">
                 <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/CopyRequest"/>
             </Annotations>
-            <Annotations Target="SAP__self.ImmediateValidationsOnEnter(SAP__self.VarListType)">
-                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/ImmediateValidationsOnEnter"/>
-            </Annotations>
             <Annotations Target="SAP__self.MaintainLocation(SAP__self.VarListType)">
                 <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/MaintainLocation"/>
             </Annotations>
@@ -3054,21 +3021,6 @@
                     <Collection>
                         <PropertyPath>ReqNum</PropertyPath>
                     </Collection>
-                </Annotation>
-                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Determine_Action_ImmediateValidationsOnEnter">
-                    <Record Type="SAP__common.SideEffectsType">
-                        <PropertyValue Property="TriggerAction" String="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.ImmediateValidationsOnEnter"/>
-                        <PropertyValue Property="SourceEntities">
-                            <Collection>
-                                <NavigationPropertyPath/>
-                            </Collection>
-                        </PropertyValue>
-                        <PropertyValue Property="TargetProperties">
-                            <Collection>
-                                <String>SAP__Messages</String>
-                            </Collection>
-                        </PropertyValue>
-                    </Record>
                 </Annotation>
                 <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_Begda">
                     <Record Type="SAP__common.SideEffectsType">
@@ -4523,6 +4475,12 @@
                 <Annotation Term="SAP__common.Label" String="Truth Value"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
             </Annotations>
+            <Annotations Target="SAP__self.VehicleDetailsType/StickerValidCriticality">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VehicleDetailsType/ViolationExistCriticality">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
             <Annotations Target="SAP__self.VisitorDetailsType/IDTYPDesc">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
@@ -4608,11 +4566,6 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Method Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Method Property"/>
             </Annotations>
-            <Annotations Target="SAP__self.VehicleDetailsType/__OperationControl/ImmediateVehiclesOnEnter">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
             <Annotations Target="SAP__self.VisitTypeType/VisitTypeDesc">
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
@@ -4643,11 +4596,6 @@
                 <Annotation Term="SAP__common.Label" String="Dyn. Method Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Method Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Method Property"/>
-            </Annotations>
-            <Annotations Target="SAP__self.VisitorDetailsType/__OperationControl/ImmediateVisitorsOnEnter">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
             <Annotations Target="SAP__self.BlockedVisitorsType/Begda">
                 <Annotation Term="SAP__common.Label" String="Start Date"/>
@@ -4755,11 +4703,6 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
             <Annotations Target="SAP__self.VarListType/__OperationControl/Edit">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
-            <Annotations Target="SAP__self.VarListType/__OperationControl/ImmediateValidationsOnEnter">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
@@ -4878,16 +4821,6 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Create by Association Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Create via Association Control Property"/>
             </Annotations>
-            <Annotations Target="SAP__self.VehicleDetailsOperationControl/ImmediateVehiclesOnEnter">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
-            <Annotations Target="SAP__self.VisitorDetailsOperationControl/ImmediateVisitorsOnEnter">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
             <Annotations Target="SAP__self.LocationMasterOperationControl/DelReq">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
@@ -4904,11 +4837,6 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
             <Annotations Target="SAP__self.VarListOperationControl/Edit">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
-            <Annotations Target="SAP__self.VarListOperationControl/ImmediateValidationsOnEnter">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>

@@ -5,12 +5,28 @@
 /* =========================================================
    12. JUSTIFICATION TEXTAREA OVERRIDES
 ========================================================= */
-.sapUiFormCLCellsS12:has([id*="RequestGrpFacet"][id*="Justification"][id*="Field-content"]),
-.sapUiFormCLCellsL12:has([id*="RequestGrpFacet"][id*="Justification"][id*="Field-content"]),
-.sapUiFormCLCellsS12:has([id*="RequestGrpFacet"][id*="Remarks"][id*="Field-content"]),
-.sapUiFormCLCellsL12:has([id*="RequestGrpFacet"][id*="Remarks"][id*="Field-content"]),
-.sapUiFormCLCellsS12:has([id*="RequestGrpFacet"][id*="Reason"][id*="Field-content"]),
-.sapUiFormCLCellsL12:has([id*="RequestGrpFacet"][id*="Reason"][id*="Field-content"]) {
+
+
+/* 12. JUSTIFICATION / REMARKS / REASON */
+.sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Justification"][id*="Field-content"]),
+.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Justification"][id*="Field-content"]),
+.sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Remarks"][id*="Field-content"]),
+.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Remarks"][id*="Field-content"]),
+.sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Reason"][id*="Field-content"]),
+.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Reason"][id*="Field-content"]) {
+    grid-column: 1 / -1 !important;  
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+.sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Justification"][id*="Field-content"]),
+.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Justification"][id*="Field-content"]),
+.sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Remarks"][id*="Field-content"]),
+.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Remarks"][id*="Field-content"]),
+.sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Reason"][id*="Field-content"]),
+.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Reason"][id*="Field-content"]) {
     width: 700px !important;
     max-width: 700px !important;
     min-width: 700px !important;
@@ -18,34 +34,30 @@
     overflow: visible !important;
 }
 
-[id*="RequestGrpFacet"][id*="Justification"][id*="Field-content"],
-[id*="RequestGrpFacet"][id*="Justification"][id*="Field-edit"],
-[id*="RequestGrpFacet"][id*="Remarks"][id*="Field-content"],
-[id*="RequestGrpFacet"][id*="Remarks"][id*="Field-edit"],
-[id*="RequestGrpFacet"][id*="Reason"][id*="Field-content"],
-[id*="RequestGrpFacet"][id*="Reason"][id*="Field-edit"] {
+[id*="JustReasonFacet"][id*="Justification"][id*="Field-content"],
+[id*="JustReasonFacet"][id*="Justification"][id*="Field-edit"],
+[id*="JustReasonFacet"][id*="Remarks"][id*="Field-content"],
+[id*="JustReasonFacet"][id*="Remarks"][id*="Field-edit"],
+[id*="JustReasonFacet"][id*="Reason"][id*="Field-content"],
+[id*="JustReasonFacet"][id*="Reason"][id*="Field-edit"] {
     
-    /* [JHAH FIX LOG: FIXED TEXT OVERLAP] 
-       Changed from "1000px" to "100%" below. 
-       This stops the text fields from spilling out of their 700px parent 
-       containers and overlapping the next column, while keeping your exact layout. */
     width: 100% !important;
     max-width: 100% !important;
     
     box-sizing: border-box !important;
 }
 
-[id*="RequestGrpFacet"][id*="Justification"][id*="Field-edit-content"],
-[id*="RequestGrpFacet"][id*="Remarks"][id*="Field-edit-content"] ,
-[id*="RequestGrpFacet"][id*="Reason"][id*="Field-edit-content"]  {
+[id*="JustReasonFacet"][id*="Justification"][id*="Field-edit-content"],
+[id*="JustReasonFacet"][id*="Remarks"][id*="Field-edit-content"] ,
+[id*="JustReasonFacet"][id*="Reason"][id*="Field-edit-content"]  {
     width: 100% !important;
     max-width: none !important;
     box-sizing: border-box !important;
 }
 
-[id*="RequestGrpFacet"][id*="Justification"][id*="Field-edit-inner"],
- [id*="RequestGrpFacet"][id*="Remarks"][id*="Field-edit-inner"],
- [id*="RequestGrpFacet"][id*="Reason"][id*="Field-edit-inner"]{
+[id*="JustReasonFacet"][id*="Justification"][id*="Field-edit-inner"],
+ [id*="JustReasonFacet"][id*="Remarks"][id*="Field-edit-inner"],
+ [id*="JustReasonFacet"][id*="Reason"][id*="Field-edit-inner"]{
     width: 100% !important;
     max-width: none !important;
     box-sizing: border-box !important;
