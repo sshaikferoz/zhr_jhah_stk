@@ -99,6 +99,15 @@
                 <Property Name="DomvalLd" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="DomvalHd" Type="Edm.String" Nullable="false" MaxLength="10"/>
             </EntityType>
+            <EntityType Name="IssueLocationType">
+                <Key>
+                    <PropertyRef Name="Uuid"/>
+                    <PropertyRef Name="LocationValue"/>
+                </Key>
+                <Property Name="Uuid" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="LocationValue" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="LocationDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+            </EntityType>
             <EntityType Name="PlateTypesType">
                 <Key>
                     <PropertyRef Name="Domname"/>
@@ -199,10 +208,10 @@
             <EntityType Name="ActivestickerType">
                 <Key>
                     <PropertyRef Name="Pernr"/>
-                    <PropertyRef Name="StickerNo"/>
+                    <PropertyRef Name="StickerNumber"/>
                 </Key>
                 <Property Name="Pernr" Type="Edm.String" Nullable="false" MaxLength="8"/>
-                <Property Name="StickerNo" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="StickerNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
                 <Property Name="StkReqId" Type="Edm.String" Nullable="false" MaxLength="8"/>
                 <Property Name="Status" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="ExpireDate" Type="Edm.Date"/>
@@ -229,6 +238,24 @@
                 <Property Name="PlateNo" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="PlateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
             </EntityType>
+            <EntityType Name="PastVioHistoryType">
+                <Key>
+                    <PropertyRef Name="ViolationUuid"/>
+                </Key>
+                <Property Name="ViolationUuid" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="JhahId" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="ViolatorName" Type="Edm.String" Nullable="false" MaxLength="256"/>
+                <Property Name="ViolationNo" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="ViolationDate" Type="Edm.Date"/>
+                <Property Name="ViolationType" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="ViolationTypeDesc" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="ViolationPoints" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="IssuedByUser" Type="Edm.String" Nullable="false" MaxLength="100"/>
+                <Property Name="ViolationRaisedBy" Type="Edm.String" Nullable="false" MaxLength="40"/>
+                <Property Name="DisciplinaryAction" Type="Edm.String" Nullable="false" MaxLength="25"/>
+                <Property Name="Status" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="StatusDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+            </EntityType>
             <EntityType Name="StickerMasterType">
                 <Key>
                     <PropertyRef Name="StkReqId"/>
@@ -239,6 +266,8 @@
                 <Property Name="PreStkReqId" Type="Edm.String" Nullable="false" MaxLength="8"/>
                 <Property Name="StkReqIdStr" Type="Edm.String" Nullable="false" MaxLength="24"/>
                 <Property Name="StickerNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="OldStkNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="HideStkNo" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="StkType" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="HideAttachTab" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="StkTypeDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
@@ -289,6 +318,7 @@
                 <Property Name="DeactivedOn" Type="Edm.Date"/>
                 <Property Name="ValidityDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="Remarks" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="HideRemark" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="HideExpireDate" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="LastChangedAt" Type="Edm.DateTimeOffset" Precision="7"/>
                 <Property Name="LocalLastChangedAt" Type="Edm.DateTimeOffset" Precision="7"/>
@@ -298,9 +328,11 @@
                 <Property Name="ToTime" Type="Edm.TimeOfDay" Nullable="false"/>
                 <Property Name="HideApp" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="RejectJust" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="HideRejJust" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="ContractEnddate" Type="Edm.Date"/>
                 <Property Name="isSecurityRescheduled" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="QRCode" Type="Edm.String" Nullable="false"/>
+                <Property Name="HideVioHistory" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="ReturnType" Type="Edm.String" Nullable="false" MaxLength="1"/>
                 <Property Name="ReturnMsg" Type="Edm.String" Nullable="false" MaxLength="255"/>
                 <Property Name="Reason" Type="Edm.String" Nullable="false" MaxLength="255"/>
@@ -328,6 +360,7 @@
                 <NavigationProperty Name="_Evidence" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.evidenceType)" Partner="_Header">
                     <OnDelete Action="Cascade"/>
                 </NavigationProperty>
+                <NavigationProperty Name="_PastViolation" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.PastVioHistoryType)"/>
             </EntityType>
             <EntityType Name="StickerStatusType">
                 <Key>
@@ -443,10 +476,10 @@
                 <Property Name="Nationality" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="NationalityDesc" Type="Edm.String" Nullable="false" MaxLength="50"/>
                 <Property Name="NationalID" Type="Edm.String" Nullable="false" MaxLength="30"/>
-                <Property Name="IQAMA" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="Iqama" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="GovernmentID" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="BloodGroup" Type="Edm.String" Nullable="false" MaxLength="3"/>
-                <Property Name="gender" Type="Edm.String" Nullable="false" MaxLength="80"/>
+                <Property Name="Gender" Type="Edm.String" Nullable="false" MaxLength="80"/>
                 <Property Name="BadgeNumber" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="WorkPhone" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="HomePhone" Type="Edm.String" Nullable="false" MaxLength="30"/>
@@ -485,7 +518,6 @@
                 <Property Name="CancelRequest" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="CopySticker" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="Edit" Type="Edm.Boolean" Nullable="false"/>
-                <Property Name="ImmediateValidationsOnEnter" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="IssueSticker" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="NoShow" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="Reject" Type="Edm.Boolean" Nullable="false"/>
@@ -495,6 +527,7 @@
             <ComplexType Name="ZHR_STK_HDR_DET">
                 <Property Name="stkreqid" Type="Edm.String" Nullable="false" MaxLength="12"/>
                 <Property Name="stktype" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="oldstknumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
                 <Property Name="requestorname" Type="Edm.String" Nullable="false" MaxLength="40"/>
                 <Property Name="location" Type="Edm.String" Nullable="false" MaxLength="4"/>
                 <Property Name="status" Type="Edm.String" Nullable="false" MaxLength="3"/>
@@ -568,6 +601,7 @@
                 <Parameter Name="_it" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)" Nullable="false"/>
                 <Parameter Name="stkreqid" Type="Edm.String" Nullable="false" MaxLength="12"/>
                 <Parameter Name="stktype" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Parameter Name="oldstknumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
                 <Parameter Name="requestorname" Type="Edm.String" Nullable="false" MaxLength="40"/>
                 <Parameter Name="location" Type="Edm.String" Nullable="false" MaxLength="4"/>
                 <Parameter Name="status" Type="Edm.String" Nullable="false" MaxLength="3"/>
@@ -693,9 +727,6 @@
                 <Parameter Name="Justification" Type="Edm.String" Nullable="false" MaxLength="255"/>
                 <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ZHR_STK_RETURN_PRM" Nullable="true"/>
             </Action>
-            <Action Name="ImmediateValidationsOnEnter" IsBound="true">
-                <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
-            </Action>
             <EntityContainer Name="Container">
                 <EntitySet Name="Activesticker" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ActivestickerType"/>
                 <EntitySet Name="AppointmentSlot" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.AppointmentSlotType"/>
@@ -706,12 +737,14 @@
                     <NavigationPropertyBinding Path="SiblingEntity" Target="evidence"/>
                     <NavigationPropertyBinding Path="_Header" Target="StickerMaster"/>
                 </EntitySet>
+                <EntitySet Name="IssueLocation" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.IssueLocationType"/>
                 <EntitySet Name="I_DraftAdministrativeData" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.I_DraftAdministrativeDataType"/>
                 <EntitySet Name="MaintLocation" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.MaintLocationType">
                     <NavigationPropertyBinding Path="DraftAdministrativeData" Target="I_DraftAdministrativeData"/>
                     <NavigationPropertyBinding Path="SiblingEntity" Target="MaintLocation"/>
                 </EntitySet>
                 <EntitySet Name="ManufacturerDetails" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ManufacturerDetailsType"/>
+                <EntitySet Name="PastVioHistory" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.PastVioHistoryType"/>
                 <EntitySet Name="PlateNum" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.PlateNumType"/>
                 <EntitySet Name="PlateTypes" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.PlateTypesType"/>
                 <EntitySet Name="RemoveList" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.RemoveListType"/>
@@ -723,6 +756,7 @@
                     <NavigationPropertyBinding Path="DraftAdministrativeData" Target="I_DraftAdministrativeData"/>
                     <NavigationPropertyBinding Path="SiblingEntity" Target="StickerMaster"/>
                     <NavigationPropertyBinding Path="_Evidence" Target="evidence"/>
+                    <NavigationPropertyBinding Path="_PastViolation" Target="PastVioHistory"/>
                 </EntitySet>
                 <EntitySet Name="StickerStatus" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerStatusType"/>
                 <EntitySet Name="StickerTypes" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerTypesType"/>
@@ -1065,6 +1099,48 @@
                     <Record>
                         <PropertyValue Property="Searchable" Bool="true"/>
                         <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.IssueLocationType/LocationValue">
+                <Annotation Term="SAP__common.Text" Path="LocationDesc">
+                    <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Sticker Location"/>
+                <Annotation Term="SAP__common.Heading" String="Maintenance of Sticker Location"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Maintenance of Sticker Location"/>
+            </Annotations>
+            <Annotations Target="SAP__self.IssueLocationType">
+                <Annotation Term="SAP__common.Label" String="Location Details of the Request"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/IssueLocation">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -1874,6 +1950,128 @@
                     <Collection/>
                 </Annotation>
             </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/ViolatorName">
+                <Annotation Term="SAP__common.Label" String="Violator Name"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Heading" String="Violator Name"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Violator Name"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/ViolationNo">
+                <Annotation Term="SAP__common.Label" String="Violation No"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Heading" String="SEC JH Violation Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="SEC JH Violation Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/ViolationDate">
+                <Annotation Term="SAP__common.Label" String="Violation Date"/>
+                <Annotation Term="SAP__common.Heading" String="Violation Date"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Violation date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/ViolationType">
+                <Annotation Term="SAP__common.Label" String="Violation Type"/>
+                <Annotation Term="SAP__common.Text" Path="ViolationTypeDesc">
+                    <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Heading" String="Violation Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Violation Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/ViolationPoints">
+                <Annotation Term="SAP__common.Label" String="Violation Points"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/ViolationRaisedBy">
+                <Annotation Term="SAP__common.Label" String="Violation Raised By"/>
+                <Annotation Term="SAP__common.Heading" String="Name of employee or applicant"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Formatted Name of Employee or Applicant"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/DisciplinaryAction">
+                <Annotation Term="SAP__common.Label" String="Disciplinary Action"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/Status">
+                <Annotation Term="SAP__common.Label" String="Status"/>
+                <Annotation Term="SAP__common.Text" Path="StatusDesc">
+                    <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Status Data Element"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType">
+                <Annotation Term="SAP__common.Label" String="Violation History for employee"/>
+                <Annotation Term="SAP__UI.LineItem">
+                    <Collection>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Violator Name"/>
+                            <PropertyValue Property="Value" Path="ViolatorName"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Violation No"/>
+                            <PropertyValue Property="Value" Path="ViolationNo"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Violation Date"/>
+                            <PropertyValue Property="Value" Path="ViolationDate"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Violation Type"/>
+                            <PropertyValue Property="Value" Path="ViolationType"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Violation Points"/>
+                            <PropertyValue Property="Value" Path="ViolationPoints"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Violation Raised By"/>
+                            <PropertyValue Property="Value" Path="ViolationRaisedBy"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/Medium"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Disciplinary Action"/>
+                            <PropertyValue Property="Value" Path="DisciplinaryAction"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Status"/>
+                            <PropertyValue Property="Value" Path="Status"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/PastVioHistory">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/StkReqId">
                 <Annotation Term="SAP__core.Computed"/>
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -1888,6 +2086,12 @@
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/StickerNumber">
                 <Annotation Term="SAP__common.Label" String="Sticker Number"/>
+                <Annotation Term="SAP__common.Heading" String="Sticker Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Sticker Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/OldStkNumber">
+                <Annotation Term="SAP__common.Label" String="Current Issued Sticker Number"/>
+                <Annotation Term="SAP__core.Computed"/>
                 <Annotation Term="SAP__common.Heading" String="Sticker Number"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Number"/>
             </Annotations>
@@ -1991,7 +2195,7 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Employee's Name (Sortable by LAST NAME FIRST NAME)"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/Location">
-                <Annotation Term="SAP__common.Label" String="Sticker Issue Location"/>
+                <Annotation Term="SAP__common.Label" String="Sticker Processing Location"/>
                 <Annotation Term="SAP__common.Text" Path="LocationDesc">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
@@ -2033,6 +2237,7 @@
                     </Collection>
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+                <Annotation Term="SAP__common.FilterDefaultValueHigh" String="Approved"/>
                 <Annotation Term="SAP__common.FilterDefaultValue" String="In-Process"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/StatusCode">
@@ -2208,7 +2413,7 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/Remarks">
-                <Annotation Term="SAP__common.Label" String="Sticker Expire Remarks"/>
+                <Annotation Term="SAP__common.Label" String="Process Sticker Remarks"/>
                 <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/Remarks"/>
                 <Annotation Term="SAP__common.Heading" String="Sticker Expire Remarks"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Expire Date Remarks"/>
@@ -2235,6 +2440,10 @@
             <Annotations Target="SAP__self.StickerMasterType/ToTime">
                 <Annotation Term="SAP__core.Computed"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/RejectJust">
+                <Annotation Term="SAP__common.Label" String="Rejection Jusitification"/>
+                <Annotation Term="SAP__UI.MultiLineText"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/ContractEnddate">
                 <Annotation Term="SAP__core.Computed"/>
             </Annotations>
@@ -2242,7 +2451,7 @@
                 <Annotation Term="SAP__core.Computed"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/Reason">
-                <Annotation Term="SAP__common.Label" String="Reason"/>
+                <Annotation Term="SAP__common.Label" String="Reason for Renew/Cancel Sticker"/>
                 <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/Reason"/>
                 <Annotation Term="SAP__UI.MultiLineText"/>
                 <Annotation Term="SAP__common.Heading" String="Message"/>
@@ -2336,6 +2545,14 @@
                                         </Record>
                                     </PropertyValue>
                                 </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_PastViolation"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -2369,7 +2586,7 @@
                             <Collection>
                                 <Record>
                                     <PropertyValue Property="Property" PropertyPath="Status"/>
-                                    <PropertyValue Property="AllowedExpressions" String="SingleValue"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
                                 </Record>
                                 <Record>
                                     <PropertyValue Property="Property" PropertyPath="QRCode"/>
@@ -2452,7 +2669,7 @@
                 <Annotation Term="SAP__common.Label" String="Plate Number"/>
             </Annotations>
             <Annotations Target="SAP__self.Remove(Collection(SAP__self.StickerMasterType))/Location">
-                <Annotation Term="SAP__common.Label" String="Sticker Issue Location"/>
+                <Annotation Term="SAP__common.Label" String="Sticker Processing Location"/>
                 <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
@@ -2537,7 +2754,7 @@
                 <Annotation Term="SAP__common.Label" String="Plate Number"/>
             </Annotations>
             <Annotations Target="SAP__self.Renew(Collection(SAP__self.StickerMasterType))/Location">
-                <Annotation Term="SAP__common.Label" String="Sticker Issue Location"/>
+                <Annotation Term="SAP__common.Label" String="Sticker Processing Location"/>
                 <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Collection>
@@ -2690,6 +2907,8 @@
                     <Record Type="SAP__common.SideEffectsType">
                         <PropertyValue Property="TargetProperties">
                             <Collection>
+                                <String>_it/HideRejJust</String>
+                                <String>_it/RejectJust</String>
                                 <String>_it/StatsCriticality</String>
                                 <String>_it/Status</String>
                                 <String>_it/__OperationControl/Approve</String>
@@ -2701,30 +2920,12 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="SAP__self.ImmediateValidationsOnEnter(SAP__self.StickerMasterType)">
-                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/ImmediateValidationsOnEnter"/>
-            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType">
                 <Annotation Term="SAP__common.Label" String="Consumption View of ZI_HR_STK_MSTR"/>
                 <Annotation Term="SAP__common.SemanticKey">
                     <Collection>
                         <PropertyPath>StkReqIdStr</PropertyPath>
                     </Collection>
-                </Annotation>
-                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Determine_Action_ImmediateValidationsOnEnter">
-                    <Record Type="SAP__common.SideEffectsType">
-                        <PropertyValue Property="TriggerAction" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ImmediateValidationsOnEnter"/>
-                        <PropertyValue Property="SourceEntities">
-                            <Collection>
-                                <NavigationPropertyPath/>
-                            </Collection>
-                        </PropertyValue>
-                        <PropertyValue Property="TargetProperties">
-                            <Collection>
-                                <String>SAP__Messages</String>
-                            </Collection>
-                        </PropertyValue>
-                    </Record>
                 </Annotation>
                 <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_AppointmentDate">
                     <Record Type="SAP__common.SideEffectsType">
@@ -2926,6 +3127,11 @@
                             <PropertyValue Property="ID" String="VehicleSpecFacet"/>
                             <PropertyValue Property="Target" AnnotationPath="@SAP__UI.FieldGroup#VehicleSpec"/>
                         </Record>
+                        <Record Type="SAP__UI.ReferenceFacet">
+                            <PropertyValue Property="Label" String="Justification/Reason"/>
+                            <PropertyValue Property="ID" String="JustReasonFacet"/>
+                            <PropertyValue Property="Target" AnnotationPath="@SAP__UI.FieldGroup#JustReason"/>
+                        </Record>
                         <Record Type="SAP__UI.CollectionFacet">
                             <PropertyValue Property="Label" String="Supporting Attachments"/>
                             <PropertyValue Property="ID" String="EvidenceSection"/>
@@ -2944,6 +3150,12 @@
                                 </Collection>
                             </PropertyValue>
                             <Annotation Term="SAP__UI.Hidden" Path="HideAttachTab"/>
+                        </Record>
+                        <Record Type="SAP__UI.ReferenceFacet">
+                            <PropertyValue Property="Label" String="Past Violations"/>
+                            <PropertyValue Property="ID" String="PastViolationTab"/>
+                            <PropertyValue Property="Target" AnnotationPath="_PastViolation/@SAP__UI.LineItem"/>
+                            <Annotation Term="SAP__UI.Hidden" Path="HideVioHistory"/>
                         </Record>
                     </Collection>
                 </Annotation>
@@ -2964,6 +3176,30 @@
                                     <PropertyValue Property="Label" String="Appointment To Time"/>
                                     <PropertyValue Property="Value" Path="ToTime"/>
                                     <Annotation Term="SAP__UI.Hidden" Path="HideApp"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__UI.FieldGroup" Qualifier="JustReason">
+                    <Record>
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="Justification"/>
+                                    <Annotation Term="SAP__UI.Hidden" Path="HideJust"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="RejectJust"/>
+                                    <Annotation Term="SAP__UI.Hidden" Path="HideRejJust"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="Reason"/>
+                                    <Annotation Term="SAP__UI.Hidden" Path="HideRes"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="Remarks"/>
+                                    <Annotation Term="SAP__UI.Hidden" Path="HideRemark"/>
                                 </Record>
                             </Collection>
                         </PropertyValue>
@@ -3015,16 +3251,8 @@
                                     <Annotation Term="SAP__UI.Hidden" Path="HideExpireDate"/>
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
-                                    <PropertyValue Property="Value" Path="Remarks"/>
-                                    <Annotation Term="SAP__UI.Hidden" Path="HideExpireDate"/>
-                                </Record>
-                                <Record Type="SAP__UI.DataField">
-                                    <PropertyValue Property="Value" Path="Justification"/>
-                                    <Annotation Term="SAP__UI.Hidden" Path="HideJust"/>
-                                </Record>
-                                <Record Type="SAP__UI.DataField">
-                                    <PropertyValue Property="Value" Path="Reason"/>
-                                    <Annotation Term="SAP__UI.Hidden" Path="HideRes"/>
+                                    <PropertyValue Property="Value" Path="OldStkNumber"/>
+                                    <Annotation Term="SAP__UI.Hidden" Path="HideStkNo"/>
                                 </Record>
                             </Collection>
                         </PropertyValue>
@@ -3204,7 +3432,7 @@
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
-                            <PropertyValue Property="Label" String="Sticker Issue Location"/>
+                            <PropertyValue Property="Label" String="Sticker Processing Location"/>
                             <PropertyValue Property="Value" Path="Location"/>
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
@@ -3256,7 +3484,7 @@
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
-                            <PropertyValue Property="Label" String="Sticker Issue Location"/>
+                            <PropertyValue Property="Label" String="Sticker Processing Location"/>
                             <PropertyValue Property="Value" Path="Location"/>
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
@@ -3799,7 +4027,7 @@
                 <Annotation Term="SAP__common.Label" String="Identity Number"/>
                 <Annotation Term="SAP__common.Heading" String="ID Number"/>
             </Annotations>
-            <Annotations Target="SAP__self.EmployeeDetailsType/IQAMA">
+            <Annotations Target="SAP__self.EmployeeDetailsType/Iqama">
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__common.Label" String="Identity Number"/>
                 <Annotation Term="SAP__common.Heading" String="ID Number"/>
@@ -4008,6 +4236,10 @@
                 <Annotation Term="SAP__common.Label" String="Changed On"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Last Change Date Time"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/HideStkNo">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/HideAttachTab">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
@@ -4080,6 +4312,10 @@
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Request Date"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/HideRemark">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/HideExpireDate">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
@@ -4094,10 +4330,16 @@
                 <Annotation Term="SAP__common.Label" String="Truth Value"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
             </Annotations>
-            <Annotations Target="SAP__self.StickerMasterType/RejectJust">
+            <Annotations Target="SAP__self.StickerMasterType/HideRejJust">
                 <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/isSecurityRescheduled">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Truth Value"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/HideVioHistory">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Truth Value"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
@@ -4125,6 +4367,11 @@
             <Annotations Target="SAP__self.StickerMasterType/RemovedBy">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Removed By"/>
+            </Annotations>
+            <Annotations Target="SAP__self.IssueLocationType/Uuid">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="UUID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)"/>
             </Annotations>
             <Annotations Target="SAP__self.AppointmentSlotType/Apps">
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -4189,6 +4436,9 @@
                 <Annotation Term="SAP__common.Heading" String="Ln"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Language Key"/>
             </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/IssuedByUser">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
             <Annotations Target="SAP__self.ColorDetailsType/Ddlanguage">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Lang."/>
@@ -4233,6 +4483,10 @@
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
             </Annotations>
+            <Annotations Target="SAP__self.IssueLocationType/LocationDesc">
+                <Annotation Term="SAP__common.Label" String="Short text"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Explanatory Short Text"/>
+            </Annotations>
             <Annotations Target="SAP__self.PlateTypesType/PlateTypeDesc">
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
@@ -4268,7 +4522,7 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
-            <Annotations Target="SAP__self.ActivestickerType/StickerNo">
+            <Annotations Target="SAP__self.ActivestickerType/StickerNumber">
                 <Annotation Term="SAP__common.Label" String="Sticker Number"/>
             </Annotations>
             <Annotations Target="SAP__self.ActivestickerType/ExpireDate">
@@ -4280,6 +4534,18 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Field of type DATS"/>
             </Annotations>
             <Annotations Target="SAP__self.PlateNumType/PlateNumDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/ViolationUuid">
+                <Annotation Term="SAP__common.Label" String="UUID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/JhahId">
+                <Annotation Term="SAP__common.Label" String="JHAH ID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Violator JHAH ID"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PastVioHistoryType/StatusDesc">
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
             </Annotations>
@@ -4412,11 +4678,6 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
-            <Annotations Target="SAP__self.StickerMasterType/__OperationControl/ImmediateValidationsOnEnter">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/__OperationControl/IssueSticker">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
@@ -4487,7 +4748,7 @@
             <Annotations Target="SAP__self.EmployeeDetailsType/NationalityDesc">
                 <Annotation Term="SAP__common.Label" String="Country/Region Name"/>
             </Annotations>
-            <Annotations Target="SAP__self.EmployeeDetailsType/gender">
+            <Annotations Target="SAP__self.EmployeeDetailsType/Gender">
                 <Annotation Term="SAP__common.Label" String="Gender"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Texts for Gender"/>
             </Annotations>
@@ -4611,11 +4872,6 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
-            <Annotations Target="SAP__self.StickerMasterOperationControl/ImmediateValidationsOnEnter">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
             <Annotations Target="SAP__self.StickerMasterOperationControl/IssueSticker">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
@@ -4648,6 +4904,9 @@
             </Annotations>
             <Annotations Target="SAP__self.ZHR_STK_HDR_DET/stktype">
                 <Annotation Term="SAP__common.Label" String="Sticker Request Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_STK_HDR_DET/oldstknumber">
+                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_STK_HDR_DET/requestorname">
                 <Annotation Term="SAP__common.Label" String="Employee/app.name"/>
@@ -4765,6 +5024,9 @@
             </Annotations>
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/stktype">
                 <Annotation Term="SAP__common.Label" String="Sticker Request Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/oldstknumber">
+                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
             </Annotations>
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/requestorname">
                 <Annotation Term="SAP__common.Label" String="Employee/app.name"/>

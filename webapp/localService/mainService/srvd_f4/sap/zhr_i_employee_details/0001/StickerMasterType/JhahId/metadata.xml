@@ -74,10 +74,10 @@
                 <Property Name="Nationality" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="NationalityDesc" Type="Edm.String" Nullable="false" MaxLength="50"/>
                 <Property Name="NationalID" Type="Edm.String" Nullable="false" MaxLength="30"/>
-                <Property Name="IQAMA" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="Iqama" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="GovernmentID" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="BloodGroup" Type="Edm.String" Nullable="false" MaxLength="3"/>
-                <Property Name="gender" Type="Edm.String" Nullable="false" MaxLength="80"/>
+                <Property Name="Gender" Type="Edm.String" Nullable="false" MaxLength="80"/>
                 <Property Name="BadgeNumber" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="WorkPhone" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="HomePhone" Type="Edm.String" Nullable="false" MaxLength="30"/>
@@ -150,7 +150,7 @@
                 <Annotation Term="SAP__common.Label" String="Identity Number"/>
                 <Annotation Term="SAP__common.Heading" String="ID Number"/>
             </Annotations>
-            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/IQAMA">
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/Iqama">
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__common.Label" String="Identity Number"/>
                 <Annotation Term="SAP__common.Heading" String="ID Number"/>
@@ -269,7 +269,7 @@
                                     <PropertyValue Property="ValueListProperty" String="NationalID"/>
                                 </Record>
                                 <Record Type="SAP__common.ValueListParameterDisplayOnly">
-                                    <PropertyValue Property="ValueListProperty" String="IQAMA"/>
+                                    <PropertyValue Property="ValueListProperty" String="Iqama"/>
                                 </Record>
                                 <Record Type="SAP__common.ValueListParameterDisplayOnly">
                                     <PropertyValue Property="ValueListProperty" String="GovernmentID"/>
@@ -278,7 +278,7 @@
                                     <PropertyValue Property="ValueListProperty" String="BloodGroup"/>
                                 </Record>
                                 <Record Type="SAP__common.ValueListParameterDisplayOnly">
-                                    <PropertyValue Property="ValueListProperty" String="gender"/>
+                                    <PropertyValue Property="ValueListProperty" String="Gender"/>
                                 </Record>
                                 <Record Type="SAP__common.ValueListParameterDisplayOnly">
                                     <PropertyValue Property="ValueListProperty" String="BadgeNumber"/>
@@ -417,7 +417,7 @@
             <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/NationalityDesc">
                 <Annotation Term="SAP__common.Label" String="Country/Region Name"/>
             </Annotations>
-            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/gender">
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/Gender">
                 <Annotation Term="SAP__common.Label" String="Gender"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Texts for Gender"/>
             </Annotations>
