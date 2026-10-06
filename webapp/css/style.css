@@ -7,26 +7,14 @@
 ========================================================= */
 
 
-/* 12. JUSTIFICATION / REMARKS / REASON */
 .sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Justification"][id*="Field-content"]),
 .sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Justification"][id*="Field-content"]),
 .sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Remarks"][id*="Field-content"]),
 .sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Remarks"][id*="Field-content"]),
 .sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Reason"][id*="Field-content"]),
-.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Reason"][id*="Field-content"]) {
-    grid-column: 1 / -1 !important;  
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    overflow: visible !important;
-}
-.sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Justification"][id*="Field-content"]),
-.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Justification"][id*="Field-content"]),
-.sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Remarks"][id*="Field-content"]),
-.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Remarks"][id*="Field-content"]),
-.sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="Reason"][id*="Field-content"]),
-.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Reason"][id*="Field-content"]) {
+.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="Reason"][id*="Field-content"]),
+.sapUiFormCLCellsS12:has([id*="JustReasonFacet"][id*="RejectJust"][id*="Field-content"]),
+.sapUiFormCLCellsL12:has([id*="JustReasonFacet"][id*="RejectJust"][id*="Field-content"]) {
     width: 700px !important;
     max-width: 700px !important;
     min-width: 700px !important;
@@ -39,29 +27,34 @@
 [id*="JustReasonFacet"][id*="Remarks"][id*="Field-content"],
 [id*="JustReasonFacet"][id*="Remarks"][id*="Field-edit"],
 [id*="JustReasonFacet"][id*="Reason"][id*="Field-content"],
-[id*="JustReasonFacet"][id*="Reason"][id*="Field-edit"] {
-    
-    width: 100% !important;
-    max-width: 100% !important;
-    
+[id*="JustReasonFacet"][id*="Reason"][id*="Field-edit"],
+[id*="JustReasonFacet"][id*="RejectJust"][id*="Field-content"],
+[id*="JustReasonFacet"][id*="RejectJust"][id*="Field-edit"] {
+    width: 1000px !important;
+    max-width: 1000px !important;
     box-sizing: border-box !important;
 }
 
 [id*="JustReasonFacet"][id*="Justification"][id*="Field-edit-content"],
-[id*="JustReasonFacet"][id*="Remarks"][id*="Field-edit-content"] ,
-[id*="JustReasonFacet"][id*="Reason"][id*="Field-edit-content"]  {
+[id*="JustReasonFacet"][id*="Reason"][id*="Field-edit-content"],
+[id*="JustReasonFacet"][id*="Remarks"][id*="Field-edit-content"],
+[id*="JustReasonFacet"][id*="RejectJust"][id*="Field-edit-content"]  {
     width: 100% !important;
     max-width: none !important;
     box-sizing: border-box !important;
 }
 
 [id*="JustReasonFacet"][id*="Justification"][id*="Field-edit-inner"],
- [id*="JustReasonFacet"][id*="Remarks"][id*="Field-edit-inner"],
- [id*="JustReasonFacet"][id*="Reason"][id*="Field-edit-inner"]{
+[id*="JustReasonFacet"][id*="Reason"][id*="Field-edit-inner"] ,
+[id*="JustReasonFacet"][id*="Remarks"][id*="Field-edit-inner"],
+[id*="JustReasonFacet"][id*="RejectJust"][id*="Field-edit-inner"]  {
     width: 100% !important;
     max-width: none !important;
     box-sizing: border-box !important;
 }
+
+
+
 
 
 
