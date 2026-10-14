@@ -117,6 +117,7 @@ sap.ui.define([
                     this._applyMaintenanceActionVisibility();
 
                     this._markAppointmentFieldsMandatory();
+                    this._observeMandatoryLabels();
                     this._markAttachmentsMandatory();
                     this._applyUIEnhancements();
                     this._hideEditingStatusFilter();
@@ -130,6 +131,13 @@ sap.ui.define([
 
                 } catch (err) {
                     console.error("Error in StickerControllerExtension onInit:", err);
+                }
+            },
+
+            onExit: function () {
+                if (this._oMandatoryLabelObserver) {
+                    this._oMandatoryLabelObserver.disconnect();
+                    this._oMandatoryLabelObserver = null;
                 }
             },
 
@@ -576,6 +584,46 @@ sap.ui.define([
                 var oLabel = oView.byId(sFieldId);
                 if (oLabel) {
                     oLabel.setRequired(true);
+                }
+            });
+        },
+
+        /**
+         * The object page loads its subsections lazily: the fields of a subsection
+         * are only created when it scrolls into view, so most of the labels marked
+         * by _markAppointmentFieldsMandatory do not exist yet in onInit. In edit
+         * mode Fiori elements shows the asterisk on its own, which hid this; in
+         * display mode the labels stayed unmarked. Re-apply the marking whenever
+         * the object page DOM changes, so subsections created later are covered.
+         */
+        _observeMandatoryLabels: function () {
+            var oExtension = this;
+            var oView = this.base.getView();
+
+            if (oView.getId().indexOf("StickerMasterObjectPage") === -1) { return; }
+
+            var iDebounceHandle = null;
+            var fnMark = function () {
+                try {
+                    oExtension._markAppointmentFieldsMandatory();
+                } catch (e) { }
+            };
+
+            oView.addEventDelegate({
+                onAfterRendering: function () {
+                    var domView = oView.getDomRef();
+                    if (!domView || domView === oExtension._domMandatoryLabelsObserved) { return; }
+
+                    if (oExtension._oMandatoryLabelObserver) {
+                        oExtension._oMandatoryLabelObserver.disconnect();
+                    }
+                    oExtension._oMandatoryLabelObserver = new MutationObserver(function () {
+                        if (iDebounceHandle) { clearTimeout(iDebounceHandle); }
+                        iDebounceHandle = setTimeout(fnMark, 50);
+                    });
+                    oExtension._oMandatoryLabelObserver.observe(domView, { childList: true, subtree: true });
+                    oExtension._domMandatoryLabelsObserved = domView;
+                    fnMark();
                 }
             });
         },
