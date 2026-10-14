@@ -82,6 +82,7 @@
 /* myRequestMode: Logged-in user is viewing their OWN record */
 /* otherRequestMode: Admin is viewing SOMEONE ELSE'S record  */
 /* ========================================================= */
+/* Hide business actions only during draft Create/Edit mode */
 
 /* 
   When looking at MY OWN request, you act as an Employee.
@@ -108,12 +109,19 @@
 .otherRequestMode [id*="StandardAction::Edit" i],
 .otherRequestMode [id$="::Edit" i],
 .otherRequestMode [id*="EditAction" i],
-.otherRequestMode [id*="StandardAction::Delete" i],
+/* .otherRequestMode [id*="StandardAction::Delete" i], */
 .otherRequestMode [id*="Renew" i],
 .otherRequestMode [id*="Remove" i],
 .otherRequestMode [id*="CancelRequest" i],
 .otherRequestMode [id*="CopySticker" i] {
     display: none !important;
+}
+
+/* Hide Approve / Reject while the object is an unsaved draft */
+.zhrjhahsecstk-app.draftMode [id*="Approve"],
+.zhrjhahsecstk-app.draftMode [id*="Reject"],
+.zhrjhahsecstk-app.draftMode [id*="IssueSticker"] {
+  display: none !important;
 }
 
 /* 
@@ -127,7 +135,7 @@
 .loadingOwnershipMode [id*="StandardAction::Edit" i],
 .loadingOwnershipMode [id$="::Edit" i],
 .loadingOwnershipMode [id*="EditAction" i],
-.loadingOwnershipMode [id*="StandardAction::Delete" i],
+/* .loadingOwnershipMode [id*="StandardAction::Delete" i], */
 .loadingOwnershipMode [id*="Renew" i],
 .loadingOwnershipMode [id*="Remove" i],
 .loadingOwnershipMode [id*="CancelRequest" i],
@@ -281,8 +289,35 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
 [id$="-fu_button"] .sapMBtnInner::after {
     content: "Upload File";
 }
+[id*="VehicleSpecFacet"][id$="PlateTyp-label"]::after,
+[id*="VehicleSpecFacet"][id$="PlateNum-label"]::after,
+[id*="VehicleSpecFacet"][id$="Manufacturer-label"]::after,
+[id*="VehicleSpecFacet"][id$="Color-label"]::after,
+[id*="VehicleSpecFacet"][id$="PlateNum1-label"]::after,
+[id*="VehicleSpecFacet"][id$="PlateNum2-label"]::after,
+[id*="VehicleSpecFacet"][id$="PlateNum3-label"]::after,
 
-.zhrAttachmentsMandatory::after {
+/* Appointment Specification */
+[id*="AppointSpecFacet"][id$="AppointmentDatePicker-label"]::after,
+[id*="AppointSpecFacet"][id$="TimeSlotSelect-label"]::after,
+[id*="AppointSpecFacet"][id$="AppointmentLocation-label"]::after,
+
+
+/* Request Group */
+[id*="RequestGrpFacet"][id$="Location-label"]::after,
+[id*="RequestGrpFacet"][id$="StkType-label"]::after,
+
+
+/* Justification, Remarks, Reason and Reject Justification labels */
+[id*="JustReasonFacet"][id$="Justification-label"]::after,
+[id*="JustReasonFacet"][id$="Remarks-label"]::after,
+[id*="JustReasonFacet"][id$="Reason-label"]::after,
+[id*="JustReasonFacet"][id$="RejectJust-label"]::after,
+
+
+[id$="_Evidence::LineItem-title"]::after
+
+{
     content: " *";
     color: #bb0000;
     font-weight: bold;

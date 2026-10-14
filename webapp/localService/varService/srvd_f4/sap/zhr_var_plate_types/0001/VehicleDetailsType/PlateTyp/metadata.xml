@@ -97,6 +97,7 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Version of the entry (not used)"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_VAR_PLATE_TYPESType/PlateTypeValue">
+                <Annotation Term="SAP__common.Text" Path="PlateTypeDesc"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Lower Value"/>

@@ -77,8 +77,7 @@
                                     <PropertyValue Property="LocalDataProperty" PropertyPath="Lifnr"/>
                                     <PropertyValue Property="ValueListProperty" String="VendorNumber"/>
                                 </Record>
-                                <Record Type="SAP__common.ValueListParameterOut">
-                                    <PropertyValue Property="LocalDataProperty" PropertyPath="VendorName"/>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
                                     <PropertyValue Property="ValueListProperty" String="VendorName"/>
                                 </Record>
                             </Collection>
