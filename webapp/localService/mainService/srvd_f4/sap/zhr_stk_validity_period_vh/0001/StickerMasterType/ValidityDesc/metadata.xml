@@ -57,6 +57,7 @@
                 </Key>
                 <Property Name="ValidityValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="ValidityDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="SortRank" Type="Edm.Byte" Nullable="false"/>
             </EntityType>
             <EntityContainer Name="Container">
                 <EntitySet Name="ZHR_STK_VALIDITY_PERIOD_VH" EntityType="com.sap.gateway.srvd_f4.zhr_stk_validity_period_vh.v0001.ZHR_STK_VALIDITY_PERIOD_VHType"/>
@@ -96,8 +97,8 @@
                         <PropertyValue Property="SortOrder">
                             <Collection>
                                 <Record Type="SAP__common.SortOrderType">
-                                    <PropertyValue Property="Property" PropertyPath="ValidityDesc"/>
-                                    <PropertyValue Property="Descending" Bool="true"/>
+                                    <PropertyValue Property="Property" PropertyPath="SortRank"/>
+                                    <PropertyValue Property="Descending" Bool="false"/>
                                 </Record>
                             </Collection>
                         </PropertyValue>
@@ -191,6 +192,9 @@
                 </Annotation>
                 <Annotation Term="SAP__capabilities.KeyAsSegmentSupported"/>
                 <Annotation Term="SAP__capabilities.AsynchronousRequestsSupported"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_STK_VALIDITY_PERIOD_VHType/SortRank">
+                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_STK_VALIDITY_PERIOD_VHType/ValidityDesc">
                 <Annotation Term="SAP__common.Label" String="Short Description"/>

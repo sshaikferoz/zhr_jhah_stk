@@ -153,7 +153,7 @@
                     "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#AdminTab"
                   }
                 ],
-                "showCounts": true
+                "showCounts": false
               },
               "navigation": {
                 "StickerMaster": {

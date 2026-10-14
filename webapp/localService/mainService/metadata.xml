@@ -292,6 +292,7 @@
                 <Property Name="StatusCode" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="Justification" Type="Edm.String" Nullable="false" MaxLength="255"/>
                 <Property Name="HideJust" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="HideJustSec" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="PlateTyp" Type="Edm.String" Nullable="false" MaxLength="2"/>
                 <Property Name="PlateTypDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="Manufacturer" Type="Edm.String" Nullable="false" MaxLength="3"/>
@@ -332,6 +333,7 @@
                 <Property Name="ContractEnddate" Type="Edm.Date"/>
                 <Property Name="isSecurityRescheduled" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="QRCode" Type="Edm.String" Nullable="false"/>
+                <Property Name="TimeStamp" Type="Edm.DateTimeOffset" Precision="7"/>
                 <Property Name="HideVioHistory" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="ReturnType" Type="Edm.String" Nullable="false" MaxLength="1"/>
                 <Property Name="ReturnMsg" Type="Edm.String" Nullable="false" MaxLength="255"/>
@@ -452,6 +454,7 @@
                 </Key>
                 <Property Name="ValidityValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="ValidityDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="SortRank" Type="Edm.Byte" Nullable="false"/>
             </EntityType>
             <EntityType Name="EmployeeDetailsType">
                 <Key>
@@ -719,7 +722,7 @@
             </Action>
             <Action Name="ScanQRCode" EntitySetPath="_it" IsBound="true">
                 <Parameter Name="_it" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)" Nullable="false"/>
-                <Parameter Name="Base64Token" Type="Edm.String" Nullable="false"/>
+                <Parameter Name="QrToken" Type="Edm.String" Nullable="false"/>
                 <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
             </Action>
             <Action Name="Reject" IsBound="true">
@@ -2183,7 +2186,6 @@
             <Annotations Target="SAP__self.StickerMasterType/Name">
                 <Annotation Term="SAP__common.Label" String="Requestor Name"/>
                 <Annotation Term="SAP__core.Computed"/>
-                <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Heading" String="Name of employee or applicant"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Formatted Name of Employee or Applicant"/>
             </Annotations>
@@ -2237,8 +2239,6 @@
                     </Collection>
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
-                <Annotation Term="SAP__common.FilterDefaultValueHigh" String="Approved"/>
-                <Annotation Term="SAP__common.FilterDefaultValue" String="In-Process"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/StatusCode">
                 <Annotation Term="SAP__common.IsUpperCase"/>
@@ -2450,6 +2450,11 @@
             <Annotations Target="SAP__self.StickerMasterType/QRCode">
                 <Annotation Term="SAP__core.Computed"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/TimeStamp">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.Label" String="Time Stamp"/>
+                <Annotation Term="SAP__common.QuickInfo" String="UTC Time Stamp in Long Form (YYYYMMDDhhmmssmmmuuun)"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/Reason">
                 <Annotation Term="SAP__common.Label" String="Reason for Renew/Cancel Sticker"/>
                 <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/Reason"/>
@@ -2586,7 +2591,7 @@
                             <Collection>
                                 <Record>
                                     <PropertyValue Property="Property" PropertyPath="Status"/>
-                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                    <PropertyValue Property="AllowedExpressions" String="MultiValue"/>
                                 </Record>
                                 <Record>
                                     <PropertyValue Property="Property" PropertyPath="QRCode"/>
@@ -2608,6 +2613,7 @@
                                 <PropertyPath>ToTime</PropertyPath>
                                 <PropertyPath>ContractEnddate</PropertyPath>
                                 <PropertyPath>QRCode</PropertyPath>
+                                <PropertyPath>TimeStamp</PropertyPath>
                                 <PropertyPath>__CreateByAssociationControl</PropertyPath>
                                 <PropertyPath>__EntityControl</PropertyPath>
                                 <PropertyPath>__FieldControl</PropertyPath>
@@ -2624,6 +2630,7 @@
                                 <PropertyPath>ToTime</PropertyPath>
                                 <PropertyPath>ContractEnddate</PropertyPath>
                                 <PropertyPath>QRCode</PropertyPath>
+                                <PropertyPath>TimeStamp</PropertyPath>
                                 <PropertyPath>__CreateByAssociationControl</PropertyPath>
                                 <PropertyPath>__EntityControl</PropertyPath>
                                 <PropertyPath>__FieldControl</PropertyPath>
@@ -3131,6 +3138,7 @@
                             <PropertyValue Property="Label" String="Justification/Reason"/>
                             <PropertyValue Property="ID" String="JustReasonFacet"/>
                             <PropertyValue Property="Target" AnnotationPath="@SAP__UI.FieldGroup#JustReason"/>
+                            <Annotation Term="SAP__UI.Hidden" Path="HideJustSec"/>
                         </Record>
                         <Record Type="SAP__UI.CollectionFacet">
                             <PropertyValue Property="Label" String="Supporting Attachments"/>
@@ -3186,10 +3194,6 @@
                         <PropertyValue Property="Data">
                             <Collection>
                                 <Record Type="SAP__UI.DataField">
-                                    <PropertyValue Property="Value" Path="Justification"/>
-                                    <Annotation Term="SAP__UI.Hidden" Path="HideJust"/>
-                                </Record>
-                                <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Value" Path="RejectJust"/>
                                     <Annotation Term="SAP__UI.Hidden" Path="HideRejJust"/>
                                 </Record>
@@ -3200,6 +3204,10 @@
                                 <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Value" Path="Remarks"/>
                                     <Annotation Term="SAP__UI.Hidden" Path="HideRemark"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="Justification"/>
+                                    <Annotation Term="SAP__UI.Hidden" Path="HideJust"/>
                                 </Record>
                             </Collection>
                         </PropertyValue>
@@ -3217,9 +3225,6 @@
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Value" Path="ArabicName"/>
-                                </Record>
-                                <Record Type="SAP__UI.DataField">
-                                    <PropertyValue Property="Value" Path="Name"/>
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Value" Path="Vendor"/>
@@ -3275,15 +3280,15 @@
                                     <PropertyValue Property="Value" Path="Color"/>
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
-                                    <PropertyValue Property="Label" String="Plate No 1"/>
+                                    <PropertyValue Property="Label" String="Plate Letter 1"/>
                                     <PropertyValue Property="Value" Path="PlateNum1"/>
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
-                                    <PropertyValue Property="Label" String="Plate No 2"/>
+                                    <PropertyValue Property="Label" String="Plate Letter 2"/>
                                     <PropertyValue Property="Value" Path="PlateNum2"/>
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
-                                    <PropertyValue Property="Label" String="Plate No 3"/>
+                                    <PropertyValue Property="Label" String="Plate Letter 3"/>
                                     <PropertyValue Property="Value" Path="PlateNum3"/>
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
@@ -3337,9 +3342,6 @@
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="PlateNum1"/>
-                        </Record>
-                        <Record Type="SAP__UI.DataField">
-                            <PropertyValue Property="Value" Path="Name"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="PlateNum2"/>
@@ -3400,6 +3402,9 @@
                             <PropertyValue Property="Label" String="SMS Request No."/>
                             <PropertyValue Property="Value" Path="StkReqIdStr"/>
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="Name"/>
                         </Record>
                     </Collection>
                 </Annotation>
@@ -3927,8 +3932,8 @@
                         <PropertyValue Property="SortOrder">
                             <Collection>
                                 <Record Type="SAP__common.SortOrderType">
-                                    <PropertyValue Property="Property" PropertyPath="ValidityDesc"/>
-                                    <PropertyValue Property="Descending" Bool="true"/>
+                                    <PropertyValue Property="Property" PropertyPath="SortRank"/>
+                                    <PropertyValue Property="Descending" Bool="false"/>
                                 </Record>
                             </Collection>
                         </PropertyValue>
@@ -4268,6 +4273,10 @@
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/HideJustSec">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/PlateTypDesc">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
@@ -4372,6 +4381,9 @@
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="UUID"/>
                 <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidityValueHelpType/SortRank">
+                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.AppointmentSlotType/Apps">
                 <Annotation Term="SAP__UI.Hidden"/>

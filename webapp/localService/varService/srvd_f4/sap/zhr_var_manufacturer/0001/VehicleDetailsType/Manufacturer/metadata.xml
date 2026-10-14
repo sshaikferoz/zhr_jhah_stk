@@ -67,6 +67,7 @@
                 <Property Name="ManufacturerDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="DomvalLd" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="DomvalHd" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="ManufacturerValue1" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="ManufacturerValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
             </EntityType>
             <EntityContainer Name="Container">
@@ -111,7 +112,7 @@
                 <Annotation Term="SAP__common.Heading" String="Uppr Limit"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Language-specific values for domains, upper limit"/>
             </Annotations>
-            <Annotations Target="SAP__self.ZHR_VAR_MANUFACTURERType/ManufacturerValue">
+            <Annotations Target="SAP__self.ZHR_VAR_MANUFACTURERType/ManufacturerValue1">
                 <Annotation Term="SAP__common.Text" Path="ManufacturerDesc"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -145,7 +146,8 @@
             <Annotations Target="SAP__self.Container/ZHR_VAR_MANUFACTURER">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="false"/>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -235,6 +237,9 @@
                 <Annotation Term="SAP__common.Label" String="Lang."/>
                 <Annotation Term="SAP__common.Heading" String="Ln"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Language Key"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_VAR_MANUFACTURERType/ManufacturerValue">
+                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_VAR_MANUFACTURERType/ManufacturerDesc">
                 <Annotation Term="SAP__common.Label" String="Short Description"/>

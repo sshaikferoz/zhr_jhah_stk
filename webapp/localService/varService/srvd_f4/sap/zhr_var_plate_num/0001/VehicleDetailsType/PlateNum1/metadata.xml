@@ -65,6 +65,7 @@
                 <Property Name="Valpos" Type="Edm.String" Nullable="false" MaxLength="4"/>
                 <Property Name="As4vers" Type="Edm.String" Nullable="false" MaxLength="4"/>
                 <Property Name="PlateNumDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="PlateNo" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="PlateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
             </EntityType>
             <EntityContainer Name="Container">
@@ -96,13 +97,16 @@
                 <Annotation Term="SAP__common.Heading" String="Vers"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Version of the entry (not used)"/>
             </Annotations>
-            <Annotations Target="SAP__self.ZHR_VAR_PLATE_NUMType/PlateNum">
-                <Annotation Term="SAP__common.Text" Path="PlateNumDesc"/>
+            <Annotations Target="SAP__self.ZHR_VAR_PLATE_NUMType/PlateNo">
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Lower Value"/>
                 <Annotation Term="SAP__common.Heading" String="Fixed"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Values for Domains: Single Value/Lower Limit"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_VAR_PLATE_NUMType/PlateNum">
+                <Annotation Term="SAP__common.Text" Path="PlateNumDesc"/>
+                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__ParentService.VehicleDetailsType/PlateNum1">
                 <Annotation Term="SAP__common.ValueListMapping">
@@ -130,7 +134,8 @@
             <Annotations Target="SAP__self.Container/ZHR_VAR_PLATE_NUM">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="false"/>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">

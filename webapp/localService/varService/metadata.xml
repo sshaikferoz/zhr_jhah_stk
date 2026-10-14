@@ -71,10 +71,13 @@
                 <Property Name="PlateNum3Desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="PlateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="ArabicPlateNum" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="PlateNumEng" Type="Edm.String" Nullable="false" MaxLength="20"/>
                 <Property Name="HidePlates" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="StickerValid" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="StickerValidText" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="StickerValidCriticality" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="ViolationExist" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="ViolationExistText" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="ViolationExistCriticality" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="DraftUUID" Type="Edm.Guid" Nullable="false"/>
@@ -144,6 +147,7 @@
                 <Property Name="ManufacturerDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="DomvalLd" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="DomvalHd" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="ManufacturerValue1" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="ManufacturerValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
             </EntityType>
             <EntityType Name="VendorListType">
@@ -269,6 +273,15 @@
                 <Property Name="DomvalHd" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="VendorTypeValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
             </EntityType>
+            <EntityType Name="NationalitynewType">
+                <Key>
+                    <PropertyRef Name="Spras"/>
+                    <PropertyRef Name="Land1"/>
+                </Key>
+                <Property Name="Spras" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="Land1" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="NationalityText" Type="Edm.String" Nullable="false" MaxLength="255"/>
+            </EntityType>
             <EntityType Name="RACAreaListType">
                 <Key>
                     <PropertyRef Name="UUID"/>
@@ -351,6 +364,7 @@
                 <Property Name="ViewPDF" Type="Edm.String" Nullable="false" MaxLength="500"/>
                 <Property Name="ViewPDFText" Type="Edm.String" Nullable="false" MaxLength="18"/>
                 <Property Name="IsAdmin" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="HideApprovalLog" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="DraftUUID" Type="Edm.Guid" Nullable="false"/>
                 <Property Name="DraftEntityCreationDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
@@ -447,6 +461,18 @@
                 <Property Name="Land1" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="Natio50" Type="Edm.String" Nullable="false" MaxLength="50"/>
             </EntityType>
+            <EntityType Name="PlateInfoType">
+                <Key>
+                    <PropertyRef Name="PlateNumber"/>
+                    <PropertyRef Name="PlateType"/>
+                </Key>
+                <Property Name="PlateNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="PlateType" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="ViolationFlag" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="ViolationCriticality" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="StickerFlag" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="StickerCriticality" Type="Edm.Byte" Nullable="false"/>
+            </EntityType>
             <EntityType Name="LocationDetailsType">
                 <Key>
                     <PropertyRef Name="UUID"/>
@@ -488,6 +514,7 @@
                 <Property Name="Valpos" Type="Edm.String" Nullable="false" MaxLength="4"/>
                 <Property Name="As4vers" Type="Edm.String" Nullable="false" MaxLength="4"/>
                 <Property Name="PlateNumDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="PlateNo" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="PlateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
             </EntityType>
             <EntityType Name="WorkflowLogType">
@@ -544,6 +571,7 @@
             <ComplexType Name="VarListOperationControl">
                 <Property Name="CopyRequest" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="Edit" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="ImmediateValidationsOnEnter" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="MaintainLocation" Type="Edm.Boolean" Nullable="false"/>
             </ComplexType>
             <ComplexType Name="ZHR_MOB_VISITOR">
@@ -619,6 +647,9 @@
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
                 <Parameter Name="ResultIsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
                 <ReturnType Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
+            </Action>
+            <Action Name="ImmediateValidationsOnEnter" IsBound="true">
+                <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
             </Action>
             <Action Name="onVisitorCreateExt" IsBound="true">
                 <Parameter Name="_it" Type="Collection(com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType)" Nullable="false"/>
@@ -696,6 +727,8 @@
                 <EntitySet Name="ManufacturerDetails" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.ManufacturerDetailsType"/>
                 <EntitySet Name="MeansofTransport" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.MeansofTransportType"/>
                 <EntitySet Name="Nationality" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.NationalityType"/>
+                <EntitySet Name="Nationalitynew" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.NationalitynewType"/>
+                <EntitySet Name="PlateInfo" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.PlateInfoType"/>
                 <EntitySet Name="PlateNum" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.PlateNumType"/>
                 <EntitySet Name="PlateTypes" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.PlateTypesType"/>
                 <EntitySet Name="RACAreaList" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.RACAreaListType"/>
@@ -786,7 +819,7 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Color"/>
             </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType/PlateNum1">
-                <Annotation Term="SAP__common.Label" String="Plate No 1"/>
+                <Annotation Term="SAP__common.Label" String="1st Letter"/>
                 <Annotation Term="SAP__common.Text" Path="PlateNum1Desc">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
@@ -808,7 +841,7 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
             </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType/PlateNum2">
-                <Annotation Term="SAP__common.Label" String="Plate No 2"/>
+                <Annotation Term="SAP__common.Label" String="2nd Letter"/>
                 <Annotation Term="SAP__common.Text" Path="PlateNum2Desc">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
@@ -830,7 +863,7 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
             </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType/PlateNum3">
-                <Annotation Term="SAP__common.Label" String="Plate No 3"/>
+                <Annotation Term="SAP__common.Label" String="3rd Letter"/>
                 <Annotation Term="SAP__common.Text" Path="PlateNum3Desc">
                     <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
@@ -862,13 +895,31 @@
                 <Annotation Term="SAP__common.Label" String="Arabic Plate Number"/>
                 <Annotation Term="SAP__core.Immutable"/>
             </Annotations>
-            <Annotations Target="SAP__self.VehicleDetailsType/StickerValid">
-                <Annotation Term="SAP__common.Label" String="Sticker Valid"/>
+            <Annotations Target="SAP__self.VehicleDetailsType/PlateNumEng">
+                <Annotation Term="SAP__common.Label" String="English Plate Number"/>
                 <Annotation Term="SAP__core.Immutable"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VehicleDetailsType/StickerValid">
+                <Annotation Term="SAP__common.Label" String="Active Sticker"/>
+                <Annotation Term="SAP__core.Immutable"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Heading" String="Sticker Flag"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Sticker Flag"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VehicleDetailsType/StickerValidCriticality">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType/ViolationExist">
                 <Annotation Term="SAP__common.Label" String="Violation Exist"/>
                 <Annotation Term="SAP__core.Immutable"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Heading" String="Violation Flag"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Violation Flag"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VehicleDetailsType/ViolationExistCriticality">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType/HasDraftEntity">
                 <Annotation Term="SAP__core.Computed"/>
@@ -1019,6 +1070,13 @@
                         <PropertyValue Property="TargetProperties">
                             <Collection>
                                 <String>ArabicPlateNum</String>
+                                <String>PlateNumEng</String>
+                                <String>StickerValid</String>
+                                <String>StickerValidCriticality</String>
+                                <String>StickerValidText</String>
+                                <String>ViolationExist</String>
+                                <String>ViolationExistCriticality</String>
+                                <String>ViolationExistText</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1033,6 +1091,13 @@
                         <PropertyValue Property="TargetProperties">
                             <Collection>
                                 <String>ArabicPlateNum</String>
+                                <String>PlateNumEng</String>
+                                <String>StickerValid</String>
+                                <String>StickerValidCriticality</String>
+                                <String>StickerValidText</String>
+                                <String>ViolationExist</String>
+                                <String>ViolationExistCriticality</String>
+                                <String>ViolationExistText</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1047,6 +1112,13 @@
                         <PropertyValue Property="TargetProperties">
                             <Collection>
                                 <String>ArabicPlateNum</String>
+                                <String>PlateNumEng</String>
+                                <String>StickerValid</String>
+                                <String>StickerValidCriticality</String>
+                                <String>StickerValidText</String>
+                                <String>ViolationExist</String>
+                                <String>ViolationExistCriticality</String>
+                                <String>ViolationExistText</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1061,6 +1133,13 @@
                         <PropertyValue Property="TargetProperties">
                             <Collection>
                                 <String>ArabicPlateNum</String>
+                                <String>PlateNumEng</String>
+                                <String>StickerValid</String>
+                                <String>StickerValidCriticality</String>
+                                <String>StickerValidText</String>
+                                <String>ViolationExist</String>
+                                <String>ViolationExistCriticality</String>
+                                <String>ViolationExistText</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1074,6 +1153,7 @@
                         </PropertyValue>
                         <PropertyValue Property="TargetProperties">
                             <Collection>
+                                <String>ArabicPlateNum</String>
                                 <String>HidePlates</String>
                                 <String>PlateNum</String>
                                 <String>PlateNum1</String>
@@ -1082,6 +1162,13 @@
                                 <String>PlateNum2Desc</String>
                                 <String>PlateNum3</String>
                                 <String>PlateNum3Desc</String>
+                                <String>PlateNumEng</String>
+                                <String>StickerValid</String>
+                                <String>StickerValidCriticality</String>
+                                <String>StickerValidText</String>
+                                <String>ViolationExist</String>
+                                <String>ViolationExistCriticality</String>
+                                <String>ViolationExistText</String>
                                 <String>SAP__Messages</String>
                             </Collection>
                         </PropertyValue>
@@ -1125,6 +1212,9 @@
                                 <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Value" Path="ArabicPlateNum"/>
                                 </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="PlateNumEng"/>
+                                </Record>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1144,12 +1234,12 @@
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Criticality" Path="StickerValidCriticality"/>
-                                    <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithIcon"/>
+                                    <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithoutIcon"/>
                                     <PropertyValue Property="Value" Path="StickerValid"/>
                                 </Record>
                                 <Record Type="SAP__UI.DataField">
                                     <PropertyValue Property="Criticality" Path="ViolationExistCriticality"/>
-                                    <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithIcon"/>
+                                    <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithoutIcon"/>
                                     <PropertyValue Property="Value" Path="ViolationExist"/>
                                 </Record>
                             </Collection>
@@ -1208,6 +1298,9 @@
                             <PropertyValue Property="Value" Path="StickerValid"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateNumEng"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="ArabicPlateNum"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
@@ -1246,12 +1339,15 @@
                     <Collection>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="ReqNum"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="VehSeqNum"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="PlateTyp"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                             <Annotation Term="SAP__HTML5.CssDefaults">
                                 <Record>
                                     <PropertyValue Property="width" String="30rem"/>
@@ -1260,6 +1356,7 @@
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="Manufacturer"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                             <Annotation Term="SAP__HTML5.CssDefaults">
                                 <Record>
                                     <PropertyValue Property="width" String="40rem"/>
@@ -1268,15 +1365,23 @@
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="Color"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateNum"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="PlateNum1"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="PlateNum2"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="PlateNum3"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                             <Annotation Term="SAP__HTML5.CssDefaults">
                                 <Record>
                                     <PropertyValue Property="width" String="5em"/>
@@ -1284,32 +1389,40 @@
                             </Annotation>
                         </Record>
                         <Record Type="SAP__UI.DataField">
-                            <PropertyValue Property="Value" Path="PlateNum"/>
-                        </Record>
-                        <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="PlateNum1Desc"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="ArabicPlateNum"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="PlateNum2Desc"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateNumEng"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="PlateNum3Desc"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Criticality" Path="StickerValidCriticality"/>
-                            <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithIcon"/>
+                            <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithoutIcon"/>
                             <PropertyValue Property="Value" Path="StickerValid"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Criticality" Path="ViolationExistCriticality"/>
-                            <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithIcon"/>
+                            <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithoutIcon"/>
                             <PropertyValue Property="Value" Path="ViolationExist"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="ManufacturerDesc"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                             <Annotation Term="SAP__HTML5.CssDefaults">
                                 <Record>
                                     <PropertyValue Property="width" String="40rem"/>
@@ -1441,7 +1554,7 @@
                 <Annotation Term="SAP__common.Heading" String="Uppr Limit"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Language-specific values for domains, upper limit"/>
             </Annotations>
-            <Annotations Target="SAP__self.ManufacturerDetailsType/ManufacturerValue">
+            <Annotations Target="SAP__self.ManufacturerDetailsType/ManufacturerValue1">
                 <Annotation Term="SAP__common.Text" Path="ManufacturerDesc"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -1455,7 +1568,8 @@
             <Annotations Target="SAP__self.Container/ManufacturerDetails">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="false"/>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -1547,6 +1661,7 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Version of the entry (not used)"/>
             </Annotations>
             <Annotations Target="SAP__self.PlateTypesType/PlateTypeValue">
+                <Annotation Term="SAP__common.Text" Path="PlateTypeDesc"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Lower Value"/>
@@ -1699,7 +1814,7 @@
             <Annotations Target="SAP__self.VisitorDetailsType/Natio">
                 <Annotation Term="SAP__common.Label" String="ID Nation"/>
                 <Annotation Term="SAP__common.Text" Path="NationalityDesc">
-                    <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextFirst"/>
+                    <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
                 </Annotation>
                 <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
@@ -1708,6 +1823,7 @@
                         <String>../../../../srvd_f4/sap/zhr_var_nation/0001;ps='srvd-zhr_var_app_srv_defn-0001';va='com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.et-zhr_c_vis_app.natio'/$metadata</String>
                     </Collection>
                 </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__common.Heading" String="C/R of Issue"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Country/Region of Issue"/>
             </Annotations>
@@ -1920,6 +2036,7 @@
                         <PropertyValue Property="TargetProperties">
                             <Collection>
                                 <String>daysinyear</String>
+                                <String>IdNum</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -2036,24 +2153,31 @@
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="SeqNum"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="IdTyp"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="IdNum"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="VisName"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="Natio"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="IdExpDate"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="Email"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="IconUrl" String="sap-icon://it-host"/>
@@ -2064,6 +2188,7 @@
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="daysinyear"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                     </Collection>
                 </Annotation>
@@ -2240,6 +2365,43 @@
                 <Annotation Term="SAP__common.Label" String="Vendor Process Types"/>
             </Annotations>
             <Annotations Target="SAP__self.Container/VendorTypes">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.NationalitynewType/Land1">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Country/Region Key"/>
+            </Annotations>
+            <Annotations Target="SAP__self.NationalitynewType">
+                <Annotation Term="SAP__common.Label" String="Nationality Full Text VH"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/Nationalitynew">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
                         <PropertyValue Property="Searchable" Bool="false"/>
@@ -2722,7 +2884,7 @@
                 <Annotation Term="SAP__common.QuickInfo" String="BP Type"/>
             </Annotations>
             <Annotations Target="SAP__self.VarListType/Lifnr">
-                <Annotation Term="SAP__common.Label" String="Vendor Number"/>
+                <Annotation Term="SAP__common.Label" String="Vendor Code"/>
                 <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/Lifnr"/>
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__common.ValueListReferences">
@@ -3009,6 +3171,9 @@
             <Annotations Target="SAP__self.CopyRequest(SAP__self.VarListType)">
                 <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/CopyRequest"/>
             </Annotations>
+            <Annotations Target="SAP__self.ImmediateValidationsOnEnter(SAP__self.VarListType)">
+                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/ImmediateValidationsOnEnter"/>
+            </Annotations>
             <Annotations Target="SAP__self.MaintainLocation(SAP__self.VarListType)">
                 <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/MaintainLocation"/>
             </Annotations>
@@ -3021,6 +3186,49 @@
                     <Collection>
                         <PropertyPath>ReqNum</PropertyPath>
                     </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Determine_Action_ImmediateValidationsOnEnter">
+                    <Record Type="SAP__common.SideEffectsType">
+                        <PropertyValue Property="TriggerAction" String="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.ImmediateValidationsOnEnter"/>
+                        <PropertyValue Property="SourceEntities">
+                            <Collection>
+                                <NavigationPropertyPath/>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="TargetProperties">
+                            <Collection>
+                                <String>SAP__Messages</String>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_AcknoDirFlag">
+                    <Record Type="SAP__common.SideEffectsType">
+                        <PropertyValue Property="SourceProperties">
+                            <Collection>
+                                <PropertyPath>AcknoDirFlag</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="TargetProperties">
+                            <Collection>
+                                <String>SAP__Messages</String>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_AcknoFlag">
+                    <Record Type="SAP__common.SideEffectsType">
+                        <PropertyValue Property="SourceProperties">
+                            <Collection>
+                                <PropertyPath>AcknoFlag</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="TargetProperties">
+                            <Collection>
+                                <String>SAP__Messages</String>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
                 </Annotation>
                 <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_Begda">
                     <Record Type="SAP__common.SideEffectsType">
@@ -3071,6 +3279,20 @@
                         <PropertyValue Property="TargetEntities">
                             <Collection>
                                 <NavigationPropertyPath>_VisitorDetails</NavigationPropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="TargetProperties">
+                            <Collection>
+                                <String>SAP__Messages</String>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_justification">
+                    <Record Type="SAP__common.SideEffectsType">
+                        <PropertyValue Property="SourceProperties">
+                            <Collection>
+                                <PropertyPath>justification</PropertyPath>
                             </Collection>
                         </PropertyValue>
                         <PropertyValue Property="TargetProperties">
@@ -3204,6 +3426,7 @@
                             <PropertyValue Property="Label" String="Approval History Details"/>
                             <PropertyValue Property="ID" String="ApproverInfo"/>
                             <PropertyValue Property="Target" AnnotationPath="_ApprovalHist/@SAP__UI.LineItem"/>
+                            <Annotation Term="SAP__UI.Hidden" Path="HideApprovalLog"/>
                         </Record>
                     </Collection>
                 </Annotation>
@@ -3413,11 +3636,6 @@
                                     <PropertyValue Property="Property" PropertyPath="ReqNum"/>
                                     <PropertyValue Property="Descending" Bool="true"/>
                                 </Record>
-                            </Collection>
-                        </PropertyValue>
-                        <PropertyValue Property="GroupBy">
-                            <Collection>
-                                <PropertyPath>Pernr</PropertyPath>
                             </Collection>
                         </PropertyValue>
                         <PropertyValue Property="Visualizations">
@@ -3767,6 +3985,7 @@
             </Annotations>
             <Annotations Target="SAP__self.NationalityType/Land1">
                 <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Country/Region Key"/>
                 <Annotation Term="SAP__common.Heading" String="C/R"/>
             </Annotations>
@@ -3774,6 +3993,62 @@
                 <Annotation Term="SAP__common.Label" String="Nationality Details"/>
             </Annotations>
             <Annotations Target="SAP__self.Container/Nationality">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateInfoType/PlateNumber">
+                <Annotation Term="SAP__common.Label" String="Vehicle Plate Number"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Heading" String="Vehicle Plate Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateInfoType/PlateType">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateInfoType/ViolationFlag">
+                <Annotation Term="SAP__common.Label" String="Violation Flag"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateInfoType/ViolationCriticality">
+                <Annotation Term="SAP__common.Label" String="Violation Criticality"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateInfoType/StickerFlag">
+                <Annotation Term="SAP__common.Label" String="Active Sticker Flag"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateInfoType/StickerCriticality">
+                <Annotation Term="SAP__common.Label" String="Sticker Criticality"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateInfoType">
+                <Annotation Term="SAP__common.Label" String="API: Plate Violation and Sticker Flags"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/PlateInfo">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
                         <PropertyValue Property="Searchable" Bool="false"/>
@@ -3947,13 +4222,16 @@
                 <Annotation Term="SAP__common.Heading" String="Vers"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Version of the entry (not used)"/>
             </Annotations>
-            <Annotations Target="SAP__self.PlateNumType/PlateNum">
-                <Annotation Term="SAP__common.Text" Path="PlateNumDesc"/>
+            <Annotations Target="SAP__self.PlateNumType/PlateNo">
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Lower Value"/>
                 <Annotation Term="SAP__common.Heading" String="Fixed"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Values for Domains: Single Value/Lower Limit"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateNumType/PlateNum">
+                <Annotation Term="SAP__common.Text" Path="PlateNumDesc"/>
+                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.PlateNumType">
                 <Annotation Term="SAP__common.Label" String="Plate Number and its Value"/>
@@ -3961,7 +4239,8 @@
             <Annotations Target="SAP__self.Container/PlateNum">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="false"/>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -4193,6 +4472,8 @@
                 <Annotation Term="SAP__core.OptimisticConcurrency">
                     <Collection/>
                 </Annotation>
+                <Annotation Term="SAP__UI.CreateHidden"/>
+                <Annotation Term="SAP__UI.DeleteHidden"/>
             </Annotations>
             <Annotations Target="SAP__self.WorkflowLogType">
                 <Annotation Term="SAP__common.Label" String="Consumption view of Approval History"/>
@@ -4287,7 +4568,7 @@
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Criticality" Path="StatsCriticality"/>
-                            <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithIcon"/>
+                            <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithoutIcon"/>
                             <PropertyValue Property="Value" Path="Statustx"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
@@ -4455,6 +4736,11 @@
                 <Annotation Term="SAP__common.Label" String="Changed On"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Local Instance Last Change Date Time"/>
             </Annotations>
+            <Annotations Target="SAP__self.VarListType/HideApprovalLog">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Truth Value"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
+            </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType/PlateTypDesc">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
@@ -4475,10 +4761,10 @@
                 <Annotation Term="SAP__common.Label" String="Truth Value"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
             </Annotations>
-            <Annotations Target="SAP__self.VehicleDetailsType/StickerValidCriticality">
+            <Annotations Target="SAP__self.VehicleDetailsType/StickerValidText">
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
-            <Annotations Target="SAP__self.VehicleDetailsType/ViolationExistCriticality">
+            <Annotations Target="SAP__self.VehicleDetailsType/ViolationExistText">
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.VisitorDetailsType/IDTYPDesc">
@@ -4514,6 +4800,14 @@
                 <Annotation Term="SAP__common.Label" String="Lang."/>
                 <Annotation Term="SAP__common.Heading" String="Ln"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Language Key"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ManufacturerDetailsType/ManufacturerValue">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.NationalityType/Spras">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Language Key"/>
+                <Annotation Term="SAP__common.Heading" String="Language"/>
             </Annotations>
             <Annotations Target="SAP__self.PlateNumType/Ddlanguage">
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -4611,6 +4905,10 @@
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
             </Annotations>
+            <Annotations Target="SAP__self.NationalitynewType/Spras">
+                <Annotation Term="SAP__common.Label" String="Language Key"/>
+                <Annotation Term="SAP__common.Heading" String="Lang."/>
+            </Annotations>
             <Annotations Target="SAP__self.RACAreaListType/RACAreaDesc">
                 <Annotation Term="SAP__common.Label" String="Short text"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Explanatory Short Text"/>
@@ -4707,6 +5005,11 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
+            <Annotations Target="SAP__self.VarListType/__OperationControl/ImmediateValidationsOnEnter">
+                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
+            </Annotations>
             <Annotations Target="SAP__self.VarListType/__OperationControl/MaintainLocation">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
@@ -4744,10 +5047,6 @@
                 <Annotation Term="SAP__common.Label" String="Nationality (Long)"/>
                 <Annotation Term="SAP__common.Heading" String="Nationality"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Nationality (Max. 50 Characters)"/>
-            </Annotations>
-            <Annotations Target="SAP__self.NationalityType/Spras">
-                <Annotation Term="SAP__common.Label" String="Language Key"/>
-                <Annotation Term="SAP__common.Heading" String="Language"/>
             </Annotations>
             <Annotations Target="SAP__self.NationalityType/Natio50">
                 <Annotation Term="SAP__common.Label" String="Nationality (Long)"/>
@@ -4837,6 +5136,11 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
             <Annotations Target="SAP__self.VarListOperationControl/Edit">
+                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VarListOperationControl/ImmediateValidationsOnEnter">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>

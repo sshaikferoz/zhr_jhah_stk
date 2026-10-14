@@ -65,6 +65,7 @@
             </EntityContainer>
             <Annotations Target="SAP__self.ZHR_VAR_NATIONType/Land1">
                 <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Country/Region Key"/>
                 <Annotation Term="SAP__common.Heading" String="C/R"/>
             </Annotations>
@@ -83,9 +84,6 @@
                                     <PropertyValue Property="LocalDataProperty" PropertyPath="NationalityDesc"/>
                                     <PropertyValue Property="ValueListProperty" String="Natio50"/>
                                 </Record>
-                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
-                                    <PropertyValue Property="ValueListProperty" String="Spras"/>
-                                </Record>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -97,7 +95,8 @@
             <Annotations Target="SAP__self.Container/ZHR_VAR_NATION">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="false"/>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -183,6 +182,7 @@
                 <Annotation Term="SAP__capabilities.AsynchronousRequestsSupported"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_VAR_NATIONType/Spras">
+                <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Language Key"/>
                 <Annotation Term="SAP__common.Heading" String="Language"/>
             </Annotations>
