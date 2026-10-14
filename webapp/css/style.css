@@ -289,33 +289,35 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
 [id$="-fu_button"] .sapMBtnInner::after {
     content: "Upload File";
 }
-[id*="VehicleSpecFacet"][id$="PlateTyp-label"]::after,
-[id*="VehicleSpecFacet"][id$="PlateNum-label"]::after,
-[id*="VehicleSpecFacet"][id$="Manufacturer-label"]::after,
-[id*="VehicleSpecFacet"][id$="Color-label"]::after,
-[id*="VehicleSpecFacet"][id$="PlateNum1-label"]::after,
-[id*="VehicleSpecFacet"][id$="PlateNum2-label"]::after,
-[id*="VehicleSpecFacet"][id$="PlateNum3-label"]::after,
+/* Mandatory asterisks: only while a request is created or edited (draftMode),
+   not in display mode */
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="PlateTyp-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="PlateNum-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="Manufacturer-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="Color-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="PlateNum1-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="PlateNum2-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="PlateNum3-label"]::after,
 
 /* Appointment Specification */
-[id*="AppointSpecFacet"][id$="AppointmentDatePicker-label"]::after,
-[id*="AppointSpecFacet"][id$="TimeSlotSelect-label"]::after,
-[id*="AppointSpecFacet"][id$="AppointmentLocation-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="AppointSpecFacet"][id$="AppointmentDatePicker-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="AppointSpecFacet"][id$="TimeSlotSelect-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="AppointSpecFacet"][id$="AppointmentLocation-label"]::after,
 
 
 /* Request Group */
-[id*="RequestGrpFacet"][id$="Location-label"]::after,
-[id*="RequestGrpFacet"][id$="StkType-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="RequestGrpFacet"][id$="Location-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="RequestGrpFacet"][id$="StkType-label"]::after,
 
 
 /* Justification, Remarks, Reason and Reject Justification labels */
-[id*="JustReasonFacet"][id$="Justification-label"]::after,
-[id*="JustReasonFacet"][id$="Remarks-label"]::after,
-[id*="JustReasonFacet"][id$="Reason-label"]::after,
-[id*="JustReasonFacet"][id$="RejectJust-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="JustReasonFacet"][id$="Justification-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="JustReasonFacet"][id$="Remarks-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="JustReasonFacet"][id$="Reason-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="JustReasonFacet"][id$="RejectJust-label"]::after,
 
 
-[id$="_Evidence::LineItem-title"]::after
+.zhrjhahsecstk-app.draftMode [id$="_Evidence::LineItem-title"]::after
 
 {
     content: " *";
