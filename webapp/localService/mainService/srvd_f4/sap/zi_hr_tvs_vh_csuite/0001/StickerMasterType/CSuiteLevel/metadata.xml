@@ -62,7 +62,6 @@
                 <EntitySet Name="ZI_HR_TVS_VH_CSUITE" EntityType="com.sap.gateway.srvd_f4.zi_hr_tvs_vh_csuite.v0001.ZI_HR_TVS_VH_CSUITEType"/>
             </EntityContainer>
             <Annotations Target="SAP__self.ZI_HR_TVS_VH_CSUITEType/CSuiteId">
-                <Annotation Term="SAP__common.Text" Path="CSuiteName"/>
                 <Annotation Term="SAP__common.IsDigitSequence"/>
                 <Annotation Term="SAP__common.Label" String="Object ID"/>
                 <Annotation Term="SAP__common.Heading" String="ObjectID"/>
@@ -105,8 +104,7 @@
             <Annotations Target="SAP__self.Container/ZI_HR_TVS_VH_CSUITE">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="true"/>
-                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
+                        <PropertyValue Property="Searchable" Bool="false"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">

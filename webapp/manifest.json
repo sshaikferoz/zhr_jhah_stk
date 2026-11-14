@@ -145,12 +145,12 @@
               "views": {
                 "paths": [
                   {
-                    "key": "EmpTabKey",
-                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#EmpTab"
-                  },
-                  {
                     "key": "AdminTabKey",
                     "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#AdminTab"
+                  },
+                  {
+                    "key": "EmpTabKey",
+                    "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#EmpTab"
                   }
                 ],
                 "showCounts": false
@@ -197,6 +197,18 @@
                     "customViolatorStrip": {
                       "type": "XMLFragment",
                       "name": "com.jhah.zhrjhahsecstk.ext.fragment.ViolatorStrip"
+                    }
+                  }
+                },
+                "body": {
+                  "sections": {
+                    "Notes": {
+                      "template": "com.jhah.zhrjhahsecstk.ext.fragment.Notes",
+                      "position": {
+                        "placement": "After",
+                        "anchor": "JustReasonFacet"
+                      },
+                      "title": "Notes"
                     }
                   }
                 }

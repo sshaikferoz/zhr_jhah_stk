@@ -66,6 +66,7 @@
                 <Property Name="As4vers" Type="Edm.String" Nullable="false" MaxLength="4"/>
                 <Property Name="PlateTypeDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="PlateTypeValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="SortOrder" Type="Edm.Byte" Nullable="false"/>
             </EntityType>
             <EntityContainer Name="Container">
                 <EntitySet Name="ZI_STK_PLATETYPE" EntityType="com.sap.gateway.srvd_f4.zi_stk_platetype.v0001.ZI_STK_PLATETYPEType"/>
@@ -108,6 +109,7 @@
                     <Record>
                         <PropertyValue Property="Label" String="Plate Type Details"/>
                         <PropertyValue Property="CollectionPath" String="ZI_STK_PLATETYPE"/>
+                        <PropertyValue Property="PresentationVariantQualifier" String="PLATE_TYPE_SORT"/>
                         <PropertyValue Property="Parameters">
                             <Collection>
                                 <Record Type="SAP__common.ValueListParameterInOut">
@@ -125,11 +127,24 @@
             </Annotations>
             <Annotations Target="SAP__self.ZI_STK_PLATETYPEType">
                 <Annotation Term="SAP__common.Label" String="Plate Type Details"/>
+                <Annotation Term="SAP__UI.PresentationVariant" Qualifier="PLATE_TYPE_SORT">
+                    <Record>
+                        <PropertyValue Property="SortOrder">
+                            <Collection>
+                                <Record Type="SAP__common.SortOrderType">
+                                    <PropertyValue Property="Property" PropertyPath="SortOrder"/>
+                                    <PropertyValue Property="Descending" Bool="false"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
             </Annotations>
             <Annotations Target="SAP__self.Container/ZI_STK_PLATETYPE">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="false"/>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -219,6 +234,9 @@
                 <Annotation Term="SAP__common.Label" String="Lang."/>
                 <Annotation Term="SAP__common.Heading" String="Ln"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Language Key"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZI_STK_PLATETYPEType/SortOrder">
+                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.ZI_STK_PLATETYPEType/PlateTypeDesc">
                 <Annotation Term="SAP__common.Label" String="Short Description"/>

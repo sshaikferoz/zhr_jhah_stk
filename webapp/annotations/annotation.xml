@@ -64,7 +64,6 @@
                 <Annotation Term="UI.DeleteHidden" Bool="true" />
             </Annotations>
 
-
             <!--
                 Issue Sticker dialog: Expire Date is only asked for when the
                 validity period is "Others" (OT) — every other period derives the
@@ -126,6 +125,10 @@
                         <Path>__FieldControl/AppointmentLocation</Path>
                     </If>
                 </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/OldStkNumber">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
+                <Annotation Term="UI.Placeholder" String="JHS-XXXX" />
             </Annotations>
         </Schema>
     </edmx:DataServices>

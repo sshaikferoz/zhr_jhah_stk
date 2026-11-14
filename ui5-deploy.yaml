@@ -21,7 +21,7 @@ builder:
           name: ZHR_JHAHSEC_STK
           description: Sticker Management System
           package: ZHR
-          transport: DHCK943978
+          transport: DHCK944868
         exclude:
           - /test/
           - /localService/

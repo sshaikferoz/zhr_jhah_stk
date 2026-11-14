@@ -41,6 +41,12 @@ sap.ui.define(
     var MAX_ACTIVE_STICKERS = 2;
     var ISSUED_CRITICALITY = 3;
 
+    // Shared config service (ZHR_I_SEC_APP_CONFIG) - placeholder, confirm the real path
+    // Config OData V4 service (ZSRV_HR_JHAHSEC_AUTH_INFO) - returns all apps' parameters
+    var CONFIG_ODATA_URL =
+      "/sap/opu/odata4/sap/zsb_jhahsec_auth_o4/srvd_a2x/sap/zsrv_hr_jhahsec_auth_info/0001/config";
+    var STK_APP_ID = "STK_APP";
+
     var GUARD_FLAG = "zhrActionGuarded";
 
     var APPOINTMENT_PROPERTIES = ["AppointmentDate", "AppointmentFromTime"];
@@ -204,6 +210,8 @@ sap.ui.define(
                 this._applyActionGuards();
                 this._applyActionGuardsWithRetry();
                 this._applyDraftModeVisibility(oBindingContext);
+                this._bindStickerEditModeClass();
+                // this._getStkParam("MAX_STICKERS");
               } catch (err) {
                 console.error("Failed to apply action guards:", err);
               }
@@ -271,6 +279,53 @@ sap.ui.define(
           var sLog = "[JHAH-EXT] " + sMessage;
           if (oData !== undefined) console.log(sLog, oData);
           else console.log(sLog);
+        },
+
+        _getStkConfig: function () {
+          if (!this._pStkConfig) {
+            var that = this;
+            this._pStkConfig = new Promise(function (resolve, reject) {
+              jQuery.ajax({
+                url: CONFIG_ODATA_URL,
+                method: "GET",
+                dataType: "json",
+                headers: { Accept: "application/json" },
+                success: function (oData) {
+                  var aRows = (oData && oData.value) || [];
+                  resolve(
+                    aRows.filter(function (oItem) {
+                      return oItem.AppId === STK_APP_ID;
+                    }),
+                  );
+                  console.log("aRows", aRows);
+                },
+                error: function (oError) {
+                  reject(oError);
+                },
+              });
+            }).catch(function (err) {
+              that._pStkConfig = null; // clear the cache so the next call retries
+              throw err;
+            });
+          }
+          return this._pStkConfig;
+        },
+
+        _getStkParam: function (sParamKey) {
+          return this._getStkConfig().then(function (aRows) {
+            var oRow = (aRows || []).find(function (oItem) {
+              return oItem.ParamKey === sParamKey;
+            });
+            console.log(oRow);
+            var iValue = oRow ? parseInt(oRow.ParamVal, 10) : NaN;
+            console.log(iValue);
+            if (isNaN(iValue)) {
+              throw new Error(
+                "STK_APP " + sParamKey + " is missing or not numeric.",
+              );
+            }
+            return iValue;
+          });
         },
 
         _applyMaintenanceActionVisibility: function () {
@@ -361,6 +416,28 @@ sap.ui.define(
               that._pGuardRetry = null;
             }
           }, 300);
+        },
+        _bindStickerEditModeClass: function () {
+          if (this._oEditBinding) {
+            return; // attach only once
+          }
+          var oView = this.base.getView();
+          var oUiModel = oView && oView.getModel("ui");
+          if (!oUiModel) {
+            return;
+          }
+          this._oEditBinding = oUiModel.bindProperty("/isEditable");
+          this._oEditBinding.attachChange(function () {
+            oView.toggleStyleClass(
+              "draftMode",
+              !!oUiModel.getProperty("/isEditable"),
+            );
+          });
+          // set initial state
+          oView.toggleStyleClass(
+            "draftMode",
+            !!oUiModel.getProperty("/isEditable"),
+          );
         },
         // ========================================================================
         // 2. ISOLATED OBJECT PAGE LOGIC (No CSS, UI5 Specific)
@@ -947,26 +1024,56 @@ sap.ui.define(
           return oBinding.getHeaderContext().requestProperty("$count");
         },
 
-        _checkActiveStickerLimit: function () {
-          return this._requestActiveStickerCount().then(
-            function (iCount) {
-              if (iCount < MAX_ACTIVE_STICKERS) {
-                return;
-              }
+        checkActiveStickerLimit: function () {
+          var that = this;
 
-              MessageBox.error(
-                VALIDATION_MESSAGES.activeStickerLimit(
-                  iCount,
-                  MAX_ACTIVE_STICKERS,
-                ),
+          return this._getStkParam("MAX_STICKERS")
+            .catch(function (err) {
+              console.error("[JHAH-EXT] Could not load MAX_STICKERS:", err);
+              MessageBox.error(VALIDATION_MESSAGES.configUnavailable);
+              throw new Error("MAX_STICKERS unavailable.");
+            })
+            .then(function (iMax) {
+              return that._requestActiveStickerCount().then(
+                function (iCount) {
+                  if (iCount < iMax) {
+                    return;
+                  }
+
+                  MessageBox.error(
+                    VALIDATION_MESSAGES.activeStickerLimit(iCount, iMax),
+                  );
+                  throw new Error("Active sticker limit reached.");
+                },
+                function (err) {
+                  console.error(
+                    "Failed to read the active sticker count:",
+                    err,
+                  );
+                },
               );
-              return Promise.reject(new Error("Active sticker limit reached."));
-            },
-            function (err) {
-              console.error("Failed to read the active sticker count:", err);
-            },
-          );
+            });
         },
+        // _checkActiveStickerLimit: function () {
+        //   return this._requestActiveStickerCount().then(
+        //     function (iCount) {
+        //       if (iCount < MAX_ACTIVE_STICKERS) {
+        //         return;
+        //       }
+
+        //       MessageBox.error(
+        //         VALIDATION_MESSAGES.activeStickerLimit(
+        //           iCount,
+        //           MAX_ACTIVE_STICKERS,
+        //         ),
+        //       );
+        //       return Promise.reject(new Error("Active sticker limit reached."));
+        //     },
+        //     function (err) {
+        //       console.error("Failed to read the active sticker count:", err);
+        //     },
+        //   );
+        // },
 
         _applyActionGuards: function () {
           this._guardActionButton("reschedulePopup", {
@@ -1358,7 +1465,6 @@ sap.ui.define(
         },
 
         _validateRenew: function (oContext) {
-          // [JHAH FIX LOG: SAFE CONTEXT EXTRACTION]
           var oCtx = Array.isArray(oContext) ? oContext[0] : oContext;
           if (!oCtx || typeof oCtx.getProperty !== "function") return null;
 
@@ -1367,23 +1473,61 @@ sap.ui.define(
             return VALIDATION_MESSAGES.renewNoExpiry;
           }
 
-          var oToday = startOfToday();
-          var iDaysLeft = Math.round(
-            (oExpire.getTime() - oToday.getTime()) / MS_PER_DAY,
-          );
+          return this._getStkParam("RENEW_DAYS").then(
+            function (iRenewDays) {
+              var oToday = startOfToday();
+              var iDaysLeft = Math.round(
+                (oExpire.getTime() - oToday.getTime()) / MS_PER_DAY,
+              );
 
-          if (iDaysLeft < 0) {
-            return VALIDATION_MESSAGES.renewAlreadyExpired(formatDate(oExpire));
-          }
-          if (iDaysLeft > RENEW_WINDOW_DAYS) {
-            return VALIDATION_MESSAGES.renewNotYetEligible(
-              formatDate(oExpire),
-              RENEW_WINDOW_DAYS,
-              formatDate(addDays(oExpire, -RENEW_WINDOW_DAYS)),
-            );
-          }
-          return null;
+              if (iDaysLeft < 0) {
+                return VALIDATION_MESSAGES.renewAlreadyExpired(
+                  formatDate(oExpire),
+                );
+              }
+              if (iDaysLeft > iRenewDays) {
+                return VALIDATION_MESSAGES.renewNotYetEligible(
+                  formatDate(oExpire),
+                  iRenewDays,
+                  formatDate(addDays(oExpire, -iRenewDays)),
+                );
+              }
+              return null;
+            },
+            function (err) {
+              console.error("[JHAH-EXT] Could not load RENEW_DAYS:", err);
+              return VALIDATION_MESSAGES.configUnavailable;
+            },
+          );
         },
+
+        // _validateRenew: function (oContext) {
+        //   // [JHAH FIX LOG: SAFE CONTEXT EXTRACTION]
+        //   var oCtx = Array.isArray(oContext) ? oContext[0] : oContext;
+        //   if (!oCtx || typeof oCtx.getProperty !== "function") return null;
+
+        //   var oExpire = toLocalDate(oCtx.getProperty("ExpireDate"));
+        //   if (!oExpire) {
+        //     return VALIDATION_MESSAGES.renewNoExpiry;
+        //   }
+
+        //   var oToday = startOfToday();
+        //   var iDaysLeft = Math.round(
+        //     (oExpire.getTime() - oToday.getTime()) / MS_PER_DAY,
+        //   );
+
+        //   if (iDaysLeft < 0) {
+        //     return VALIDATION_MESSAGES.renewAlreadyExpired(formatDate(oExpire));
+        //   }
+        //   if (iDaysLeft > RENEW_WINDOW_DAYS) {
+        //     return VALIDATION_MESSAGES.renewNotYetEligible(
+        //       formatDate(oExpire),
+        //       RENEW_WINDOW_DAYS,
+        //       formatDate(addDays(oExpire, -RENEW_WINDOW_DAYS)),
+        //     );
+        //   }
+        //   return null;
+        // },
 
         _getText: function (sKey, sFallback) {
           var oModel = this.base.getView().getModel("i18n");
