@@ -48,6 +48,23 @@
     <edmx:DataServices>
         <Schema Namespace="com.sap.gateway.srvd.zsrv_hr_stk.v0001" Alias="SAP__self">
             <Annotation Term="SAP__core.SchemaVersion" String="1.0.0"/>
+            <EntityType Name="LogDetailsType">
+                <Key>
+                    <PropertyRef Name="StkReqId"/>
+                    <PropertyRef Name="LogSeq"/>
+                </Key>
+                <Property Name="StkReqId" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="LogSeq" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="LogStep" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="ActionByUser" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="ActionByName" Type="Edm.String" Nullable="false" MaxLength="40"/>
+                <Property Name="ActionDate" Type="Edm.Date"/>
+                <Property Name="ActionTime" Type="Edm.TimeOfDay" Nullable="false"/>
+                <Property Name="LogStatus" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="LogCriticality" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Comments" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <NavigationProperty Name="_ActionByUser" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.EmployeeDetailsType"/>
+            </EntityType>
             <EntityType Name="evidenceType">
                 <Key>
                     <PropertyRef Name="AttachmentUuid"/>
@@ -123,6 +140,7 @@
                 <Property Name="As4vers" Type="Edm.String" Nullable="false" MaxLength="4"/>
                 <Property Name="PlateTypeDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="PlateTypeValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="SortOrder" Type="Edm.Byte" Nullable="false"/>
             </EntityType>
             <EntityType Name="StickerTypesType">
                 <Key>
@@ -142,6 +160,66 @@
                 <Property Name="DomvalHd" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="StickerTypeValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
             </EntityType>
+            <EntityType Name="PlateRequestsType">
+                <Key>
+                    <PropertyRef Name="requestId"/>
+                </Key>
+                <Property Name="requestId" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="plateTyp" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateTypDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="plateNum1" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum1Desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="plateNum2" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum2Desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="plateNum3" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum3Desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="plateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="plateNumEng" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="plateNumArabic" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="manufacturer" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="manufacturerDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="color" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="colorDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="requestIdStr" Type="Edm.String" Nullable="false" MaxLength="24"/>
+                <Property Name="requestDate" Type="Edm.Date"/>
+                <Property Name="requestTypeCode" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="requestTypeDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="statusCode" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="statusDesc" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="stickerNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="oldStickerNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="issueDate" Type="Edm.Date"/>
+                <Property Name="expireDate" Type="Edm.Date"/>
+                <Property Name="jhahId" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="requestorName" Type="Edm.String" Nullable="false" MaxLength="40"/>
+                <Property Name="location" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="locationDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="reason" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="justification" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="remarks" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="createdBy" Type="Edm.String" Nullable="false" MaxLength="12"/>
+            </EntityType>
+            <EntityType Name="StickerRequestsType">
+                <Key>
+                    <PropertyRef Name="plateTyp"/>
+                    <PropertyRef Name="plateNum1"/>
+                    <PropertyRef Name="plateNum2"/>
+                    <PropertyRef Name="plateNum3"/>
+                    <PropertyRef Name="plateNum"/>
+                </Key>
+                <Property Name="plateTyp" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum1" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum2" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum3" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="requestNumber" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="validtill" Type="Edm.Date"/>
+                <Property Name="stickerNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="manufacturer" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="color" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="statuscode" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="statusdesc" Type="Edm.String" Nullable="false" MaxLength="7"/>
+            </EntityType>
             <EntityType Name="ManufacturerDetailsType">
                 <Key>
                     <PropertyRef Name="Domname"/>
@@ -160,6 +238,35 @@
                 <Property Name="DomvalHd" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="ManufacturerVal" Type="Edm.String" Nullable="false" MaxLength="10"/>
                 <Property Name="ManufacturerValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
+            </EntityType>
+            <EntityType Name="StickerVehiclesType">
+                <Key>
+                    <PropertyRef Name="plateTyp"/>
+                    <PropertyRef Name="plateNum1"/>
+                    <PropertyRef Name="plateNum2"/>
+                    <PropertyRef Name="plateNum3"/>
+                    <PropertyRef Name="plateNum"/>
+                </Key>
+                <Property Name="plateTyp" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum1" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum2" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum3" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="plateTypecode" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateTypedesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="plateNumber" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="letter1code" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="letter1desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="letter2code" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="letter2desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="letter3code" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="letter3desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="manufacturecode" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="manufacturedesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="colorcode" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="colordesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="arabicplatenumber" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="englishplatenumber" Type="Edm.String" Nullable="false" MaxLength="20"/>
             </EntityType>
             <EntityType Name="RemoveListType">
                 <Key>
@@ -346,6 +453,12 @@
                 <Property Name="RenewedBy" Type="Edm.String" Nullable="false" MaxLength="50"/>
                 <Property Name="RemovedBy" Type="Edm.String" Nullable="false" MaxLength="50"/>
                 <Property Name="CreationMode" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="EnableManageSticker" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="EnableRenewButton" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="EnableCancelSticker" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="MobileStatusDesc" Type="Edm.String" Nullable="false" MaxLength="7"/>
+                <Property Name="HideCurrentStatus" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="CreatedByAdmin" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="DraftUUID" Type="Edm.Guid" Nullable="false"/>
                 <Property Name="DraftEntityCreationDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
@@ -363,6 +476,7 @@
                     <OnDelete Action="Cascade"/>
                 </NavigationProperty>
                 <NavigationProperty Name="_PastViolation" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.PastVioHistoryType)"/>
+                <NavigationProperty Name="_ReqLog" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.LogDetailsType)"/>
             </EntityType>
             <EntityType Name="StickerStatusType">
                 <Key>
@@ -424,6 +538,31 @@
                 <Property Name="StickerRequest" Type="Edm.String" Nullable="false" MaxLength="12"/>
                 <Property Name="FormatTime" Type="Edm.TimeOfDay" Nullable="false"/>
             </EntityType>
+            <EntityType Name="StickerListType">
+                <Key>
+                    <PropertyRef Name="plateTyp"/>
+                    <PropertyRef Name="plateNum1"/>
+                    <PropertyRef Name="plateNum2"/>
+                    <PropertyRef Name="plateNum3"/>
+                    <PropertyRef Name="plateNum"/>
+                </Key>
+                <Property Name="plateTyp" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum1" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum2" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum3" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="plateType" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateFormatted" Type="Edm.String" Nullable="false" MaxLength="13"/>
+                <Property Name="jhahId" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="Manufacturer" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="Color" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="englishplatenumber" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="arabicplatenumber" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="expiredate" Type="Edm.Date"/>
+                <Property Name="AllowStickerCreate" Type="Edm.Boolean" Nullable="false"/>
+                <NavigationProperty Name="_requestHistory" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.PlateRequestsType)"/>
+                <NavigationProperty Name="_vehicleDetails" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerVehiclesType)"/>
+            </EntityType>
             <EntityType Name="RenewListType">
                 <Key>
                     <PropertyRef Name="Pernr"/>
@@ -436,6 +575,45 @@
                 <Property Name="ExpireDate" Type="Edm.Date"/>
                 <Property Name="Status" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="DaystoExpire" Type="Edm.Int32" Nullable="false"/>
+            </EntityType>
+            <EntityType Name="ValidPlatesType">
+                <Key>
+                    <PropertyRef Name="plateTyp"/>
+                    <PropertyRef Name="plateNum1"/>
+                    <PropertyRef Name="plateNum2"/>
+                    <PropertyRef Name="plateNum3"/>
+                    <PropertyRef Name="plateNum"/>
+                </Key>
+                <Property Name="plateTyp" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum1" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum2" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum3" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="plateTypDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="plateNum1Desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="plateNum2Desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="plateNum3Desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="color" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="colorDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="manufacturer" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="manufacturerDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="plateNumberEng" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="plateNumberArabic" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="status" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="validTill" Type="Edm.Date"/>
+                <Property Name="ReturnType" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="ReturnMsg" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="requestCount" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="latestRequestId" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="latestRequestType" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="requestTypeDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="jhahId" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="requestorName" Type="Edm.String" Nullable="false" MaxLength="40"/>
+                <Property Name="location" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="locationDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="latestStickerNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <NavigationProperty Name="_RequestHistory" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.PlateRequestsType)"/>
+                <NavigationProperty Name="_vehicleDetails" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.PlateVehiclesType" Nullable="false"/>
             </EntityType>
             <EntityType Name="StickerKPIType">
                 <Key>
@@ -489,6 +667,34 @@
                 <Property Name="BusinessMobile" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="CellPhone" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="Phone" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="ExpiryDate" Type="Edm.Date"/>
+                <Property Name="JobTypeKey" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="JobRoleType" Type="Edm.String" Nullable="false" MaxLength="50"/>
+                <Property Name="JobRoleTypeAR" Type="Edm.String" Nullable="false" MaxLength="50"/>
+                <Property Name="PhotoContent" Type="Edm.Binary" Nullable="false"/>
+                <Property Name="PhotoMimeType" Type="Edm.String" Nullable="false" MaxLength="128"/>
+                <Property Name="QRval" Type="Edm.String" Nullable="false" MaxLength="265"/>
+                <Property Name="timestamp" Type="Edm.Decimal" Nullable="false" Precision="15"/>
+            </EntityType>
+            <EntityType Name="PlateVehiclesType">
+                <Key>
+                    <PropertyRef Name="plateTyp"/>
+                    <PropertyRef Name="plateNum1"/>
+                    <PropertyRef Name="plateNum2"/>
+                    <PropertyRef Name="plateNum3"/>
+                    <PropertyRef Name="plateNum"/>
+                </Key>
+                <Property Name="plateTyp" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum1" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum2" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum3" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="plateTypeCode" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="plateTypeDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="manufactureCode" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="manufactureDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="colorCode" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="colorDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
             </EntityType>
             <ComplexType Name="StickerMasterControl">
                 <Property Name="AppointmentDate" Type="Edm.Byte" Nullable="false"/>
@@ -500,6 +706,7 @@
                 <Property Name="Justification" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="Location" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="Manufacturer" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="OldStkNumber" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="PlateNum" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="PlateNum1" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="PlateNum2" Type="Edm.Byte" Nullable="false"/>
@@ -517,15 +724,11 @@
                 <Property Name="Edit" Type="Edm.Boolean" Nullable="false"/>
             </ComplexType>
             <ComplexType Name="StickerMasterOperationControl">
-                <Property Name="Approve" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="CancelRequest" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="CopySticker" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="Edit" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="IssueSticker" Type="Edm.Boolean" Nullable="false"/>
-                <Property Name="NoShow" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="Reject" Type="Edm.Boolean" Nullable="false"/>
-                <Property Name="RemoveSticker" Type="Edm.Boolean" Nullable="false"/>
-                <Property Name="RenewSticker" Type="Edm.Boolean" Nullable="false"/>
             </ComplexType>
             <ComplexType Name="ZHR_STK_HDR_DET">
                 <Property Name="stkreqid" Type="Edm.String" Nullable="false" MaxLength="12"/>
@@ -571,6 +774,38 @@
                 <Property Name="Deletable" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="Updatable" Type="Edm.Boolean" Nullable="false"/>
             </ComplexType>
+            <ComplexType Name="ZA_HR_STK_QR_SCAN_RESULT">
+                <Property Name="ArabicName" Type="Edm.String" Nullable="false" MaxLength="80"/>
+                <Property Name="ArabicPlateNum" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Color" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="ColorDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="ExpireDate" Type="Edm.Date"/>
+                <Property Name="JhahId" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="Location" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="LocationDesc" Type="Edm.String" Nullable="false" MaxLength="80"/>
+                <Property Name="Manufacturer" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="ManufacturerDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Name" Type="Edm.String" Nullable="false" MaxLength="80"/>
+                <Property Name="OrgText" Type="Edm.String" Nullable="false" MaxLength="80"/>
+                <Property Name="PlateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="PlateNum1" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="PlateNum2" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="PlateNum3" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="PlateNumEng" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="PlateTyp" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="PlateTypDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="PositionText" Type="Edm.String" Nullable="false" MaxLength="80"/>
+                <Property Name="RequestDate" Type="Edm.Date"/>
+                <Property Name="ReturnMsg" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="ReturnType" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Status" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="StatusCode" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="StickerNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
+                <Property Name="StkReqId" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="StkReqIdStr" Type="Edm.String" Nullable="false" MaxLength="25"/>
+                <Property Name="StkType" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="StkTypeDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+            </ComplexType>
             <ComplexType Name="SAP__Message">
                 <Property Name="code" Type="Edm.String" Nullable="false"/>
                 <Property Name="message" Type="Edm.String" Nullable="false"/>
@@ -580,26 +815,6 @@
                 <Property Name="numericSeverity" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="longtextUrl" Type="Edm.String"/>
             </ComplexType>
-            <Action Name="Remove" EntitySetPath="_it" IsBound="true">
-                <Parameter Name="_it" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)" Nullable="false"/>
-                <Parameter Name="ResultIsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
-                <Parameter Name="StickerNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
-                <Parameter Name="PlateNum" Type="Edm.String" Nullable="false"/>
-                <Parameter Name="StkReqId" Type="Edm.String" Nullable="false" MaxLength="8"/>
-                <Parameter Name="Location" Type="Edm.String" Nullable="false" MaxLength="4"/>
-                <Parameter Name="Reason" Type="Edm.String" Nullable="false" MaxLength="255"/>
-                <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
-            </Action>
-            <Action Name="RenewSticker" EntitySetPath="_it" IsBound="true">
-                <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
-                <Parameter Name="stkreqid" Type="Edm.String" Nullable="false" MaxLength="12"/>
-                <Parameter Name="appointmentdate" Type="Edm.Date" Nullable="true"/>
-                <Parameter Name="appointmentfromtime" Type="Edm.TimeOfDay" Nullable="false"/>
-                <Parameter Name="appointmenttotime" Type="Edm.TimeOfDay" Nullable="false"/>
-                <Parameter Name="appointmentlocation" Type="Edm.String" Nullable="false" MaxLength="4"/>
-                <Parameter Name="slotid" Type="Edm.String" Nullable="false" MaxLength="15"/>
-                <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="true"/>
-            </Action>
             <Action Name="onStickerCreateExt" IsBound="true">
                 <Parameter Name="_it" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)" Nullable="false"/>
                 <Parameter Name="stkreqid" Type="Edm.String" Nullable="false" MaxLength="12"/>
@@ -636,16 +851,6 @@
             <Action Name="Resume" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
             </Action>
-            <Action Name="Renew" EntitySetPath="_it" IsBound="true">
-                <Parameter Name="_it" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)" Nullable="false"/>
-                <Parameter Name="ResultIsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
-                <Parameter Name="StickerNumber" Type="Edm.String" Nullable="false" MaxLength="15"/>
-                <Parameter Name="PlateNum" Type="Edm.String" Nullable="false"/>
-                <Parameter Name="StkReqId" Type="Edm.String" Nullable="false" MaxLength="8"/>
-                <Parameter Name="Location" Type="Edm.String" Nullable="false" MaxLength="4"/>
-                <Parameter Name="Reason" Type="Edm.String" Nullable="false" MaxLength="255"/>
-                <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
-            </Action>
             <Action Name="CreateSelfStkReq" EntitySetPath="_it" IsBound="true">
                 <Parameter Name="_it" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)" Nullable="false"/>
                 <Parameter Name="ResultIsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
@@ -663,16 +868,6 @@
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
                 <Parameter Name="ResultIsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
                 <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
-            </Action>
-            <Action Name="RemoveSticker" EntitySetPath="_it" IsBound="true">
-                <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
-                <Parameter Name="stkreqid" Type="Edm.String" Nullable="false" MaxLength="12"/>
-                <Parameter Name="appointmentdate" Type="Edm.Date" Nullable="true"/>
-                <Parameter Name="appointmentfromtime" Type="Edm.TimeOfDay" Nullable="false"/>
-                <Parameter Name="appointmenttotime" Type="Edm.TimeOfDay" Nullable="false"/>
-                <Parameter Name="appointmentlocation" Type="Edm.String" Nullable="false" MaxLength="4"/>
-                <Parameter Name="slotid" Type="Edm.String" Nullable="false" MaxLength="15"/>
-                <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="true"/>
             </Action>
             <Action Name="IssueSticker" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
@@ -692,10 +887,6 @@
             <Action Name="Prepare" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.MaintLocationType" Nullable="false"/>
             </Action>
-            <Action Name="NoShow" IsBound="true">
-                <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
-                <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ZHR_STK_RETURN_PRM" Nullable="true"/>
-            </Action>
             <Action Name="Edit" EntitySetPath="_it" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
                 <Parameter Name="PreserveChanges" Type="Edm.Boolean" Nullable="false"/>
@@ -710,25 +901,26 @@
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.MaintLocationType" Nullable="false"/>
                 <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.MaintLocationType" Nullable="false"/>
             </Action>
-            <Action Name="Approve" IsBound="true">
-                <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
-                <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ZHR_STK_RETURN_PRM" Nullable="true"/>
-            </Action>
             <Action Name="Resume" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.MaintLocationType" Nullable="false"/>
             </Action>
             <Action Name="Discard" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.MaintLocationType" Nullable="false"/>
             </Action>
-            <Action Name="ScanQRCode" EntitySetPath="_it" IsBound="true">
+            <Action Name="ScanQRCode" IsBound="true">
                 <Parameter Name="_it" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)" Nullable="false"/>
                 <Parameter Name="QrToken" Type="Edm.String" Nullable="false"/>
-                <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
+                <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ZA_HR_STK_QR_SCAN_RESULT" Nullable="false"/>
             </Action>
             <Action Name="Reject" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
                 <Parameter Name="Justification" Type="Edm.String" Nullable="false" MaxLength="255"/>
                 <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ZHR_STK_RETURN_PRM" Nullable="true"/>
+            </Action>
+            <Action Name="AdminCreate" EntitySetPath="_it" IsBound="true">
+                <Parameter Name="_it" Type="Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)" Nullable="false"/>
+                <Parameter Name="ResultIsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
+                <ReturnType Type="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType" Nullable="false"/>
             </Action>
             <EntityContainer Name="Container">
                 <EntitySet Name="Activesticker" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ActivestickerType"/>
@@ -742,6 +934,9 @@
                 </EntitySet>
                 <EntitySet Name="IssueLocation" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.IssueLocationType"/>
                 <EntitySet Name="I_DraftAdministrativeData" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.I_DraftAdministrativeDataType"/>
+                <EntitySet Name="LogDetails" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.LogDetailsType">
+                    <NavigationPropertyBinding Path="_ActionByUser" Target="EmployeeDetails"/>
+                </EntitySet>
                 <EntitySet Name="MaintLocation" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.MaintLocationType">
                     <NavigationPropertyBinding Path="DraftAdministrativeData" Target="I_DraftAdministrativeData"/>
                     <NavigationPropertyBinding Path="SiblingEntity" Target="MaintLocation"/>
@@ -749,24 +944,144 @@
                 <EntitySet Name="ManufacturerDetails" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ManufacturerDetailsType"/>
                 <EntitySet Name="PastVioHistory" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.PastVioHistoryType"/>
                 <EntitySet Name="PlateNum" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.PlateNumType"/>
+                <EntitySet Name="PlateRequests" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.PlateRequestsType"/>
                 <EntitySet Name="PlateTypes" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.PlateTypesType"/>
+                <EntitySet Name="PlateVehicles" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.PlateVehiclesType"/>
                 <EntitySet Name="RemoveList" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.RemoveListType"/>
                 <EntitySet Name="RenewList" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.RenewListType"/>
                 <EntitySet Name="StickerKPI" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerKPIParameters">
                     <NavigationPropertyBinding Path="Set/Parameters" Target="StickerKPI"/>
+                </EntitySet>
+                <EntitySet Name="StickerList" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerListType">
+                    <NavigationPropertyBinding Path="_requestHistory" Target="PlateRequests"/>
+                    <NavigationPropertyBinding Path="_vehicleDetails" Target="StickerVehicles"/>
                 </EntitySet>
                 <EntitySet Name="StickerMaster" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType">
                     <NavigationPropertyBinding Path="DraftAdministrativeData" Target="I_DraftAdministrativeData"/>
                     <NavigationPropertyBinding Path="SiblingEntity" Target="StickerMaster"/>
                     <NavigationPropertyBinding Path="_Evidence" Target="evidence"/>
                     <NavigationPropertyBinding Path="_PastViolation" Target="PastVioHistory"/>
+                    <NavigationPropertyBinding Path="_ReqLog" Target="LogDetails"/>
                 </EntitySet>
+                <EntitySet Name="StickerRequests" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerRequestsType"/>
                 <EntitySet Name="StickerStatus" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerStatusType"/>
                 <EntitySet Name="StickerTypes" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerTypesType"/>
+                <EntitySet Name="StickerVehicles" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerVehiclesType"/>
                 <EntitySet Name="ValidityValueHelp" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ValidityValueHelpType"/>
+                <EntitySet Name="ValidPlates" EntityType="com.sap.gateway.srvd.zsrv_hr_stk.v0001.ValidPlatesType">
+                    <NavigationPropertyBinding Path="_RequestHistory" Target="PlateRequests"/>
+                    <NavigationPropertyBinding Path="_vehicleDetails" Target="PlateVehicles"/>
+                </EntitySet>
             </EntityContainer>
             <Annotations Target="SAP__self.ZHR_STK_HDR_DET/action">
                 <Annotation Term="SAP__common.Label" String="Action"/>
+            </Annotations>
+            <Annotations Target="SAP__self.LogDetailsType/LogSeq">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+            </Annotations>
+            <Annotations Target="SAP__self.LogDetailsType/LogStep">
+                <Annotation Term="SAP__common.Label" String="Step"/>
+            </Annotations>
+            <Annotations Target="SAP__self.LogDetailsType/ActionByName">
+                <Annotation Term="SAP__common.Label" String="Action By"/>
+                <Annotation Term="SAP__common.Heading" String="Name of employee or applicant"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Formatted Name of Employee or Applicant"/>
+            </Annotations>
+            <Annotations Target="SAP__self.LogDetailsType/ActionDate">
+                <Annotation Term="SAP__common.Label" String="Action Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.LogDetailsType/ActionTime">
+                <Annotation Term="SAP__common.Label" String="Action Time"/>
+            </Annotations>
+            <Annotations Target="SAP__self.LogDetailsType/LogStatus">
+                <Annotation Term="SAP__common.Label" String="Status"/>
+            </Annotations>
+            <Annotations Target="SAP__self.LogDetailsType/Comments">
+                <Annotation Term="SAP__common.Label" String="Comments"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/LogDetails">
+                <Annotation Term="SAP__capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_ActionByUser"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.LogDetailsType">
+                <Annotation Term="SAP__common.Label" String="Log History for the Sticker Request"/>
+                <Annotation Term="SAP__UI.LineItem">
+                    <Collection>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Step"/>
+                            <PropertyValue Property="Value" Path="LogStep"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Action By"/>
+                            <PropertyValue Property="Value" Path="ActionByName"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Action Date"/>
+                            <PropertyValue Property="Value" Path="ActionDate"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Action Time"/>
+                            <PropertyValue Property="Value" Path="ActionTime"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/Medium"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Status"/>
+                            <PropertyValue Property="Criticality" Path="LogCriticality"/>
+                            <PropertyValue Property="Value" Path="LogStatus"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Comments"/>
+                            <PropertyValue Property="Value" Path="Comments"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/Medium"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
             </Annotations>
             <Annotations Target="SAP__self.evidenceType/AttachmentUuid">
                 <Annotation Term="SAP__core.Computed"/>
@@ -1205,11 +1520,24 @@
             </Annotations>
             <Annotations Target="SAP__self.PlateTypesType">
                 <Annotation Term="SAP__common.Label" String="Plate Type Details"/>
+                <Annotation Term="SAP__UI.PresentationVariant" Qualifier="PLATE_TYPE_SORT">
+                    <Record>
+                        <PropertyValue Property="SortOrder">
+                            <Collection>
+                                <Record Type="SAP__common.SortOrderType">
+                                    <PropertyValue Property="Property" PropertyPath="SortOrder"/>
+                                    <PropertyValue Property="Descending" Bool="false"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
             </Annotations>
             <Annotations Target="SAP__self.Container/PlateTypes">
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="false"/>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -1317,6 +1645,126 @@
                     <Collection/>
                 </Annotation>
             </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/plateTyp">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/plateNum">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="License Plate Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/manufacturer">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Manufacturer"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/color">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Color"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/statusCode">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Request Status"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/jhahId">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Personnel Number"/>
+                <Annotation Term="SAP__common.Heading" String="Pers.No."/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/location">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Visitor Location"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/createdBy">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Created By"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Created By User"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType">
+                <Annotation Term="SAP__common.Label" String="Plate request history"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/PlateRequests">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerRequestsType/plateTyp">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerRequestsType/plateNum">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="License Plate Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerRequestsType/manufacturer">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Manufacturer"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerRequestsType/color">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Color"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerRequestsType">
+                <Annotation Term="SAP__common.Label" String="StickerList request details"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/StickerRequests">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
             <Annotations Target="SAP__self.ManufacturerDetailsType/Domname">
                 <Annotation Term="SAP__common.IsUpperCase"/>
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -1372,6 +1820,67 @@
                     <Record>
                         <PropertyValue Property="Searchable" Bool="true"/>
                         <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/plateTyp">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/plateNum">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="License Plate Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/plateTypecode">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/plateNumber">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="License Plate Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/manufacturecode">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Manufacturer"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/colorcode">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Color"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType">
+                <Annotation Term="SAP__common.Label" String="StickerList vehicle details"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/StickerVehicles">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -2084,17 +2593,17 @@
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/StkReqIdStr">
-                <Annotation Term="SAP__common.Label" String="SMS Request No."/>
+                <Annotation Term="SAP__common.Label" String="Request Number"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Unique Request No. for the sticker management system"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/StickerNumber">
-                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
+                <Annotation Term="SAP__common.Label" String="Issued Sticker Number"/>
                 <Annotation Term="SAP__common.Heading" String="Sticker Number"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Number"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/OldStkNumber">
                 <Annotation Term="SAP__common.Label" String="Current Issued Sticker Number"/>
-                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/OldStkNumber"/>
                 <Annotation Term="SAP__common.Heading" String="Sticker Number"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Number"/>
             </Annotations>
@@ -2129,7 +2638,6 @@
                         <String>../../../../srvd_f4/sap/zhr_i_employee_details/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.et-zc_hr_stk_mstr.jhahid'/$metadata</String>
                     </Collection>
                 </Annotation>
-                <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Heading" String="Pers.No."/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/UserId">
@@ -2265,6 +2773,7 @@
                     </Collection>
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Type"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/Manufacturer">
@@ -2311,6 +2820,7 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__UI.Hidden" Path="HidePlates"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Letter"/>
                 <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/PlateNum2">
@@ -2327,6 +2837,7 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__UI.Hidden" Path="HidePlates"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Letter"/>
                 <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/PlateNum3">
@@ -2343,6 +2854,7 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__UI.Hidden" Path="HidePlates"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Letter"/>
                 <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/PlateNum">
@@ -2474,6 +2986,12 @@
                 <Annotation Term="SAP__common.Heading" String="Sticker Creation Mode"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Creation Mode"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/CreatedByAdmin">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Truth Value"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/HasDraftEntity">
                 <Annotation Term="SAP__core.Computed"/>
                 <Annotation Term="SAP__UI.HiddenFilter"/>
@@ -2558,6 +3076,14 @@
                                         </Record>
                                     </PropertyValue>
                                 </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_ReqLog"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -2566,10 +3092,9 @@
                     <Record>
                         <PropertyValue Property="AdditionalNewActions">
                             <Collection>
-                                <String>com.sap.gateway.srvd.zsrv_hr_stk.v0001.Remove</String>
-                                <String>com.sap.gateway.srvd.zsrv_hr_stk.v0001.Renew</String>
                                 <String>com.sap.gateway.srvd.zsrv_hr_stk.v0001.CreateSelfStkReq</String>
                                 <String>com.sap.gateway.srvd.zsrv_hr_stk.v0001.CopySticker</String>
+                                <String>com.sap.gateway.srvd.zsrv_hr_stk.v0001.AdminCreate</String>
                             </Collection>
                         </PropertyValue>
                         <PropertyValue Property="ActivationAction" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.Activate"/>
@@ -2580,8 +3105,7 @@
                 </Annotation>
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
                     <Record>
-                        <PropertyValue Property="Searchable" Bool="true"/>
-                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
+                        <PropertyValue Property="Searchable" Bool="false"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.FilterRestrictions">
@@ -2660,119 +3184,8 @@
                 <Annotation Term="SAP__UI.CreateHidden"/>
                 <Annotation Term="SAP__UI.DeleteHidden"/>
             </Annotations>
-            <Annotations Target="SAP__self.Remove(Collection(SAP__self.StickerMasterType))/StickerNumber">
-                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
-                <Annotation Term="SAP__common.ValueListReferences">
-                    <Collection>
-                        <String>../../../../srvd_f4/sap/zi_hr_stk_remove_vh/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.remove.stickernumber.StickerMasterType.X'/$metadata</String>
-                    </Collection>
-                </Annotation>
-                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
-                <Annotation Term="SAP__common.Heading" String="Sticker Number"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Sticker Number"/>
-            </Annotations>
-            <Annotations Target="SAP__self.Remove(Collection(SAP__self.StickerMasterType))/PlateNum">
-                <Annotation Term="SAP__common.Label" String="Plate Number"/>
-            </Annotations>
-            <Annotations Target="SAP__self.Remove(Collection(SAP__self.StickerMasterType))/Location">
-                <Annotation Term="SAP__common.Label" String="Sticker Processing Location"/>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
-                <Annotation Term="SAP__common.ValueListReferences">
-                    <Collection>
-                        <String>../../../../srvd_f4/sap/zhr_stk_location_vh/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.remove.location.StickerMasterType.X'/$metadata</String>
-                    </Collection>
-                </Annotation>
-                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
-            </Annotations>
-            <Annotations Target="SAP__self.Remove(Collection(SAP__self.StickerMasterType))/Reason">
-                <Annotation Term="SAP__common.Label" String="Reason"/>
-                <Annotation Term="SAP__UI.MultiLineText"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/appointmentdate">
-                <Annotation Term="SAP__common.Label" String="Appointment Date"/>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
-                <Annotation Term="SAP__common.ValueListReferences">
-                    <Collection>
-                        <String>../../../../srvd_f4/sap/zi_hr_stk_appointment_slots/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.renewsticker.appointmentdate.StickerMasterType'/$metadata</String>
-                    </Collection>
-                </Annotation>
-            </Annotations>
-            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/appointmentfromtime">
-                <Annotation Term="SAP__common.Label" String="Appointment From Time"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/appointmenttotime">
-                <Annotation Term="SAP__common.Label" String="Appointment To Time"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/appointmentlocation">
-                <Annotation Term="SAP__common.Label" String="Appointment Location"/>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
-                <Annotation Term="SAP__common.ValueListReferences">
-                    <Collection>
-                        <String>../../../../srvd_f4/sap/zhr_stk_location_vh/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.renewsticker.appointmentlocation.StickerMasterType'/$metadata</String>
-                    </Collection>
-                </Annotation>
-                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/slotid">
-                <Annotation Term="SAP__common.Label" String="Slot ID"/>
-                <Annotation Term="SAP__UI.Hidden"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)">
-                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/RenewSticker"/>
-                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Action_RenewSticker">
-                    <Record Type="SAP__common.SideEffectsType">
-                        <PropertyValue Property="TargetEntities">
-                            <Collection>
-                                <NavigationPropertyPath/>
-                            </Collection>
-                        </PropertyValue>
-                        <PropertyValue Property="TargetProperties">
-                            <Collection>
-                                <String>_it/AppointmentDate</String>
-                                <String>_it/AppointmentFromTime</String>
-                                <String>_it/AppointmentLocation</String>
-                                <String>_it/AppointmentToTime</String>
-                                <String>_it/__FieldControl/AppointmentDate</String>
-                                <String>_it/__FieldControl/AppointmentFromTime</String>
-                                <String>_it/__FieldControl/AppointmentLocation</String>
-                                <String>_it/__FieldControl/AppointmentToTime</String>
-                            </Collection>
-                        </PropertyValue>
-                    </Record>
-                </Annotation>
-            </Annotations>
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/action">
                 <Annotation Term="SAP__common.Label" String="Action"/>
-            </Annotations>
-            <Annotations Target="SAP__self.Renew(Collection(SAP__self.StickerMasterType))/StickerNumber">
-                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
-                <Annotation Term="SAP__common.ValueListReferences">
-                    <Collection>
-                        <String>../../../../srvd_f4/sap/zi_hr_stk_renew_vh/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.renew.stickernumber.StickerMasterType.X'/$metadata</String>
-                    </Collection>
-                </Annotation>
-                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
-                <Annotation Term="SAP__common.Heading" String="Sticker Number"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Sticker Number"/>
-            </Annotations>
-            <Annotations Target="SAP__self.Renew(Collection(SAP__self.StickerMasterType))/PlateNum">
-                <Annotation Term="SAP__common.Label" String="Plate Number"/>
-            </Annotations>
-            <Annotations Target="SAP__self.Renew(Collection(SAP__self.StickerMasterType))/Location">
-                <Annotation Term="SAP__common.Label" String="Sticker Processing Location"/>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
-                <Annotation Term="SAP__common.ValueListReferences">
-                    <Collection>
-                        <String>../../../../srvd_f4/sap/zhr_stk_location_vh/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.renew.location.StickerMasterType.X'/$metadata</String>
-                    </Collection>
-                </Annotation>
-                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
-            </Annotations>
-            <Annotations Target="SAP__self.Renew(Collection(SAP__self.StickerMasterType))/Reason">
-                <Annotation Term="SAP__common.Label" String="Reason"/>
-                <Annotation Term="SAP__UI.MultiLineText"/>
             </Annotations>
             <Annotations Target="SAP__self.CancelRequest(SAP__self.StickerMasterType)">
                 <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/CancelRequest"/>
@@ -2788,47 +3201,6 @@
             </Annotations>
             <Annotations Target="SAP__self.CopySticker(SAP__self.StickerMasterType)">
                 <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/CopySticker"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/appointmentdate">
-                <Annotation Term="SAP__common.Label" String="Appointment Date"/>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
-                <Annotation Term="SAP__common.ValueListReferences">
-                    <Collection>
-                        <String>../../../../srvd_f4/sap/zi_hr_stk_appointment_slots/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.removesticker.appointmentdate.StickerMasterType'/$metadata</String>
-                    </Collection>
-                </Annotation>
-            </Annotations>
-            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/appointmentfromtime">
-                <Annotation Term="SAP__common.Label" String="Appointment From Time"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/appointmenttotime">
-                <Annotation Term="SAP__common.Label" String="Appointment To Time"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/appointmentlocation">
-                <Annotation Term="SAP__common.Label" String="Appointment Location"/>
-                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
-                <Annotation Term="SAP__common.ValueListReferences">
-                    <Collection>
-                        <String>../../../../srvd_f4/sap/zhr_stk_location_vh/0001;ps='srvd-zsrv_hr_stk-0001';va='com.sap.gateway.srvd.zsrv_hr_stk.v0001.ae-zc_hr_stk_mstr.removesticker.appointmentlocation.StickerMasterType'/$metadata</String>
-                    </Collection>
-                </Annotation>
-                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/slotid">
-                <Annotation Term="SAP__common.Label" String="Slot ID"/>
-                <Annotation Term="SAP__UI.Hidden"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)">
-                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/RemoveSticker"/>
-                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Action_RemoveSticker">
-                    <Record Type="SAP__common.SideEffectsType">
-                        <PropertyValue Property="TargetEntities">
-                            <Collection>
-                                <NavigationPropertyPath/>
-                            </Collection>
-                        </PropertyValue>
-                    </Record>
-                </Annotation>
             </Annotations>
             <Annotations Target="SAP__self.IssueSticker(SAP__self.StickerMasterType)/ValidityPeriod">
                 <Annotation Term="SAP__common.Label" String="Validity Period"/>
@@ -2864,19 +3236,6 @@
                                 <String>_it/StatsCriticality</String>
                                 <String>_it/Status</String>
                                 <String>_it/StickerNumber</String>
-                                <String>_it/__OperationControl/RemoveSticker</String>
-                            </Collection>
-                        </PropertyValue>
-                    </Record>
-                </Annotation>
-            </Annotations>
-            <Annotations Target="SAP__self.NoShow(SAP__self.StickerMasterType)">
-                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/NoShow"/>
-                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Action_NoShow">
-                    <Record Type="SAP__common.SideEffectsType">
-                        <PropertyValue Property="TargetEntities">
-                            <Collection>
-                                <NavigationPropertyPath/>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -2884,25 +3243,6 @@
             </Annotations>
             <Annotations Target="SAP__self.Edit(SAP__self.StickerMasterType)">
                 <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/Edit"/>
-            </Annotations>
-            <Annotations Target="SAP__self.Approve(SAP__self.StickerMasterType)">
-                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/Approve"/>
-                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Action_Approve">
-                    <Record Type="SAP__common.SideEffectsType">
-                        <PropertyValue Property="TargetProperties">
-                            <Collection>
-                                <String>_it/StatsCriticality</String>
-                                <String>_it/Status</String>
-                                <String>_it/__OperationControl/Approve</String>
-                                <String>_it/__OperationControl/Edit</String>
-                                <String>_it/__OperationControl/IssueSticker</String>
-                                <String>_it/__OperationControl/NoShow</String>
-                                <String>_it/__OperationControl/Reject</String>
-                                <String>_it/__EntityControl/Deletable</String>
-                            </Collection>
-                        </PropertyValue>
-                    </Record>
-                </Annotation>
             </Annotations>
             <Annotations Target="SAP__self.Reject(SAP__self.StickerMasterType)/Justification">
                 <Annotation Term="SAP__common.Label" String="Reject Justification"/>
@@ -2918,8 +3258,8 @@
                                 <String>_it/RejectJust</String>
                                 <String>_it/StatsCriticality</String>
                                 <String>_it/Status</String>
-                                <String>_it/__OperationControl/Approve</String>
                                 <String>_it/__OperationControl/Edit</String>
+                                <String>_it/__OperationControl/IssueSticker</String>
                                 <String>_it/__OperationControl/Reject</String>
                                 <String>_it/__EntityControl/Deletable</String>
                             </Collection>
@@ -2962,6 +3302,32 @@
                         <PropertyValue Property="TargetEntities">
                             <Collection>
                                 <NavigationPropertyPath/>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.SideEffects" Qualifier="SAP__Field_OldStkNumber">
+                    <Record Type="SAP__common.SideEffectsType">
+                        <PropertyValue Property="SourceProperties">
+                            <Collection>
+                                <PropertyPath>OldStkNumber</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="TargetEntities">
+                            <Collection>
+                                <NavigationPropertyPath/>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="TargetProperties">
+                            <Collection>
+                                <String>SAP__Messages</String>
+                                <String>__FieldControl/Color</String>
+                                <String>__FieldControl/Manufacturer</String>
+                                <String>__FieldControl/PlateNum</String>
+                                <String>__FieldControl/PlateNum1</String>
+                                <String>__FieldControl/PlateNum2</String>
+                                <String>__FieldControl/PlateNum3</String>
+                                <String>__FieldControl/PlateTyp</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -3080,7 +3446,22 @@
                             <Collection>
                                 <String>HideAttachTab</String>
                                 <String>HideJust</String>
+                                <String>HideJustSec</String>
                                 <String>HideRes</String>
+                                <String>HideStkNo</String>
+                                <String>OldStkNumber</String>
+                                <String>Reason</String>
+                                <String>SAP__Messages</String>
+                                <String>__FieldControl/Color</String>
+                                <String>__FieldControl/Location</String>
+                                <String>__FieldControl/Manufacturer</String>
+                                <String>__FieldControl/OldStkNumber</String>
+                                <String>__FieldControl/PlateNum</String>
+                                <String>__FieldControl/PlateNum1</String>
+                                <String>__FieldControl/PlateNum2</String>
+                                <String>__FieldControl/PlateNum3</String>
+                                <String>__FieldControl/PlateTyp</String>
+                                <String>__FieldControl/Reason</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -3115,10 +3496,12 @@
                         <Record Type="SAP__UI.ReferenceFacet">
                             <PropertyValue Property="ID" String="Status"/>
                             <PropertyValue Property="Target" AnnotationPath="@SAP__UI.DataPoint#RequestGrp"/>
+                            <Annotation Term="SAP__UI.Hidden" Path="HideCurrentStatus"/>
                         </Record>
                         <Record Type="SAP__UI.ReferenceFacet">
                             <PropertyValue Property="ID" String="StickerNumber"/>
                             <PropertyValue Property="Target" AnnotationPath="@SAP__UI.DataPoint#StickNo"/>
+                            <Annotation Term="SAP__UI.Hidden" Path="HideExpireDate"/>
                         </Record>
                     </Collection>
                 </Annotation>
@@ -3146,11 +3529,6 @@
                             <PropertyValue Property="Facets">
                                 <Collection>
                                     <Record Type="SAP__UI.ReferenceFacet">
-                                        <PropertyValue Property="Label" String="Note: Requestor should attach the proof of valid Vehicle Registration and valid Driving Licence."/>
-                                        <PropertyValue Property="ID" String="EvidenceNote"/>
-                                        <PropertyValue Property="Target" AnnotationPath="@SAP__UI.FieldGroup#Dummy"/>
-                                    </Record>
-                                    <Record Type="SAP__UI.ReferenceFacet">
                                         <PropertyValue Property="Label" String="Attachments"/>
                                         <PropertyValue Property="ID" String="EvidenceTab"/>
                                         <PropertyValue Property="Target" AnnotationPath="_Evidence/@SAP__UI.LineItem"/>
@@ -3158,6 +3536,11 @@
                                 </Collection>
                             </PropertyValue>
                             <Annotation Term="SAP__UI.Hidden" Path="HideAttachTab"/>
+                        </Record>
+                        <Record Type="SAP__UI.ReferenceFacet">
+                            <PropertyValue Property="Label" String="Log Details"/>
+                            <PropertyValue Property="ID" String="LogTab"/>
+                            <PropertyValue Property="Target" AnnotationPath="_ReqLog/@SAP__UI.LineItem"/>
                         </Record>
                         <Record Type="SAP__UI.ReferenceFacet">
                             <PropertyValue Property="Label" String="Past Violations"/>
@@ -3380,12 +3763,7 @@
                             <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
                         </Record>
                         <Record Type="SAP__UI.DataFieldForAction">
-                            <PropertyValue Property="Label" String="Approve Request"/>
-                            <PropertyValue Property="Action" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.Approve(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)"/>
-                            <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
-                        </Record>
-                        <Record Type="SAP__UI.DataFieldForAction">
-                            <PropertyValue Property="Label" String="Process Sticker Request"/>
+                            <PropertyValue Property="Label" String="Approve and Process Sticker Request"/>
                             <PropertyValue Property="Action" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.IssueSticker(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)"/>
                             <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
                         </Record>
@@ -3399,12 +3777,13 @@
                 <Annotation Term="SAP__UI.LineItem">
                     <Collection>
                         <Record Type="SAP__UI.DataField">
-                            <PropertyValue Property="Label" String="SMS Request No."/>
+                            <PropertyValue Property="Label" String="Request Number"/>
                             <PropertyValue Property="Value" Path="StkReqIdStr"/>
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="Name"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                     </Collection>
                 </Annotation>
@@ -3432,6 +3811,11 @@
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Requestor Name"/>
+                            <PropertyValue Property="Value" Path="Name"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Label" String="Vendor Name"/>
                             <PropertyValue Property="Value" Path="VendorName"/>
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
@@ -3442,7 +3826,7 @@
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
-                            <PropertyValue Property="Label" String="Sticker Number"/>
+                            <PropertyValue Property="Label" String="Issued Sticker Number"/>
                             <PropertyValue Property="Value" Path="StickerNumber"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
@@ -3451,6 +3835,11 @@
                             <PropertyValue Property="CriticalityRepresentation" EnumMember="SAP__UI.CriticalityRepresentationType/WithIcon"/>
                             <PropertyValue Property="Value" Path="Status"/>
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataFieldForAction">
+                            <PropertyValue Property="Label" String="Create"/>
+                            <PropertyValue Property="Action" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.AdminCreate(Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType))"/>
+                            <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
                         </Record>
                         <Record Type="SAP__UI.DataFieldForAction">
                             <PropertyValue Property="Label" String="Copy Request"/>
@@ -3484,6 +3873,11 @@
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Label" String="Requestor Name"/>
+                            <PropertyValue Property="Value" Path="Name"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Label" String="Vendor Name"/>
                             <PropertyValue Property="Value" Path="VendorName"/>
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
@@ -3494,7 +3888,7 @@
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
-                            <PropertyValue Property="Label" String="Sticker Number"/>
+                            <PropertyValue Property="Label" String="Issued Sticker Number"/>
                             <PropertyValue Property="Value" Path="StickerNumber"/>
                         </Record>
                         <Record Type="SAP__UI.DataField">
@@ -3508,22 +3902,13 @@
                             <PropertyValue Property="Label" String="Cancel Request"/>
                             <PropertyValue Property="Action" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.CancelRequest(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)"/>
                             <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
+                            <Annotation Term="SAP__UI.Hidden"/>
                         </Record>
                         <Record Type="SAP__UI.DataFieldForAction">
                             <PropertyValue Property="Label" String="Copy Request"/>
                             <PropertyValue Property="Action" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.CopySticker(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType)"/>
                             <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
                             <Annotation Term="SAP__UI.Hidden"/>
-                        </Record>
-                        <Record Type="SAP__UI.DataFieldForAction">
-                            <PropertyValue Property="Label" String="Cancel Sticker"/>
-                            <PropertyValue Property="Action" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.Remove(Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType))"/>
-                            <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
-                        </Record>
-                        <Record Type="SAP__UI.DataFieldForAction">
-                            <PropertyValue Property="Label" String="Renew Sticker"/>
-                            <PropertyValue Property="Action" String="com.sap.gateway.srvd.zsrv_hr_stk.v0001.Renew(Collection(com.sap.gateway.srvd.zsrv_hr_stk.v0001.StickerMasterType))"/>
-                            <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
                         </Record>
                     </Collection>
                 </Annotation>
@@ -3870,6 +4255,91 @@
                     <Collection/>
                 </Annotation>
             </Annotations>
+            <Annotations Target="SAP__self.StickerListType/plateTyp">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerListType/plateNum">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="License Plate Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerListType/plateType">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerListType/jhahId">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Personnel Number"/>
+                <Annotation Term="SAP__common.Heading" String="Pers.No."/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerListType/Manufacturer">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Manufacturer"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerListType/Color">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Color"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/StickerList">
+                <Annotation Term="SAP__capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_requestHistory"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_vehicleDetails"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerListType">
+                <Annotation Term="SAP__common.Label" String="Plate based sticker info"/>
+            </Annotations>
             <Annotations Target="SAP__self.RenewListType/Pernr">
                 <Annotation Term="SAP__common.IsDigitSequence"/>
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -3913,6 +4383,90 @@
                 <Annotation Term="SAP__core.OptimisticConcurrency">
                     <Collection/>
                 </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/plateTyp">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/plateNum">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="License Plate Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/color">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Color"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/manufacturer">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Manufacturer"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/jhahId">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Personnel Number"/>
+                <Annotation Term="SAP__common.Heading" String="Pers.No."/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/location">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Visitor Location"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/ValidPlates">
+                <Annotation Term="SAP__capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_RequestHistory"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_vehicleDetails"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType">
+                <Annotation Term="SAP__common.Label" String="Plate listing for mobile"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerKPIType">
                 <Annotation Term="SAP__common.Label" String="KPI For sticker Applications"/>
@@ -4077,6 +4631,16 @@
                 <Annotation Term="SAP__common.Label" String="System ID"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Communication Identification/Number"/>
             </Annotations>
+            <Annotations Target="SAP__self.EmployeeDetailsType/JobTypeKey">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Employee subgroup"/>
+                <Annotation Term="SAP__common.Heading" String="ESgrp"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Employee Subgroup"/>
+            </Annotations>
+            <Annotations Target="SAP__self.EmployeeDetailsType/PhotoMimeType">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Photo Mime Type"/>
+            </Annotations>
             <Annotations Target="SAP__self.EmployeeDetailsType">
                 <Annotation Term="SAP__common.Label" String="HR: Employee Details JHAH"/>
             </Annotations>
@@ -4085,6 +4649,62 @@
                     <Record>
                         <PropertyValue Property="Searchable" Bool="true"/>
                         <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateVehiclesType/plateTyp">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateVehiclesType/plateNum">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="License Plate Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateVehiclesType/plateTypeCode">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateVehiclesType/manufactureCode">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Manufacturer"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateVehiclesType/colorCode">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Color"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateVehiclesType">
+                <Annotation Term="SAP__common.Label" String="Plate vehicle details"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/PlateVehicles">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
                     </Record>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.InsertRestrictions">
@@ -4177,24 +4797,6 @@
             </Annotations>
             <Annotations Target="SAP__self.IssueSticker(SAP__self.StickerMasterType)/HideExpireFlag">
                 <Annotation Term="SAP__UI.Hidden"/>
-            </Annotations>
-            <Annotations Target="SAP__self.Remove(Collection(SAP__self.StickerMasterType))/StkReqId">
-                <Annotation Term="SAP__UI.Hidden"/>
-            </Annotations>
-            <Annotations Target="SAP__self.Renew(Collection(SAP__self.StickerMasterType))/StkReqId">
-                <Annotation Term="SAP__UI.Hidden"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RenewSticker(SAP__self.StickerMasterType)/stkreqid">
-                <Annotation Term="SAP__UI.Hidden"/>
-                <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
-                <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
-            </Annotations>
-            <Annotations Target="SAP__self.RemoveSticker(SAP__self.StickerMasterType)/stkreqid">
-                <Annotation Term="SAP__UI.Hidden"/>
-                <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
-                <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
             </Annotations>
             <Annotations Target="SAP__self.I_DraftAdministrativeDataType/DraftUUID">
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -4377,6 +4979,26 @@
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Removed By"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/EnableManageSticker">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/EnableRenewButton">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/EnableCancelSticker">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/MobileStatusDesc">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/HideCurrentStatus">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Truth Value"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
+            </Annotations>
             <Annotations Target="SAP__self.IssueLocationType/Uuid">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="UUID"/>
@@ -4411,6 +5033,12 @@
                 <Annotation Term="SAP__common.QuickInfo" String="ALOTTED"/>
             </Annotations>
             <Annotations Target="SAP__self.AppointmentSlotType/FormatTime">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.LogDetailsType/ActionByUser">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.LogDetailsType/LogCriticality">
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.RemoveListType/StkReqId">
@@ -4481,6 +5109,9 @@
                 <Annotation Term="SAP__common.Heading" String="Ln"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Language Key"/>
             </Annotations>
+            <Annotations Target="SAP__self.PlateTypesType/SortOrder">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
             <Annotations Target="SAP__self.evidenceType/__EntityControl/Deletable">
                 <Annotation Term="SAP__common.Label" String="Dyn. Method Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Method Control"/>
@@ -4507,7 +5138,105 @@
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
             </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/plateTypDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/plateNum1Desc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/plateNum2Desc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/plateNum3Desc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/manufacturerDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/colorDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/requestDate">
+                <Annotation Term="SAP__common.Label" String="Request Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/requestTypeCode">
+                <Annotation Term="SAP__common.Label" String="Sticker Request Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/requestTypeDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/stickerNumber">
+                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/oldStickerNumber">
+                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/issueDate">
+                <Annotation Term="SAP__common.Label" String="Date"/>
+                <Annotation Term="SAP__common.Heading" String="Date in Format YYYYMMDD"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Field of type DATS"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/expireDate">
+                <Annotation Term="SAP__common.Label" String="Expire Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/requestorName">
+                <Annotation Term="SAP__common.Label" String="Employee/app.name"/>
+                <Annotation Term="SAP__common.Heading" String="Name of employee or applicant"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Formatted Name of Employee or Applicant"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/locationDesc">
+                <Annotation Term="SAP__common.Label" String="Short text"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Explanatory Short Text"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/reason">
+                <Annotation Term="SAP__common.Label" String="Message"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/justification">
+                <Annotation Term="SAP__common.Label" String="Message"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateRequestsType/remarks">
+                <Annotation Term="SAP__common.Label" String="Sticker Remarks"/>
+                <Annotation Term="SAP__common.Heading" String="Sticker Expire Remarks"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Sticker Expire Date Remarks"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerRequestsType/validtill">
+                <Annotation Term="SAP__common.Label" String="Expire Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerRequestsType/stickerNumber">
+                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
+            </Annotations>
             <Annotations Target="SAP__self.ManufacturerDetailsType/ManufacturerDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/plateTypedesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/letter1desc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/letter2desc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/letter3desc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/manufacturedesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerVehiclesType/colordesc">
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
             </Annotations>
@@ -4630,6 +5359,11 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerMasterType/__FieldControl/OldStkNumber">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/__FieldControl/PlateNum">
                 <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
@@ -4670,11 +5404,6 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
             </Annotations>
-            <Annotations Target="SAP__self.StickerMasterType/__OperationControl/Approve">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/__OperationControl/CancelRequest">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
@@ -4695,22 +5424,7 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
-            <Annotations Target="SAP__self.StickerMasterType/__OperationControl/NoShow">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
             <Annotations Target="SAP__self.StickerMasterType/__OperationControl/Reject">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
-            <Annotations Target="SAP__self.StickerMasterType/__OperationControl/RemoveSticker">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
-            <Annotations Target="SAP__self.StickerMasterType/__OperationControl/RenewSticker">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
@@ -4731,7 +5445,56 @@
             <Annotations Target="SAP__self.AppointmentSlotType/ToTime">
                 <Annotation Term="SAP__common.Label" String="To Time"/>
             </Annotations>
+            <Annotations Target="SAP__self.StickerListType/expiredate">
+                <Annotation Term="SAP__common.Label" String="Expire Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerListType/AllowStickerCreate">
+                <Annotation Term="SAP__common.Label" String="Boolean Variable (X = True, - = False, Space = Unknown)"/>
+            </Annotations>
             <Annotations Target="SAP__self.RenewListType/StickerNumber">
+                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/plateTypDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/plateNum1Desc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/plateNum2Desc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/plateNum3Desc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/colorDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/manufacturerDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/latestRequestType">
+                <Annotation Term="SAP__common.Label" String="Sticker Request Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/requestTypeDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/requestorName">
+                <Annotation Term="SAP__common.Label" String="Employee/app.name"/>
+                <Annotation Term="SAP__common.Heading" String="Name of employee or applicant"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Formatted Name of Employee or Applicant"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/locationDesc">
+                <Annotation Term="SAP__common.Label" String="Short text"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Explanatory Short Text"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ValidPlatesType/latestStickerNumber">
                 <Annotation Term="SAP__common.Label" String="Sticker Number"/>
             </Annotations>
             <Annotations Target="SAP__self.ValidityValueHelpType/ValidityDesc">
@@ -4763,6 +5526,25 @@
             <Annotations Target="SAP__self.EmployeeDetailsType/Gender">
                 <Annotation Term="SAP__common.Label" String="Gender"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Texts for Gender"/>
+            </Annotations>
+            <Annotations Target="SAP__self.EmployeeDetailsType/ExpiryDate">
+                <Annotation Term="SAP__common.Label" String="Expiry Date"/>
+                <Annotation Term="SAP__common.Heading" String="ID Expiry Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.EmployeeDetailsType/PhotoContent">
+                <Annotation Term="SAP__common.Label" String="Photo Content"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateVehiclesType/plateTypeDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateVehiclesType/manufactureDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.PlateVehiclesType/colorDesc">
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterControl/AppointmentDate">
                 <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
@@ -4805,6 +5587,11 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
             </Annotations>
             <Annotations Target="SAP__self.StickerMasterControl/Manufacturer">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.StickerMasterControl/OldStkNumber">
                 <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
@@ -4864,11 +5651,6 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
-            <Annotations Target="SAP__self.StickerMasterOperationControl/Approve">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
             <Annotations Target="SAP__self.StickerMasterOperationControl/CancelRequest">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
@@ -4889,22 +5671,7 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
-            <Annotations Target="SAP__self.StickerMasterOperationControl/NoShow">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
             <Annotations Target="SAP__self.StickerMasterOperationControl/Reject">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
-            <Annotations Target="SAP__self.StickerMasterOperationControl/RemoveSticker">
-                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
-                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
-            </Annotations>
-            <Annotations Target="SAP__self.StickerMasterOperationControl/RenewSticker">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
@@ -4944,7 +5711,8 @@
                 <Annotation Term="SAP__common.Heading" String="Pers.No."/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_STK_HDR_DET/platetyp">
-                <Annotation Term="SAP__common.Label" String="Vehicle Plate Type"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_STK_HDR_DET/manufacturer">
                 <Annotation Term="SAP__common.Label" String="Manufacturer"/>
@@ -4957,13 +5725,16 @@
                 <Annotation Term="SAP__common.Label" String="Color"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_STK_HDR_DET/platenum1">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_STK_HDR_DET/platenum2">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_STK_HDR_DET/platenum3">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_STK_HDR_DET/platenum">
                 <Annotation Term="SAP__common.Label" String="License Plate Number"/>
@@ -5016,18 +5787,61 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Method Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Method Property"/>
             </Annotations>
-            <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_3/Evidence/AttachmentUuid">
-                <Annotation Term="SAP__common.Label" String="UUID"/>
-                <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/Color">
+                <Annotation Term="SAP__common.Label" String="Color"/>
             </Annotations>
-            <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_3/Evidence/stkreqid">
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/JhahId">
+                <Annotation Term="SAP__common.Label" String="Personnel Number"/>
+                <Annotation Term="SAP__common.Heading" String="Pers.No."/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/Location">
+                <Annotation Term="SAP__common.Label" String="Visitor Location"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/Manufacturer">
+                <Annotation Term="SAP__common.Label" String="Manufacturer"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/PlateNum">
+                <Annotation Term="SAP__common.Label" String="License Plate Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/PlateNum1">
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/PlateNum2">
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/PlateNum3">
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/PlateTyp">
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/StatusCode">
+                <Annotation Term="SAP__common.Label" String="Request Status"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/StickerNumber">
+                <Annotation Term="SAP__common.Label" String="Sticker Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/StkReqId">
                 <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
                 <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
             </Annotations>
-            <Annotations Target="SAP__self.Remove(Collection(SAP__self.StickerMasterType))/ResultIsActiveEntity">
-                <Annotation Term="SAP__common.Label" String="Result is active"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Is active document"/>
+            <Annotations Target="SAP__self.ZA_HR_STK_QR_SCAN_RESULT/StkType">
+                <Annotation Term="SAP__common.Label" String="Sticker Request Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_1/Evidence/AttachmentUuid">
+                <Annotation Term="SAP__common.Label" String="UUID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_1/Evidence/stkreqid">
+                <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
+                <Annotation Term="SAP__common.Heading" String="Sticker Request Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Sticker Application Request Number"/>
             </Annotations>
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/stkreqid">
                 <Annotation Term="SAP__common.Label" String="Sticker Request Numb"/>
@@ -5064,7 +5878,8 @@
                 <Annotation Term="SAP__common.Heading" String="Pers.No."/>
             </Annotations>
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/platetyp">
-                <Annotation Term="SAP__common.Label" String="Vehicle Plate Type"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
             </Annotations>
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/manufacturer">
                 <Annotation Term="SAP__common.Label" String="Manufacturer"/>
@@ -5077,13 +5892,16 @@
                 <Annotation Term="SAP__common.Label" String="Color"/>
             </Annotations>
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/platenum1">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/platenum2">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/platenum3">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/platenum">
                 <Annotation Term="SAP__common.Label" String="License Plate Number"/>
@@ -5103,10 +5921,6 @@
             <Annotations Target="SAP__self.onStickerCreateExt(Collection(SAP__self.StickerMasterType))/reason">
                 <Annotation Term="SAP__common.Label" String="Message"/>
             </Annotations>
-            <Annotations Target="SAP__self.Renew(Collection(SAP__self.StickerMasterType))/ResultIsActiveEntity">
-                <Annotation Term="SAP__common.Label" String="Result is active"/>
-                <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Is active document"/>
-            </Annotations>
             <Annotations Target="SAP__self.CreateSelfStkReq(Collection(SAP__self.StickerMasterType))/ResultIsActiveEntity">
                 <Annotation Term="SAP__common.Label" String="Result is active"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Is active document"/>
@@ -5122,6 +5936,10 @@
             <Annotations Target="SAP__self.Edit(SAP__self.MaintLocationType)/PreserveChanges">
                 <Annotation Term="SAP__common.Label" String="TRUE"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Data element for domain BOOLE: TRUE (='X') and FALSE (=' ')"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AdminCreate(Collection(SAP__self.StickerMasterType))/ResultIsActiveEntity">
+                <Annotation Term="SAP__common.Label" String="Result is active"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Is active document"/>
             </Annotations>
         </Schema>
     </edmx:DataServices>

@@ -74,10 +74,8 @@
                 <Property Name="PlateNumEng" Type="Edm.String" Nullable="false" MaxLength="20"/>
                 <Property Name="HidePlates" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="StickerValid" Type="Edm.String" Nullable="false" MaxLength="3"/>
-                <Property Name="StickerValidText" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="StickerValidCriticality" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="ViolationExist" Type="Edm.String" Nullable="false" MaxLength="3"/>
-                <Property Name="ViolationExistText" Type="Edm.String" Nullable="false" MaxLength="3"/>
                 <Property Name="ViolationExistCriticality" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="DraftUUID" Type="Edm.Guid" Nullable="false"/>
@@ -188,6 +186,63 @@
                 <Property Name="As4vers" Type="Edm.String" Nullable="false" MaxLength="4"/>
                 <Property Name="TransportDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
                 <Property Name="TransportValue" Type="Edm.String" Nullable="false" MaxLength="10"/>
+            </EntityType>
+            <EntityType Name="BlockedVehiclesType">
+                <Key>
+                    <PropertyRef Name="Uuid"/>
+                    <PropertyRef Name="PlateTyp"/>
+                    <PropertyRef Name="PlateNum1"/>
+                    <PropertyRef Name="PlateNum2"/>
+                    <PropertyRef Name="PlateNum3"/>
+                    <PropertyRef Name="PlateNum"/>
+                    <PropertyRef Name="IsActiveEntity"/>
+                </Key>
+                <Property Name="Uuid" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="PlateTyp" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="PlateNum1" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="PlateNum2" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="PlateNum3" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="PlateNum" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="PlateTypDesc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="PlateNum1Desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="PlateNum2Desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="PlateNum3Desc" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Begda" Type="Edm.Date"/>
+                <Property Name="Endda" Type="Edm.Date"/>
+                <Property Name="Justification" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="DeletionFlag" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="HideLetters" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="CreatedBy" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="CreatedAt" Type="Edm.Date"/>
+                <Property Name="ChangedBy" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="ChangedAt" Type="Edm.Date"/>
+                <Property Name="LastChangedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="LocalLastChangedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="DraftEntityCreationDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="DraftEntityLastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="HasActiveEntity" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="IsActiveEntity" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="__EntityControl" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.EntityControl"/>
+                <Property Name="__FieldControl" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesControl"/>
+                <Property Name="__OperationControl" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesOperationControl"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="DraftAdministrativeData" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.I_DraftAdministrativeDataType"/>
+                <NavigationProperty Name="SiblingEntity" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType"/>
+            </EntityType>
+            <EntityType Name="VisitorSearchType">
+                <Key>
+                    <PropertyRef Name="IdTyp"/>
+                    <PropertyRef Name="IdNum"/>
+                </Key>
+                <Property Name="IdTyp" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="IdNum" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="VisName" Type="Edm.String" Nullable="false" MaxLength="80"/>
+                <Property Name="Natio" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="NationalityDesc" Type="Edm.String" Nullable="false" MaxLength="50"/>
+                <Property Name="IdExpDate" Type="Edm.Date"/>
+                <Property Name="IdExpDateT" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="Email" Type="Edm.String" Nullable="false" MaxLength="241"/>
             </EntityType>
             <EntityType Name="VisitorDetailsType">
                 <Key>
@@ -361,10 +416,14 @@
                 <Property Name="LastChangeDat" Type="Edm.DateTimeOffset" Precision="7"/>
                 <Property Name="LastChangedBy" Type="Edm.String" Nullable="false" MaxLength="12"/>
                 <Property Name="LocalLastChangeDat" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="ReturnMsg" Type="Edm.String" Nullable="false" MaxLength="255"/>
+                <Property Name="ReturnType" Type="Edm.String" Nullable="false" MaxLength="1"/>
                 <Property Name="ViewPDF" Type="Edm.String" Nullable="false" MaxLength="500"/>
                 <Property Name="ViewPDFText" Type="Edm.String" Nullable="false" MaxLength="18"/>
                 <Property Name="IsAdmin" Type="Edm.String" Nullable="false" MaxLength="1"/>
                 <Property Name="HideApprovalLog" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="QRCode" Type="Edm.String" Nullable="false"/>
+                <Property Name="TimeStamp" Type="Edm.DateTimeOffset" Precision="7"/>
                 <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="DraftUUID" Type="Edm.Guid" Nullable="false"/>
                 <Property Name="DraftEntityCreationDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
@@ -552,6 +611,12 @@
                     <ReferentialConstraint Property="ReqNum" ReferencedProperty="ReqNum"/>
                 </NavigationProperty>
             </EntityType>
+            <ComplexType Name="BlockedVehiclesControl">
+                <Property Name="PlateNum1" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="PlateNum2" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="PlateNum3" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="PlateTyp" Type="Edm.Byte" Nullable="false"/>
+            </ComplexType>
             <ComplexType Name="VarListControl">
                 <Property Name="BpName" Type="Edm.Byte" Nullable="false"/>
                 <Property Name="BpType" Type="Edm.Byte" Nullable="false"/>
@@ -563,6 +628,10 @@
                 <Property Name="_ApprovalHist" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="_VehicleDetails" Type="Edm.Boolean" Nullable="false"/>
                 <Property Name="_VisitorDetails" Type="Edm.Boolean" Nullable="false"/>
+            </ComplexType>
+            <ComplexType Name="BlockedVehiclesOperationControl">
+                <Property Name="Edit" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="MarkDeleted" Type="Edm.Boolean" Nullable="false"/>
             </ComplexType>
             <ComplexType Name="LocationMasterOperationControl">
                 <Property Name="DelReq" Type="Edm.Boolean" Nullable="false"/>
@@ -640,6 +709,10 @@
             <Action Name="Prepare" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
             </Action>
+            <Action Name="Activate" EntitySetPath="_it" IsBound="true">
+                <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType" Nullable="false"/>
+                <ReturnType Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType" Nullable="false"/>
+            </Action>
             <Action Name="Resume" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
             </Action>
@@ -674,8 +747,19 @@
                 <Parameter Name="Visitors" Type="Collection(com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.ZHR_MOB_VISITOR)" Nullable="false"/>
                 <ReturnType Type="Collection(com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.ZHR_MOB_VAR_REQ_HDR)" Nullable="false"/>
             </Action>
+            <Action Name="ScanQRCode" EntitySetPath="_it" IsBound="true">
+                <Parameter Name="_it" Type="Collection(com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType)" Nullable="false"/>
+                <Parameter Name="QrToken" Type="Edm.String" Nullable="false"/>
+                <ReturnType Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
+            </Action>
             <Action Name="Resume" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.LocationMasterType" Nullable="false"/>
+            </Action>
+            <Action Name="Discard" IsBound="true">
+                <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType" Nullable="false"/>
+            </Action>
+            <Action Name="Prepare" IsBound="true">
+                <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType" Nullable="false"/>
             </Action>
             <Action Name="MaintainLocation" EntitySetPath="_it" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
@@ -690,6 +774,14 @@
                 <Parameter Name="PreserveChanges" Type="Edm.Boolean" Nullable="false"/>
                 <ReturnType Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
             </Action>
+            <Action Name="Resume" IsBound="true">
+                <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType" Nullable="false"/>
+            </Action>
+            <Action Name="Edit" EntitySetPath="_it" IsBound="true">
+                <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType" Nullable="false"/>
+                <Parameter Name="PreserveChanges" Type="Edm.Boolean" Nullable="false"/>
+                <ReturnType Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType" Nullable="false"/>
+            </Action>
             <Action Name="Discard" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VarListType" Nullable="false"/>
             </Action>
@@ -702,6 +794,10 @@
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.LocationMasterType" Nullable="false"/>
                 <ReturnType Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.LocationMasterType" Nullable="false"/>
             </Action>
+            <Action Name="MarkDeleted" EntitySetPath="_it" IsBound="true">
+                <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType" Nullable="false"/>
+                <ReturnType Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType" Nullable="false"/>
+            </Action>
             <Action Name="Activate" EntitySetPath="_it" IsBound="true">
                 <Parameter Name="_it" Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.LocationMasterType" Nullable="false"/>
                 <ReturnType Type="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.LocationMasterType" Nullable="false"/>
@@ -711,6 +807,10 @@
             </Action>
             <EntityContainer Name="Container">
                 <EntitySet Name="BlockedDomains" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedDomainsType"/>
+                <EntitySet Name="BlockedVehicles" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType">
+                    <NavigationPropertyBinding Path="DraftAdministrativeData" Target="I_DraftAdministrativeData"/>
+                    <NavigationPropertyBinding Path="SiblingEntity" Target="BlockedVehicles"/>
+                </EntitySet>
                 <EntitySet Name="BlockedVisitors" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVisitorsType"/>
                 <EntitySet Name="ColorDetails" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.ColorDetailsType"/>
                 <EntitySet Name="EmployeeHeader" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.EmployeeHeaderType"/>
@@ -751,6 +851,7 @@
                     <NavigationPropertyBinding Path="SiblingEntity" Target="VisitorDetails"/>
                     <NavigationPropertyBinding Path="_VisitorDetails" Target="VarList"/>
                 </EntitySet>
+                <EntitySet Name="VisitorSearch" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VisitorSearchType"/>
                 <EntitySet Name="VisitType" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.VisitTypeType"/>
                 <EntitySet Name="WorkflowLog" EntityType="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.WorkflowLogType">
                     <NavigationPropertyBinding Path="DraftAdministrativeData" Target="I_DraftAdministrativeData"/>
@@ -786,6 +887,7 @@
                     </Collection>
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Type"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
             </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType/Manufacturer">
@@ -832,6 +934,7 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__UI.Hidden" Path="HidePlates"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Letter"/>
                 <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType/PlateNum1Desc">
@@ -854,6 +957,7 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__UI.Hidden" Path="HidePlates"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Letter"/>
                 <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType/PlateNum2Desc">
@@ -876,6 +980,7 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues"/>
                 <Annotation Term="SAP__UI.Hidden" Path="HidePlates"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Letter"/>
                 <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.VehicleDetailsType/PlateNum3Desc">
@@ -995,7 +1100,7 @@
                 </Annotation>
                 <Annotation Term="SAP__common.DraftActivationVia">
                     <Collection>
-                        <String>SAP__self.Container/LocationMaster</String>
+                        <String>SAP__self.Container/BlockedVehicles</String>
                     </Collection>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
@@ -1073,10 +1178,8 @@
                                 <String>PlateNumEng</String>
                                 <String>StickerValid</String>
                                 <String>StickerValidCriticality</String>
-                                <String>StickerValidText</String>
                                 <String>ViolationExist</String>
                                 <String>ViolationExistCriticality</String>
-                                <String>ViolationExistText</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1094,10 +1197,8 @@
                                 <String>PlateNumEng</String>
                                 <String>StickerValid</String>
                                 <String>StickerValidCriticality</String>
-                                <String>StickerValidText</String>
                                 <String>ViolationExist</String>
                                 <String>ViolationExistCriticality</String>
-                                <String>ViolationExistText</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1115,10 +1216,8 @@
                                 <String>PlateNumEng</String>
                                 <String>StickerValid</String>
                                 <String>StickerValidCriticality</String>
-                                <String>StickerValidText</String>
                                 <String>ViolationExist</String>
                                 <String>ViolationExistCriticality</String>
-                                <String>ViolationExistText</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1136,10 +1235,8 @@
                                 <String>PlateNumEng</String>
                                 <String>StickerValid</String>
                                 <String>StickerValidCriticality</String>
-                                <String>StickerValidText</String>
                                 <String>ViolationExist</String>
                                 <String>ViolationExistCriticality</String>
-                                <String>ViolationExistText</String>
                             </Collection>
                         </PropertyValue>
                     </Record>
@@ -1165,10 +1262,8 @@
                                 <String>PlateNumEng</String>
                                 <String>StickerValid</String>
                                 <String>StickerValidCriticality</String>
-                                <String>StickerValidText</String>
                                 <String>ViolationExist</String>
                                 <String>ViolationExistCriticality</String>
-                                <String>ViolationExistText</String>
                                 <String>SAP__Messages</String>
                             </Collection>
                         </PropertyValue>
@@ -1767,6 +1862,539 @@
                     <Collection/>
                 </Annotation>
             </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/Uuid">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="UUID"/>
+                <Annotation Term="SAP__common.QuickInfo" String="16 Byte UUID in 16 Bytes (Raw Format)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/PlateTyp">
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.Text" Path="PlateTypDesc">
+                    <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/PlateTyp"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Collection>
+                        <String>../../../../srvd_f4/sap/zhr_var_plate_types/0001;ps='srvd-zhr_var_app_srv_defn-0001';va='com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.et-zhr_c_blocked_vehicles.platetyp'/$metadata</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/PlateNum1">
+                <Annotation Term="SAP__common.Label" String="Plate Letter 1"/>
+                <Annotation Term="SAP__common.Text" Path="PlateNum1Desc">
+                    <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/PlateNum1"/>
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Collection>
+                        <String>../../../../srvd_f4/sap/zhr_var_plate_num/0001;ps='srvd-zhr_var_app_srv_defn-0001';va='com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.et-zhr_c_blocked_vehicles.platenum1'/$metadata</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/PlateNum2">
+                <Annotation Term="SAP__common.Label" String="Plate Letter 2"/>
+                <Annotation Term="SAP__common.Text" Path="PlateNum2Desc">
+                    <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/PlateNum2"/>
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Collection>
+                        <String>../../../../srvd_f4/sap/zhr_var_plate_num/0001;ps='srvd-zhr_var_app_srv_defn-0001';va='com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.et-zhr_c_blocked_vehicles.platenum2'/$metadata</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/PlateNum3">
+                <Annotation Term="SAP__common.Label" String="Plate Letter 3"/>
+                <Annotation Term="SAP__common.Text" Path="PlateNum3Desc">
+                    <Annotation Term="SAP__UI.TextArrangement" EnumMember="SAP__UI.TextArrangementType/TextOnly"/>
+                </Annotation>
+                <Annotation Term="SAP__common.FieldControl" Path="__FieldControl/PlateNum3"/>
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Collection>
+                        <String>../../../../srvd_f4/sap/zhr_var_plate_num/0001;ps='srvd-zhr_var_app_srv_defn-0001';va='com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.et-zhr_c_blocked_vehicles.platenum3'/$metadata</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+                <Annotation Term="SAP__common.Heading" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/PlateNum">
+                <Annotation Term="SAP__common.Label" String="Plate Number"/>
+                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Heading" String="License Plate Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Plate Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/Begda">
+                <Annotation Term="SAP__common.Label" String="Blocked From"/>
+                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
+                <Annotation Term="SAP__common.Heading" String="Start Date"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Start Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/Endda">
+                <Annotation Term="SAP__common.Label" String="Blocked Until"/>
+                <Annotation Term="SAP__common.FieldControl" EnumMember="SAP__common.FieldControlType/Mandatory"/>
+                <Annotation Term="SAP__common.Heading" String="End Date"/>
+                <Annotation Term="SAP__common.QuickInfo" String="End Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/Justification">
+                <Annotation Term="SAP__common.Label" String="Justification"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__UI.MultiLineText"/>
+                <Annotation Term="SAP__common.Heading" String="Justification for block"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Justification for block"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/DeletionFlag">
+                <Annotation Term="SAP__common.Label" String="Deletion Indicator"/>
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Collection>
+                        <String>../../../../srvd_f4/sap/zhr_var_blk_del_vh/0001;ps='srvd-zhr_var_app_srv_defn-0001';va='com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.et-zhr_c_blocked_vehicles.deletionflag'/$metadata</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Single-Character Flag"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/HideLetters">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Truth Value"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/CreatedBy">
+                <Annotation Term="SAP__common.Label" String="Created By"/>
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Heading" String="Created By"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Name of Person Responsible for Creating the Object"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/CreatedAt">
+                <Annotation Term="SAP__common.Label" String="Created On"/>
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.Heading" String="Created On"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Record Creation Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/ChangedBy">
+                <Annotation Term="SAP__common.Label" String="Changed By"/>
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Heading" String="Changed By"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Name of Person Who Changed Object"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/ChangedAt">
+                <Annotation Term="SAP__common.Label" String="Changed On"/>
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.Heading" String="Chngd On"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Last Changed On"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/LastChangedAt">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Changed On"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Last Change Date Time"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/LocalLastChangedAt">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Changed On"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Local Instance Last Change Date Time"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/HasDraftEntity">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Has Draft"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Has draft document"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/DraftEntityCreationDateTime">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Draft Created On"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/DraftEntityLastChangeDateTime">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Draft Last Changed On"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/HasActiveEntity">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Has active"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Has active document"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/IsActiveEntity">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Is active"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Is active document"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/__EntityControl">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/__FieldControl">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/__OperationControl">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__UI.HiddenFilter"/>
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/BlockedVehicles">
+                <Annotation Term="SAP__common.DraftRoot">
+                    <Record>
+                        <PropertyValue Property="ActivationAction" String="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.Activate"/>
+                        <PropertyValue Property="DiscardAction" String="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.Discard"/>
+                        <PropertyValue Property="PreparationAction" String="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.Prepare"/>
+                        <PropertyValue Property="EditAction" String="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.Edit"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="Filterable" Bool="true"/>
+                        <PropertyValue Property="FilterExpressionRestrictions">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="PlateTyp"/>
+                                    <PropertyValue Property="AllowedExpressions" String="MultiValue"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="DeletionFlag"/>
+                                    <PropertyValue Property="AllowedExpressions" String="MultiValue"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="DraftEntityCreationDateTime"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="DraftEntityLastChangeDateTime"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="NonFilterableProperties">
+                            <Collection>
+                                <PropertyPath>__EntityControl</PropertyPath>
+                                <PropertyPath>__FieldControl</PropertyPath>
+                                <PropertyPath>__OperationControl</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.SortRestrictions">
+                    <Record>
+                        <PropertyValue Property="NonSortableProperties">
+                            <Collection>
+                                <PropertyPath>__EntityControl</PropertyPath>
+                                <PropertyPath>__FieldControl</PropertyPath>
+                                <PropertyPath>__OperationControl</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Path="__EntityControl/Updatable"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__UI.DeleteHidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Edit(SAP__self.BlockedVehiclesType)">
+                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/Edit"/>
+            </Annotations>
+            <Annotations Target="SAP__self.MarkDeleted(SAP__self.BlockedVehiclesType)">
+                <Annotation Term="SAP__core.OperationAvailable" Path="_it/__OperationControl/MarkDeleted"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType">
+                <Annotation Term="SAP__common.Label" String="Consumption view of Blocked Vehicles"/>
+                <Annotation Term="SAP__UI.Facets">
+                    <Collection>
+                        <Record Type="SAP__UI.ReferenceFacet">
+                            <PropertyValue Property="Label" String="Blocked Vehicle Details"/>
+                            <PropertyValue Property="ID" String="MainFacet"/>
+                            <PropertyValue Property="Target" AnnotationPath="@SAP__UI.FieldGroup#Main"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__UI.FieldGroup" Qualifier="Main">
+                    <Record>
+                        <PropertyValue Property="Data">
+                            <Collection>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="PlateTyp"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="PlateNum1"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="PlateNum2"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="PlateNum3"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="PlateNum"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="Begda"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="Endda"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="Justification"/>
+                                </Record>
+                                <Record Type="SAP__UI.DataField">
+                                    <PropertyValue Property="Value" Path="DeletionFlag"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__UI.HeaderInfo">
+                    <Record>
+                        <PropertyValue Property="TypeName" String="Blocked Vehicle"/>
+                        <PropertyValue Property="TypeNamePlural" String="List of Blocked Vehicles"/>
+                        <PropertyValue Property="Title">
+                            <Record Type="SAP__UI.DataField">
+                                <PropertyValue Property="Value" Path="PlateNum"/>
+                            </Record>
+                        </PropertyValue>
+                        <PropertyValue Property="Description">
+                            <Record Type="SAP__UI.DataField">
+                                <PropertyValue Property="Value" Path="PlateTypDesc"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__UI.Identification">
+                    <Collection>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateTyp"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateNum1"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateNum2"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateNum3"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateNum"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="Begda"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="Endda"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="Justification"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="DeletionFlag"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataFieldForAction">
+                            <PropertyValue Property="Label" String="Delete"/>
+                            <PropertyValue Property="Action" String="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.MarkDeleted(com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType)"/>
+                            <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__UI.LineItem">
+                    <Collection>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateTyp"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateNum1"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateNum2"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateNum3"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="PlateNum"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="Begda"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/Medium"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="Endda"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/Medium"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="Justification"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/Low"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="DeletionFlag"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="CreatedBy"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/Low"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="CreatedAt"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/Low"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="ChangedBy"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/Low"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataField">
+                            <PropertyValue Property="Value" Path="ChangedAt"/>
+                            <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/Low"/>
+                        </Record>
+                        <Record Type="SAP__UI.DataFieldForAction">
+                            <PropertyValue Property="Label" String="Delete"/>
+                            <PropertyValue Property="Action" String="com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.MarkDeleted(com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.BlockedVehiclesType)"/>
+                            <PropertyValue Property="InvocationGrouping" EnumMember="SAP__UI.OperationGroupingType/Isolated"/>
+                        </Record>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__UI.PresentationVariant">
+                    <Record>
+                        <PropertyValue Property="SortOrder">
+                            <Collection>
+                                <Record Type="SAP__common.SortOrderType">
+                                    <PropertyValue Property="Property" PropertyPath="Begda"/>
+                                    <PropertyValue Property="Descending" Bool="true"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="Visualizations">
+                            <Collection>
+                                <AnnotationPath>@SAP__UI.LineItem</AnnotationPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__UI.SelectionFields">
+                    <Collection>
+                        <PropertyPath>PlateTyp</PropertyPath>
+                        <PropertyPath>PlateNum</PropertyPath>
+                        <PropertyPath>DeletionFlag</PropertyPath>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VisitorSearchType/IdTyp">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="ID Type"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VisitorSearchType/IdNum">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Identity Number"/>
+                <Annotation Term="SAP__common.Heading" String="ID Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VisitorSearchType/VisName">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Employee Name"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VisitorSearchType/Natio">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Ctry/Reg. of Issue"/>
+                <Annotation Term="SAP__common.Heading" String="C/R of Issue"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Country/Region of Issue"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VisitorSearchType">
+                <Annotation Term="SAP__common.Label" String="Visitor search by ID number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/VisitorSearch">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="FilterExpressionRestrictions">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="Email"/>
+                                    <PropertyValue Property="AllowedExpressions" String="MultiValue"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
             <Annotations Target="SAP__self.VisitorDetailsType/ReqNum">
                 <Annotation Term="SAP__common.Label" String="Request Number"/>
                 <Annotation Term="SAP__core.Computed"/>
@@ -1931,7 +2559,7 @@
                 </Annotation>
                 <Annotation Term="SAP__common.DraftActivationVia">
                     <Collection>
-                        <String>SAP__self.Container/LocationMaster</String>
+                        <String>SAP__self.Container/BlockedVehicles</String>
                     </Collection>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
@@ -2828,6 +3456,12 @@
             </Annotations>
             <Annotations Target="SAP__self.VarListType/Status">
                 <Annotation Term="SAP__common.Label" String="Request Status"/>
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Collection>
+                        <String>../../../../srvd_f4/sap/zi_hr_var_status/0001;ps='srvd-zhr_var_app_srv_defn-0001';va='com.sap.gateway.srvd.zhr_var_app_srv_defn.v0001.et-zhr_c_var_app.status'/$metadata</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.ValueListWithFixedValues"/>
             </Annotations>
             <Annotations Target="SAP__self.VarListType/Purpose">
                 <Annotation Term="SAP__common.IsUpperCase"/>
@@ -2970,6 +3604,14 @@
             <Annotations Target="SAP__self.VarListType/IsAdmin">
                 <Annotation Term="SAP__core.Computed"/>
             </Annotations>
+            <Annotations Target="SAP__self.VarListType/QRCode">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VarListType/TimeStamp">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.Label" String="Time Stamp"/>
+                <Annotation Term="SAP__common.QuickInfo" String="UTC Time Stamp in Long Form (YYYYMMDDhhmmssmmmuuun)"/>
+            </Annotations>
             <Annotations Target="SAP__self.VarListType/HasDraftEntity">
                 <Annotation Term="SAP__core.Computed"/>
                 <Annotation Term="SAP__UI.HiddenFilter"/>
@@ -3091,6 +3733,10 @@
                         <PropertyValue Property="FilterExpressionRestrictions">
                             <Collection>
                                 <Record>
+                                    <PropertyValue Property="Property" PropertyPath="Status"/>
+                                    <PropertyValue Property="AllowedExpressions" String="MultiValue"/>
+                                </Record>
+                                <Record>
                                     <PropertyValue Property="Property" PropertyPath="Info"/>
                                     <PropertyValue Property="AllowedExpressions" String="SearchExpression"/>
                                 </Record>
@@ -3101,6 +3747,10 @@
                                 <Record>
                                     <PropertyValue Property="Property" PropertyPath="Erdat"/>
                                     <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="QRCode"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SearchExpression"/>
                                 </Record>
                                 <Record>
                                     <PropertyValue Property="Property" PropertyPath="DraftEntityCreationDateTime"/>
@@ -3118,6 +3768,8 @@
                                 <PropertyPath>ViewPDF</PropertyPath>
                                 <PropertyPath>ViewPDFText</PropertyPath>
                                 <PropertyPath>IsAdmin</PropertyPath>
+                                <PropertyPath>QRCode</PropertyPath>
+                                <PropertyPath>TimeStamp</PropertyPath>
                                 <PropertyPath>__CreateByAssociationControl</PropertyPath>
                                 <PropertyPath>__EntityControl</PropertyPath>
                                 <PropertyPath>__FieldControl</PropertyPath>
@@ -3135,6 +3787,8 @@
                                 <PropertyPath>ViewPDF</PropertyPath>
                                 <PropertyPath>ViewPDFText</PropertyPath>
                                 <PropertyPath>IsAdmin</PropertyPath>
+                                <PropertyPath>QRCode</PropertyPath>
+                                <PropertyPath>TimeStamp</PropertyPath>
                                 <PropertyPath>__CreateByAssociationControl</PropertyPath>
                                 <PropertyPath>__EntityControl</PropertyPath>
                                 <PropertyPath>__FieldControl</PropertyPath>
@@ -3594,12 +4248,6 @@
                             <PropertyValue Property="Value" Path="Erdat"/>
                             <Annotation Term="SAP__UI.Importance" EnumMember="SAP__UI.ImportanceType/High"/>
                         </Record>
-                        <Record Type="SAP__UI.DataFieldForIntentBasedNavigation">
-                            <PropertyValue Property="Label" String="Maintain Locations"/>
-                            <PropertyValue Property="SemanticObject" String="MaintVisitorLocation"/>
-                            <PropertyValue Property="Action" String="manage"/>
-                            <PropertyValue Property="RequiresContext" Bool="false"/>
-                        </Record>
                         <Record Type="SAP__UI.DataField">
                             <PropertyValue Property="Value" Path="Type"/>
                         </Record>
@@ -3650,6 +4298,7 @@
                         <PropertyPath>ReqNum</PropertyPath>
                         <PropertyPath>Type</PropertyPath>
                         <PropertyPath>Erdat</PropertyPath>
+                        <PropertyPath>Status</PropertyPath>
                     </Collection>
                 </Annotation>
                 <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
@@ -4399,7 +5048,7 @@
                 </Annotation>
                 <Annotation Term="SAP__common.DraftActivationVia">
                     <Collection>
-                        <String>SAP__self.Container/LocationMaster</String>
+                        <String>SAP__self.Container/BlockedVehicles</String>
                     </Collection>
                 </Annotation>
                 <Annotation Term="SAP__capabilities.SearchRestrictions">
@@ -4679,6 +5328,26 @@
             <Annotations Target="SAP__self.WorkflowLogType/StatsCriticality">
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/PlateTypDesc">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/PlateNum1Desc">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/PlateNum2Desc">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/PlateNum3Desc">
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Short Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
             <Annotations Target="SAP__self.VarListType/StatsCriticality">
                 <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
@@ -4736,6 +5405,12 @@
                 <Annotation Term="SAP__common.Label" String="Changed On"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Local Instance Last Change Date Time"/>
             </Annotations>
+            <Annotations Target="SAP__self.VarListType/ReturnMsg">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VarListType/ReturnType">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
             <Annotations Target="SAP__self.VarListType/HideApprovalLog">
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Truth Value"/>
@@ -4760,12 +5435,6 @@
                 <Annotation Term="SAP__UI.Hidden"/>
                 <Annotation Term="SAP__common.Label" String="Truth Value"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Truth Value: True/False"/>
-            </Annotations>
-            <Annotations Target="SAP__self.VehicleDetailsType/StickerValidText">
-                <Annotation Term="SAP__UI.Hidden"/>
-            </Annotations>
-            <Annotations Target="SAP__self.VehicleDetailsType/ViolationExistText">
-                <Annotation Term="SAP__UI.Hidden"/>
             </Annotations>
             <Annotations Target="SAP__self.VisitorDetailsType/IDTYPDesc">
                 <Annotation Term="SAP__UI.Hidden"/>
@@ -4880,6 +5549,57 @@
             <Annotations Target="SAP__self.MeansofTransportType/TransportDesc">
                 <Annotation Term="SAP__common.Label" String="Short Description"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Short Text for Fixed Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/__EntityControl/Deletable">
+                <Annotation Term="SAP__common.Label" String="Dyn. Method Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Method Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Method Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/__EntityControl/Updatable">
+                <Annotation Term="SAP__common.Label" String="Dyn. Method Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Method Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Method Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/__FieldControl/PlateNum1">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/__FieldControl/PlateNum2">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/__FieldControl/PlateNum3">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/__FieldControl/PlateTyp">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/__OperationControl/Edit">
+                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesType/__OperationControl/MarkDeleted">
+                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VisitorSearchType/NationalityDesc">
+                <Annotation Term="SAP__common.Label" String="Nationality (Long)"/>
+                <Annotation Term="SAP__common.Heading" String="Nationality"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Nationality (Max. 50 Characters)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VisitorSearchType/IdExpDate">
+                <Annotation Term="SAP__common.Label" String="Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.VisitorSearchType/Email">
+                <Annotation Term="SAP__common.Label" String="E-Mail Address"/>
             </Annotations>
             <Annotations Target="SAP__self.VisitorDetailsType/__EntityControl/Deletable">
                 <Annotation Term="SAP__common.Label" String="Dyn. Method Control"/>
@@ -5080,6 +5800,26 @@
                 <Annotation Term="SAP__common.Heading" String="Dynamic Method Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Method Property"/>
             </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesControl/PlateNum1">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesControl/PlateNum2">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesControl/PlateNum3">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesControl/PlateTyp">
+                <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Field Property"/>
+            </Annotations>
             <Annotations Target="SAP__self.VarListControl/BpName">
                 <Annotation Term="SAP__common.Label" String="Dyn. Field Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Field Control"/>
@@ -5119,6 +5859,16 @@
                 <Annotation Term="SAP__common.Label" String="Dynamic CbA-Control"/>
                 <Annotation Term="SAP__common.Heading" String="Dynamic Create by Association Control"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Dynamic Create via Association Control Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesOperationControl/Edit">
+                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
+            </Annotations>
+            <Annotations Target="SAP__self.BlockedVehiclesOperationControl/MarkDeleted">
+                <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
+                <Annotation Term="SAP__common.Heading" String="Dynamic Action Control"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Dynamic Action Property"/>
             </Annotations>
             <Annotations Target="SAP__self.LocationMasterOperationControl/DelReq">
                 <Annotation Term="SAP__common.Label" String="Dyn. Action Control"/>
@@ -5193,7 +5943,8 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Sequence Number"/>
             </Annotations>
             <Annotations Target="SAP__self.zhr_mob_veh_mstr/plate_typ">
-                <Annotation Term="SAP__common.Label" String="Vehicle Plate Type"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
             </Annotations>
             <Annotations Target="SAP__self.zhr_mob_veh_mstr/manufacturer">
                 <Annotation Term="SAP__common.Label" String="Manufacturer"/>
@@ -5202,13 +5953,16 @@
                 <Annotation Term="SAP__common.Label" String="Color"/>
             </Annotations>
             <Annotations Target="SAP__self.zhr_mob_veh_mstr/plate_num1">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.zhr_mob_veh_mstr/plate_num2">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.zhr_mob_veh_mstr/plate_num3">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.zhr_mob_veh_mstr/plate_num">
                 <Annotation Term="SAP__common.Label" String="License Plate Number"/>
@@ -5269,7 +6023,8 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Sequence Number"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_MOB_VAR_REQ_HDR/Vehicles/plate_typ">
-                <Annotation Term="SAP__common.Label" String="Vehicle Plate Type"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_MOB_VAR_REQ_HDR/Vehicles/manufacturer">
                 <Annotation Term="SAP__common.Label" String="Manufacturer"/>
@@ -5278,13 +6033,16 @@
                 <Annotation Term="SAP__common.Label" String="Color"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_MOB_VAR_REQ_HDR/Vehicles/plate_num1">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_MOB_VAR_REQ_HDR/Vehicles/plate_num2">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_MOB_VAR_REQ_HDR/Vehicles/plate_num3">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.ZHR_MOB_VAR_REQ_HDR/Vehicles/plate_num">
                 <Annotation Term="SAP__common.Label" String="License Plate Number"/>
@@ -5343,7 +6101,8 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Sequence Number"/>
             </Annotations>
             <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_2/Vehicles/plate_typ">
-                <Annotation Term="SAP__common.Label" String="Vehicle Plate Type"/>
+                <Annotation Term="SAP__common.Label" String="Plate Type"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Vehicle Plate Type"/>
             </Annotations>
             <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_2/Vehicles/manufacturer">
                 <Annotation Term="SAP__common.Label" String="Manufacturer"/>
@@ -5352,13 +6111,16 @@
                 <Annotation Term="SAP__common.Label" String="Color"/>
             </Annotations>
             <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_2/Vehicles/plate_num1">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_2/Vehicles/plate_num2">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_2/Vehicles/plate_num3">
-                <Annotation Term="SAP__common.Label" String="ZPLATE_NUM"/>
+                <Annotation Term="SAP__common.Label" String="Plate Letter"/>
+                <Annotation Term="SAP__common.QuickInfo" String="ZPLATE_NUM"/>
             </Annotations>
             <Annotations Target="SAP__self.SAP__VIRTUAL_CO_TY_2/Vehicles/plate_num">
                 <Annotation Term="SAP__common.Label" String="License Plate Number"/>
@@ -5453,6 +6215,10 @@
                 <Annotation Term="SAP__common.QuickInfo" String="Draft - Indicator - Is active document"/>
             </Annotations>
             <Annotations Target="SAP__self.Edit(SAP__self.VarListType)/PreserveChanges">
+                <Annotation Term="SAP__common.Label" String="TRUE"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Data element for domain BOOLE: TRUE (='X') and FALSE (=' ')"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Edit(SAP__self.BlockedVehiclesType)/PreserveChanges">
                 <Annotation Term="SAP__common.Label" String="TRUE"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Data element for domain BOOLE: TRUE (='X') and FALSE (=' ')"/>
             </Annotations>

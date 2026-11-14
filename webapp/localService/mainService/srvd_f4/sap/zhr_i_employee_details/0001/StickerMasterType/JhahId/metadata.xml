@@ -84,6 +84,14 @@
                 <Property Name="BusinessMobile" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="CellPhone" Type="Edm.String" Nullable="false" MaxLength="30"/>
                 <Property Name="Phone" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="ExpiryDate" Type="Edm.Date"/>
+                <Property Name="JobTypeKey" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="JobRoleType" Type="Edm.String" Nullable="false" MaxLength="50"/>
+                <Property Name="JobRoleTypeAR" Type="Edm.String" Nullable="false" MaxLength="50"/>
+                <Property Name="PhotoContent" Type="Edm.Binary" Nullable="false"/>
+                <Property Name="PhotoMimeType" Type="Edm.String" Nullable="false" MaxLength="128"/>
+                <Property Name="QRval" Type="Edm.String" Nullable="false" MaxLength="265"/>
+                <Property Name="timestamp" Type="Edm.Decimal" Nullable="false" Precision="15"/>
             </EntityType>
             <EntityContainer Name="Container">
                 <EntitySet Name="ZHR_I_EMPLOYEE_DETAILS" EntityType="com.sap.gateway.srvd_f4.zhr_i_employee_details.v0001.ZHR_I_EMPLOYEE_DETAILSType"/>
@@ -195,6 +203,16 @@
                 <Annotation Term="SAP__common.Label" String="System ID"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Communication Identification/Number"/>
             </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/JobTypeKey">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Employee subgroup"/>
+                <Annotation Term="SAP__common.Heading" String="ESgrp"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Employee Subgroup"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/PhotoMimeType">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Photo Mime Type"/>
+            </Annotations>
             <Annotations Target="SAP__ParentService.StickerMasterType/JhahId">
                 <Annotation Term="SAP__common.ValueListMapping">
                     <Record>
@@ -297,6 +315,30 @@
                                 </Record>
                                 <Record Type="SAP__common.ValueListParameterDisplayOnly">
                                     <PropertyValue Property="ValueListProperty" String="Phone"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="ExpiryDate"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="JobTypeKey"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="JobRoleType"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="JobRoleTypeAR"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="PhotoContent"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="PhotoMimeType"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="QRval"/>
+                                </Record>
+                                <Record Type="SAP__common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="timestamp"/>
                                 </Record>
                             </Collection>
                         </PropertyValue>
@@ -420,6 +462,13 @@
             <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/Gender">
                 <Annotation Term="SAP__common.Label" String="Gender"/>
                 <Annotation Term="SAP__common.QuickInfo" String="Texts for Gender"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/ExpiryDate">
+                <Annotation Term="SAP__common.Label" String="Expiry Date"/>
+                <Annotation Term="SAP__common.Heading" String="ID Expiry Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.ZHR_I_EMPLOYEE_DETAILSType/PhotoContent">
+                <Annotation Term="SAP__common.Label" String="Photo Content"/>
             </Annotations>
         </Schema>
     </edmx:DataServices>

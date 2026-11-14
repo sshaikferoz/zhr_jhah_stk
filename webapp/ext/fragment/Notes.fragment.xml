@@ -1,0 +1,19 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:macros="sap.fe.macros">
+	<VBox
+            width="65%"
+            class="notesSection">
+
+            <VBox>
+
+                <Text
+                    text="1.Maximum 2 stickers can be requested for NEW type."
+                    wrapping="true"/>
+
+                <Text
+                    text="2. Vehicle Registration and valid Driving Licence documents are mandatory for New and Renew Sticker Type."
+                    wrapping="true"/>
+
+            </VBox>
+
+        </VBox>
+</core:FragmentDefinition>

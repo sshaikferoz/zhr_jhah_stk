@@ -154,58 +154,131 @@
     display: none !important;
 }
 
+.notesSection {
+    margin-top: 1rem;
+}
+
+.notesSection .sapMText {
+    font-size: 0.75rem;
+    color: #444444;
+    line-height: 1.4rem;
+}
+
 /* ========================================================= */
-/* 1. HEADER STRIP (BLENDED LAYOUT)                          */
+/* HEADER LAYOUT: strip on its own full-width row            */
+/* ========================================================= */
+.zhrjhahsecstk-app .sapUxAPObjectPageHeaderContent > .sapMFlexBox {
+    flex-wrap: wrap !important;
+}
+ 
+/* Facet that wraps the strip: layout only, no card look */
+.zhrjhahsecstk-app .sapUxAPObjectPageHeaderContentItem:has(.nativeViolatorStrip),
+.zhrjhahsecstk-app [id*="::HeaderFacet::"]:has(.nativeViolatorStrip) {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    order: 99 !important;
+    box-sizing: border-box !important;
+    margin: 0.5rem 0 0 0 !important;
+    padding: 0 !important;
+}
+ 
+/* ========================================================= */
+/* HEADER STRIP (the only visible card in that row)          */
 /* ========================================================= */
 .zhrjhahsecstk-app .nativeViolatorStrip {
-    flex-basis: 100%;
-    width: 100%;
-    margin-bottom: 1rem;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    flex-basis: 100% !important;
+    width: 100% !important;
+    margin-bottom: 0.5rem !important;
+    padding: 0.5rem 1rem !important;
+    background: #ffffff !important;
+    background-image: none !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04) !important;
+    transition: box-shadow 0.2s ease-in-out !important;
 }
-
-.zhrjhahsecstk-app .violatorCard {
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0.5rem 0;
+ 
+.zhrjhahsecstk-app .nativeViolatorStrip:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08) !important;
 }
-
+ 
 .zhrjhahsecstk-app .violatorCol {
-    flex: 1 1 auto;
-    margin-right: 1.5rem;
-    margin-bottom: 0.25rem;
+    margin-right: 2rem !important;
+    margin-bottom: 0.25rem !important;
 }
-
-.zhrjhahsecstk-app .violatorCol:last-child {
-    margin-right: 0;
-}
-
-/* ========================================================= */
-/* 2. HEADER STRIP ALIGNMENT                                 */
-/* ========================================================= */
+ 
 .zhrjhahsecstk-app .violatorRow {
     align-items: center !important;
-    margin-bottom: 6px !important;
+    margin-bottom: 2px !important;
 }
-
+ 
 .zhrjhahsecstk-app .violatorLabel {
     font-size: 0.8125rem !important;
     color: #6a6d70 !important;
-    margin-right: 4px !important;
     line-height: normal !important;
+    margin-right: 4px !important;
+    margin-inline-end: 4px !important;
 }
-
+ 
 .zhrjhahsecstk-app .violatorValue {
     font-size: 0.8125rem !important;
     color: #32363a !important;
     font-weight: 600 !important;
     line-height: normal !important;
+    text-transform: uppercase !important;
 }
-
+ 
+/* ========================================================= */
+/* 3. KPI CARDS (TOP BOXES) - hover animations & shadows     */
+/* Skips the facet that holds the strip                      */
+/* ========================================================= */
+.zhrjhahsecstk-app .sapUxAPObjectPageHeaderContentItem:not(:has(.nativeViolatorStrip)),
+.zhrjhahsecstk-app [id*="::HeaderFacet::"]:not(:has(.nativeViolatorStrip)) {
+    background: #ffffff !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03) !important;
+    padding: 0.75rem 1.25rem !important;
+    margin-right: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+    transition: all 0.2s ease-in-out !important;
+}
+ 
+.zhrjhahsecstk-app .sapUxAPObjectPageHeaderContentItem:not(:has(.nativeViolatorStrip)):hover,
+.zhrjhahsecstk-app [id*="::HeaderFacet::"]:not(:has(.nativeViolatorStrip)):hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-3px) !important;
+}
+ 
+.zhrjhahsecstk-app .sapUxAPObjectPageHeaderContentItem:not(:has(.nativeViolatorStrip)) :is(.sapMText, .sapMTitle, .sapMLabel, .sapMObjectNumberText, .sapMObjectNumberTitle),
+.zhrjhahsecstk-app [id*="::HeaderFacet::"]:not(:has(.nativeViolatorStrip)) :is(.sapMText, .sapMTitle, .sapMLabel, .sapMObjectNumberText, .sapMObjectNumberTitle) {
+    font-weight: bold !important;
+}
+ 
+/* ========================================================= */
+/* Parents of the strip: never a card, not even on hover     */
+/* (keep this block AFTER the KPI card rules above)          */
+/* ========================================================= */
+.zhrjhahsecstk-app :has(> .nativeViolatorStrip),
+.zhrjhahsecstk-app :has(> * > .nativeViolatorStrip),
+.zhrjhahsecstk-app :has(> .nativeViolatorStrip):hover,
+.zhrjhahsecstk-app :has(> * > .nativeViolatorStrip):hover {
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    padding: 0 !important;
+}
+ 
 /* ========================================================= */
 /* 3. FIELD GROUP VALUE ALIGNMENT                            */
 /* Applies only to JHAH custom themes                        */
 /* ========================================================= */
+ 
 /* Remove custom indentation from form values */
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"]>dd {
     margin: 0 !important;
@@ -213,7 +286,7 @@ html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"]>dd {
     padding: 0 !important;
     padding-inline-start: 0 !important;
 }
-
+ 
 /* Stretch value container */
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapUiFormElementContent,
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] [id$="Field-content"] {
@@ -221,7 +294,7 @@ html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] [id$="Field-content"] {
     margin: 0 !important;
     padding: 0 !important;
 }
-
+ 
 /* Align field values */
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMText,
 html[class*="sapUiTheme-JHAH"] [id*="::FormElement::"] .sapMTextMaxWidth,
@@ -289,33 +362,35 @@ html[class*="sapUiTheme-JHAH"] .sapUiFormElement {
 [id$="-fu_button"] .sapMBtnInner::after {
     content: "Upload File";
 }
-[id*="VehicleSpecFacet"][id$="PlateTyp-label"]::after,
-[id*="VehicleSpecFacet"][id$="PlateNum-label"]::after,
-[id*="VehicleSpecFacet"][id$="Manufacturer-label"]::after,
-[id*="VehicleSpecFacet"][id$="Color-label"]::after,
-[id*="VehicleSpecFacet"][id$="PlateNum1-label"]::after,
-[id*="VehicleSpecFacet"][id$="PlateNum2-label"]::after,
-[id*="VehicleSpecFacet"][id$="PlateNum3-label"]::after,
+/* Mandatory asterisks: only while a request is created or edited (draftMode),
+   not in display mode */
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="PlateTyp-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="PlateNum-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="Manufacturer-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="Color-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="PlateNum1-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="PlateNum2-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="VehicleSpecFacet"][id$="PlateNum3-label"]::after,
 
 /* Appointment Specification */
-[id*="AppointSpecFacet"][id$="AppointmentDatePicker-label"]::after,
-[id*="AppointSpecFacet"][id$="TimeSlotSelect-label"]::after,
-[id*="AppointSpecFacet"][id$="AppointmentLocation-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="AppointSpecFacet"][id$="AppointmentDatePicker-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="AppointSpecFacet"][id$="TimeSlotSelect-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="AppointSpecFacet"][id$="AppointmentLocation-label"]::after,
 
 
 /* Request Group */
-[id*="RequestGrpFacet"][id$="Location-label"]::after,
-[id*="RequestGrpFacet"][id$="StkType-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="RequestGrpFacet"][id$="Location-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="RequestGrpFacet"][id$="StkType-label"]::after,
 
 
 /* Justification, Remarks, Reason and Reject Justification labels */
-[id*="JustReasonFacet"][id$="Justification-label"]::after,
-[id*="JustReasonFacet"][id$="Remarks-label"]::after,
-[id*="JustReasonFacet"][id$="Reason-label"]::after,
-[id*="JustReasonFacet"][id$="RejectJust-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="JustReasonFacet"][id$="Justification-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="JustReasonFacet"][id$="Remarks-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="JustReasonFacet"][id$="Reason-label"]::after,
+.zhrjhahsecstk-app.draftMode [id*="JustReasonFacet"][id$="RejectJust-label"]::after,
 
 
-[id$="_Evidence::LineItem-title"]::after
+.zhrjhahsecstk-app.draftMode [id$="_Evidence::LineItem-title"]::after
 
 {
     content: " *";
